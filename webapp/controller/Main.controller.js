@@ -259,6 +259,9 @@ sap.ui.define([
          */
         _onSmartFilterBarInitialized: function(oEvent) {
             console.log("[_onSmartFilterBarInitialized] SmartFilterBar initialized event fired");
+            const oSmartFilterBar = oEvent.getSource();
+            console.log("[_onSmartFilterBarInitialized] SmartFilterBar isInitialised:", typeof oSmartFilterBar.isInitialised === "function" ? oSmartFilterBar.isInitialised() : "method not available");
+            
             // Now we can safely ensure filter controls are visible
             this._ensureFilterControlsVisible();
         },
@@ -390,6 +393,14 @@ sap.ui.define([
 
                         if (sKey === "CountryList" || sKey === "CompanyCodeList") {
                             console.log(`[_ensureFilterControlsVisible] Found target filter item: ${sKey}`);
+                            
+                            // Log current state
+                            console.log(`[_ensureFilterControlsVisible] ${sKey} current state:`, {
+                                visible: oFilterItem.getVisible ? oFilterItem.getVisible() : "N/A",
+                                visibleInAdvancedArea: oFilterItem.getVisibleInAdvancedArea ? oFilterItem.getVisibleInAdvancedArea() : "N/A",
+                                getParent: typeof oFilterItem.getParent === "function" ? "exists" : "N/A"
+                            });
+                            
                             if (typeof oFilterItem.setVisible === "function") {
                                 oFilterItem.setVisible(true);
                                 console.log(`[_ensureFilterControlsVisible] Set ${sKey} visible:`, oFilterItem.getVisible ? oFilterItem.getVisible() : "N/A");
@@ -398,9 +409,42 @@ sap.ui.define([
                             }
                             if (typeof oFilterItem.setVisibleInAdvancedArea === "function") {
                                 oFilterItem.setVisibleInAdvancedArea(false);
-                                console.log(`[_ensureFilterControlsVisible] Set ${sKey} visibleInAdvancedArea: false`);
+                                console.log(`[_ensureFilterControlsVisible] Set ${sKey} visibleInAdvancedArea: false, actual:`, oFilterItem.getVisibleInAdvancedArea ? oFilterItem.getVisibleInAdvancedArea() : "N/A");
                             } else {
                                 console.warn(`[_ensureFilterControlsVisible] ${sKey} filterItem has no setVisibleInAdvancedArea method`);
+                            }
+                            
+                            // Try to get the control from the filter item and ensure it's visible
+                            if (typeof oFilterItem.getControl === "function") {
+                                const oFilterControl = oFilterItem.getControl();
+                                if (oFilterControl) {
+                                    console.log(`[_ensureFilterControlsVisible] ${sKey} filter control:`, oFilterControl.getId(), oFilterControl.getMetadata().getName());
+                                    if (typeof oFilterControl.setVisible === "function") {
+                                        oFilterControl.setVisible(true);
+                                        console.log(`[_ensureFilterControlsVisible] ${sKey} filter control visible:`, oFilterControl.getVisible());
+                                    }
+                                    // Check if control has a DOM reference
+                                    const oDomRef = oFilterControl.getDomRef ? oFilterControl.getDomRef() : null;
+                                    console.log(`[_ensureFilterControlsVisible] ${sKey} filter control DOM ref:`, oDomRef ? "exists" : "null");
+                                } else {
+                                    console.warn(`[_ensureFilterControlsVisible] ${sKey} filterItem.getControl() returned null`);
+                                }
+                            }
+                            
+                            // Check if filter item has a DOM reference
+                            const oFilterItemDomRef = oFilterItem.getDomRef ? oFilterItem.getDomRef() : null;
+                            console.log(`[_ensureFilterControlsVisible] ${sKey} filter item DOM ref:`, oFilterItemDomRef ? "exists" : "null");
+                            
+                            // Try to get parent and ensure it's visible
+                            if (typeof oFilterItem.getParent === "function") {
+                                const oParent = oFilterItem.getParent();
+                                if (oParent) {
+                                    console.log(`[_ensureFilterControlsVisible] ${sKey} filter item parent:`, oParent.getId(), oParent.getMetadata().getName());
+                                    if (typeof oParent.setVisible === "function") {
+                                        oParent.setVisible(true);
+                                        console.log(`[_ensureFilterControlsVisible] ${sKey} filter item parent visible:`, oParent.getVisible());
+                                    }
+                                }
                             }
                         }
                     });
@@ -414,6 +458,42 @@ sap.ui.define([
                     oSmartFilterBar.setFilterBarExpanded(true);
                 } else {
                     console.log("[_ensureFilterControlsVisible] setFilterBarExpanded method not available");
+                }
+                
+                // Try to get the FilterGroup and show items there
+                if (typeof oSmartFilterBar.getFilterGroup === "function") {
+                    const oFilterGroup = oSmartFilterBar.getFilterGroup();
+                    console.log("[_ensureFilterControlsVisible] FilterGroup:", oFilterGroup ? oFilterGroup.getId() : "null");
+                    if (oFilterGroup) {
+                        // Try to get all group items
+                        if (typeof oFilterGroup.getGroupItems === "function") {
+                            const aGroupItems = oFilterGroup.getGroupItems();
+                            console.log("[_ensureFilterControlsVisible] FilterGroup items:", aGroupItems ? aGroupItems.length : "null");
+                        }
+                    }
+                }
+                
+                // Try to use showFilterItem method if available
+                if (typeof oSmartFilterBar.showFilterItem === "function") {
+                    console.log("[_ensureFilterControlsVisible] Using showFilterItem method");
+                    oSmartFilterBar.showFilterItem("CountryList");
+                    oSmartFilterBar.showFilterItem("CompanyCodeList");
+                } else {
+                    console.log("[_ensureFilterControlsVisible] showFilterItem method not available");
+                }
+                
+                // Check if SmartFilterBar has a method to show filters in basic area
+                if (typeof oSmartFilterBar.showFiltersInBasicArea === "function") {
+                    console.log("[_ensureFilterControlsVisible] Using showFiltersInBasicArea method");
+                    oSmartFilterBar.showFiltersInBasicArea(["CountryList", "CompanyCodeList"]);
+                } else {
+                    console.log("[_ensureFilterControlsVisible] showFiltersInBasicArea method not available");
+                }
+                
+                // Force a re-render or update of the SmartFilterBar
+                if (typeof oSmartFilterBar.invalidate === "function") {
+                    console.log("[_ensureFilterControlsVisible] Invalidating SmartFilterBar to force re-render");
+                    oSmartFilterBar.invalidate();
                 }
             } catch (oError) {
                 console.error("[_ensureFilterControlsVisible] Error:", oError);

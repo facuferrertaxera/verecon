@@ -6,9 +6,17 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/ui/model/json/JSONModel",
+    "sap/ui/comp/valuehelpdialog/ValueHelpDialog",
+    "sap/ui/table/Column",
+    "sap/m/Column",
+    "sap/m/Text",
+    "sap/m/Label",
+    "sap/m/ColumnListItem",
+    "sap/m/SearchField",
+    "sap/m/Token",
     "tech/taxera/taxreporting/verecon/utils/types",
     "tech/taxera/taxreporting/verecon/utils/formatter"
-], (Controller, Sorter, MessageToast, MessageBox, Filter, FilterOperator, JSONModel, types, formatter) => {
+], (Controller, Sorter, MessageToast, MessageBox, Filter, FilterOperator, JSONModel, ValueHelpDialog, UITableColumn, MColumn, Text, Label, ColumnListItem, SearchField, Token, types, formatter) => {
     "use strict";
 
     const MainController = Controller.extend("tech.taxera.taxreporting.verecon.controller.Main", {
@@ -340,40 +348,93 @@ sap.ui.define([
          * Handler for country value help request
          */
         onCountryValueHelpRequest: function(oEvent) {
-            const oDialog = this.getView().byId("countryValueHelpDialog");
-            const oViewModel = this.getView().getModel("view");
-            const aSelectedCountries = oViewModel.getProperty("/filters/selectedCountries") || [];
+            const oVHD = this.getView().byId("countryValueHelpDialog");
+            const oMultiInput = this.byId("countryListFilter");
+            const oModel = this.getModel();
             
-            // Update selection state in available countries
-            const aAvailableCountries = oViewModel.getProperty("/filters/availableCountries") || [];
-            aAvailableCountries.forEach((oCountry) => {
-                oCountry.selected = aSelectedCountries.includes(oCountry.code);
+            if (!oVHD || !oModel) {
+                return;
+            }
+
+            // Set tokens from MultiInput
+            oVHD.setTokens(oMultiInput.getTokens());
+            
+            // Get table and set up binding
+            oVHD.getTableAsync().then((oTable) => {
+                oTable.setModel(oModel);
+                
+                // For Desktop - sap.ui.table.Table
+                if (oTable.bindRows) {
+                    oTable.bindAggregation("rows", {
+                        path: "/Country",
+                        events: {
+                            dataReceived: () => {
+                                oVHD.update();
+                            }
+                        }
+                    });
+                    
+                    // Add columns if not already added
+                    if (oTable.getColumns().length === 0) {
+                        const oColumnCountry = new UITableColumn({
+                            label: new Label({text: this.i18n("reconciliationList.CountryList")}),
+                            template: new Text({text: "{Country}"})
+                        });
+                        oColumnCountry.data("fieldName", "Country");
+                        
+                        const oColumnName = new UITableColumn({
+                            label: new Label({text: this.i18n("reconciliationList.CountryName")}),
+                            template: new Text({text: "{Country_Text}"})
+                        });
+                        oColumnName.data("fieldName", "Country_Text");
+                        
+                        oTable.addColumn(oColumnCountry);
+                        oTable.addColumn(oColumnName);
+                    }
+                }
+                
+                // For Mobile - sap.m.Table
+                if (oTable.bindItems) {
+                    oTable.bindAggregation("items", {
+                        path: "/Country",
+                        template: new ColumnListItem({
+                            cells: [
+                                new Label({text: "{Country}"}),
+                                new Label({text: "{Country_Text}"})
+                            ]
+                        }),
+                        events: {
+                            dataReceived: () => {
+                                oVHD.update();
+                            }
+                        }
+                    });
+                    
+                    if (oTable.getColumns().length === 0) {
+                        oTable.addColumn(new MColumn({header: new Label({text: this.i18n("reconciliationList.CountryList")})}));
+                        oTable.addColumn(new MColumn({header: new Label({text: this.i18n("reconciliationList.CountryName")})}));
+                    }
+                }
+                
+                oVHD.update();
             });
-            oViewModel.setProperty("/filters/availableCountries", aAvailableCountries);
             
-            oDialog.open();
+            oVHD.open();
         },
 
         /**
-         * Handler for country value help confirm
+         * Handler for country value help OK
          */
-        onCountryValueHelpConfirm: function() {
-            const oDialog = this.getView().byId("countryValueHelpDialog");
-            const oList = this.getView().byId("countryList");
+        onCountryValueHelpOk: function(oEvent) {
+            const aTokens = oEvent.getParameter("tokens");
+            const oMultiInput = this.byId("countryListFilter");
             const oViewModel = this.getView().getModel("view");
             
-            // Get selected items
-            const aSelectedItems = oList.getSelectedItems();
-            const aSelectedCountries = aSelectedItems.map((oItem) => {
-                return oItem.getBindingContext("view").getObject().code;
-            });
+            oMultiInput.setTokens(aTokens);
             
-            // Update view model
+            // Extract selected country codes from tokens
+            const aSelectedCountries = aTokens.map((oToken) => oToken.getKey());
             oViewModel.setProperty("/filters/selectedCountries", aSelectedCountries);
-            oViewModel.setProperty("/filters/selectedCountriesDisplay", aSelectedCountries.join(", ") || "");
-            
-            // Close dialog
-            oDialog.close();
             
             // Trigger filter refresh
             const oSmartFilterBar = this.getView().byId("smartFilterBar");
@@ -386,48 +447,108 @@ sap.ui.define([
          * Handler for country value help cancel
          */
         onCountryValueHelpCancel: function() {
-            const oDialog = this.getView().byId("countryValueHelpDialog");
-            oDialog.close();
+            const oVHD = this.getView().byId("countryValueHelpDialog");
+            oVHD.close();
+        },
+
+        /**
+         * Handler for country value help after close
+         */
+        onCountryValueHelpAfterClose: function() {
+            // Cleanup if needed
         },
 
         /**
          * Handler for company code value help request
          */
         onCompanyCodeValueHelpRequest: function(oEvent) {
-            const oDialog = this.getView().byId("companyCodeValueHelpDialog");
-            const oViewModel = this.getView().getModel("view");
-            const aSelectedCompanyCodes = oViewModel.getProperty("/filters/selectedCompanyCodes") || [];
+            const oVHD = this.getView().byId("companyCodeValueHelpDialog");
+            const oMultiInput = this.byId("companyCodeListFilter");
+            const oModel = this.getModel();
             
-            // Update selection state in available company codes
-            const aAvailableCompanyCodes = oViewModel.getProperty("/filters/availableCompanyCodes") || [];
-            aAvailableCompanyCodes.forEach((oCompanyCode) => {
-                oCompanyCode.selected = aSelectedCompanyCodes.includes(oCompanyCode.code);
+            if (!oVHD || !oModel) {
+                return;
+            }
+
+            // Set tokens from MultiInput
+            oVHD.setTokens(oMultiInput.getTokens());
+            
+            // Get table and set up binding
+            oVHD.getTableAsync().then((oTable) => {
+                oTable.setModel(oModel);
+                
+                // For Desktop - sap.ui.table.Table
+                if (oTable.bindRows) {
+                    oTable.bindAggregation("rows", {
+                        path: "/CompanyVH",
+                        events: {
+                            dataReceived: () => {
+                                oVHD.update();
+                            }
+                        }
+                    });
+                    
+                    // Add columns if not already added
+                    if (oTable.getColumns().length === 0) {
+                        const oColumnCode = new UITableColumn({
+                            label: new Label({text: this.i18n("reconciliationList.CompanyCodeList")}),
+                            template: new Text({text: "{CompanyCode}"})
+                        });
+                        oColumnCode.data("fieldName", "CompanyCode");
+                        
+                        const oColumnName = new UITableColumn({
+                            label: new Label({text: this.i18n("reconciliationList.CompanyName")}),
+                            template: new Text({text: "{Name}"})
+                        });
+                        oColumnName.data("fieldName", "Name");
+                        
+                        oTable.addColumn(oColumnCode);
+                        oTable.addColumn(oColumnName);
+                    }
+                }
+                
+                // For Mobile - sap.m.Table
+                if (oTable.bindItems) {
+                    oTable.bindAggregation("items", {
+                        path: "/CompanyVH",
+                        template: new ColumnListItem({
+                            cells: [
+                                new Label({text: "{CompanyCode}"}),
+                                new Label({text: "{Name}"})
+                            ]
+                        }),
+                        events: {
+                            dataReceived: () => {
+                                oVHD.update();
+                            }
+                        }
+                    });
+                    
+                    if (oTable.getColumns().length === 0) {
+                        oTable.addColumn(new MColumn({header: new Label({text: this.i18n("reconciliationList.CompanyCodeList")})}));
+                        oTable.addColumn(new MColumn({header: new Label({text: this.i18n("reconciliationList.CompanyName")})}));
+                    }
+                }
+                
+                oVHD.update();
             });
-            oViewModel.setProperty("/filters/availableCompanyCodes", aAvailableCompanyCodes);
             
-            oDialog.open();
+            oVHD.open();
         },
 
         /**
-         * Handler for company code value help confirm
+         * Handler for company code value help OK
          */
-        onCompanyCodeValueHelpConfirm: function() {
-            const oDialog = this.getView().byId("companyCodeValueHelpDialog");
-            const oList = this.getView().byId("companyCodeList");
+        onCompanyCodeValueHelpOk: function(oEvent) {
+            const aTokens = oEvent.getParameter("tokens");
+            const oMultiInput = this.byId("companyCodeListFilter");
             const oViewModel = this.getView().getModel("view");
             
-            // Get selected items
-            const aSelectedItems = oList.getSelectedItems();
-            const aSelectedCompanyCodes = aSelectedItems.map((oItem) => {
-                return oItem.getBindingContext("view").getObject().code;
-            });
+            oMultiInput.setTokens(aTokens);
             
-            // Update view model
+            // Extract selected company codes from tokens
+            const aSelectedCompanyCodes = aTokens.map((oToken) => oToken.getKey());
             oViewModel.setProperty("/filters/selectedCompanyCodes", aSelectedCompanyCodes);
-            oViewModel.setProperty("/filters/selectedCompanyCodesDisplay", aSelectedCompanyCodes.join(", ") || "");
-            
-            // Close dialog
-            oDialog.close();
             
             // Trigger filter refresh
             const oSmartFilterBar = this.getView().byId("smartFilterBar");
@@ -440,8 +561,15 @@ sap.ui.define([
          * Handler for company code value help cancel
          */
         onCompanyCodeValueHelpCancel: function() {
-            const oDialog = this.getView().byId("companyCodeValueHelpDialog");
-            oDialog.close();
+            const oVHD = this.getView().byId("companyCodeValueHelpDialog");
+            oVHD.close();
+        },
+
+        /**
+         * Handler for company code value help after close
+         */
+        onCompanyCodeValueHelpAfterClose: function() {
+            // Cleanup if needed
         }
     });
 

@@ -7,6 +7,7 @@
     xmlns:st="sap.ui.comp.smarttable"
     xmlns:sfb="sap.ui.comp.smartfilterbar"
     xmlns:sv="sap.ui.comp.smartvariants"
+    xmlns:vhd="sap.ui.comp.valuehelpdialog"
     xmlns:customData="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
     <f:DynamicPage id="dynamicPageId" class="sapUiNoContentPadding" headerExpanded="{view>/reconciliationList/headerExpanded}" busyIndicatorDelay="{view>/busyIndicatorDelay}">
         <f:title>
@@ -48,12 +49,12 @@
                         <sfb:controlConfiguration>
                             <sfb:ControlConfiguration key="CountryList" visibleInAdvancedArea="false" visible="true" label="{i18n>reconciliationList.CountryList}">
                                 <sfb:customControl>
-                                    <Input id="countryListFilter" value="{view>/filters/selectedCountriesDisplay}" placeholder="{i18n>reconciliationList.SelectCountries}" showValueHelp="true" valueHelpRequest="onCountryValueHelpRequest"/>
+                                    <MultiInput id="countryListFilter" valueHelpRequest="onCountryValueHelpRequest" showValueHelp="true" placeholder="{i18n>reconciliationList.SelectCountries}"/>
                                 </sfb:customControl>
                             </sfb:ControlConfiguration>
                             <sfb:ControlConfiguration key="CompanyCodeList" visibleInAdvancedArea="false" visible="true" label="{i18n>reconciliationList.CompanyCodeList}">
                                 <sfb:customControl>
-                                    <Input id="companyCodeListFilter" value="{view>/filters/selectedCompanyCodesDisplay}" placeholder="{i18n>reconciliationList.SelectCompanyCodes}" showValueHelp="true" valueHelpRequest="onCompanyCodeValueHelpRequest"/>
+                                    <MultiInput id="companyCodeListFilter" valueHelpRequest="onCompanyCodeValueHelpRequest" showValueHelp="true" placeholder="{i18n>reconciliationList.SelectCompanyCodes}"/>
                                 </sfb:customControl>
                             </sfb:ControlConfiguration>
                             <sfb:ControlConfiguration key="ConvCreatedAt" label="{i18n>reconciliationList.CreatedAt}" conditionType="{
@@ -68,34 +69,24 @@
                         </sfb:layoutData>
                         <sfb:dependents>
                             <!-- Value Help Dialog for Countries -->
-                            <Dialog id="countryValueHelpDialog" title="{i18n>reconciliationList.SelectCountries}" contentWidth="500px" contentHeight="600px">
-                                <content>
-                                    <List id="countryList" mode="MultiSelect" items="{view>/filters/availableCountries}">
-                                        <StandardListItem title="{view>code}" description="{view>name}" selected="{view>selected}"/>
-                                    </List>
-                                </content>
-                                <beginButton>
-                                    <Button text="{i18n>common.OK}" type="Emphasized" press="onCountryValueHelpConfirm"/>
-                                </beginButton>
-                                <endButton>
-                                    <Button text="{i18n>common.Cancel}" press="onCountryValueHelpCancel"/>
-                                </endButton>
-                            </Dialog>
+                            <vhd:ValueHelpDialog id="countryValueHelpDialog" 
+                                title="{i18n>reconciliationList.SelectCountries}"
+                                ok="onCountryValueHelpOk"
+                                cancel="onCountryValueHelpCancel"
+                                afterClose="onCountryValueHelpAfterClose"
+                                key="Country"
+                                descriptionKey="Country_Text"
+                                supportMultiselect="true"/>
                             
                             <!-- Value Help Dialog for Company Codes -->
-                            <Dialog id="companyCodeValueHelpDialog" title="{i18n>reconciliationList.SelectCompanyCodes}" contentWidth="500px" contentHeight="600px">
-                                <content>
-                                    <List id="companyCodeList" mode="MultiSelect" items="{view>/filters/availableCompanyCodes}">
-                                        <StandardListItem title="{view>code}" description="{view>name}" selected="{view>selected}"/>
-                                    </List>
-                                </content>
-                                <beginButton>
-                                    <Button text="{i18n>common.OK}" type="Emphasized" press="onCompanyCodeValueHelpConfirm"/>
-                                </beginButton>
-                                <endButton>
-                                    <Button text="{i18n>common.Cancel}" press="onCompanyCodeValueHelpCancel"/>
-                                </endButton>
-                            </Dialog>
+                            <vhd:ValueHelpDialog id="companyCodeValueHelpDialog" 
+                                title="{i18n>reconciliationList.SelectCompanyCodes}"
+                                ok="onCompanyCodeValueHelpOk"
+                                cancel="onCompanyCodeValueHelpCancel"
+                                afterClose="onCompanyCodeValueHelpAfterClose"
+                                key="CompanyCode"
+                                descriptionKey="Name"
+                                supportMultiselect="true"/>
                         </sfb:dependents>
                     </sfb:SmartFilterBar>
                 </f:content>

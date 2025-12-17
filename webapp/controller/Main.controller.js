@@ -411,8 +411,23 @@ sap.ui.define([
                 return;
             }
 
-            // Set tokens from MultiInput
-            oVHD.setTokens(oMultiInput.getTokens());
+            // Clear existing tokens first to prevent duplication
+            const aExistingTokens = oVHD.getTokens();
+            if (aExistingTokens && aExistingTokens.length > 0) {
+                aExistingTokens.forEach((oToken) => {
+                    oVHD.removeToken(oToken);
+                });
+            }
+            
+            // Clone tokens from MultiInput to avoid reference issues
+            const aTokens = oMultiInput.getTokens();
+            const aClonedTokens = aTokens.map((oToken) => {
+                return new Token({
+                    key: oToken.getKey(),
+                    text: oToken.getText()
+                });
+            });
+            oVHD.setTokens(aClonedTokens);
             
             // Get table and set up binding
             oVHD.getTableAsync().then((oTable) => {
@@ -531,8 +546,23 @@ sap.ui.define([
                 return;
             }
 
-            // Set tokens from MultiInput
-            oVHD.setTokens(oMultiInput.getTokens());
+            // Clear existing tokens first to prevent duplication
+            const aExistingTokens = oVHD.getTokens();
+            if (aExistingTokens && aExistingTokens.length > 0) {
+                aExistingTokens.forEach((oToken) => {
+                    oVHD.removeToken(oToken);
+                });
+            }
+            
+            // Clone tokens from MultiInput to avoid reference issues
+            const aTokens = oMultiInput.getTokens();
+            const aClonedTokens = aTokens.map((oToken) => {
+                return new Token({
+                    key: oToken.getKey(),
+                    text: oToken.getText()
+                });
+            });
+            oVHD.setTokens(aClonedTokens);
             
             // Get table and set up binding
             oVHD.getTableAsync().then((oTable) => {

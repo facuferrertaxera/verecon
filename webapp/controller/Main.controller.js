@@ -232,7 +232,7 @@ sap.ui.define([
                 setTimeout(() => {
                     try {
                         // Get the filter items and ensure CountryList and CompanyCodeList are visible
-                        const aFilterItems = oSmartFilterBar.getFilterItems();
+                        const aFilterItems = oSmartFilterBar.getAllFilterItems();
                         aFilterItems.forEach((oFilterItem) => {
                             const sName = oFilterItem.getName();
                             if (sName === "CountryList" || sName === "CompanyCodeList") {

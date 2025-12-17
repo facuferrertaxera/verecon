@@ -11,7 +11,7 @@ sap.ui.define([
         TaxeraDateType: DateType.extend("tech.taxera.taxreporting.verecon.utils.types.TaxeraDateType", {
             constructor: function(oFormatOptions, oConstraints) {
                 DateType.call(this, {
-                    pattern: "yyyy-MM-dd",
+                    //pattern: "yyyy-MM-dd",
                     ...oFormatOptions
                 }, oConstraints);
             }
@@ -23,7 +23,7 @@ sap.ui.define([
         TaxeraDateTimeType: DateTimeType.extend("tech.taxera.taxreporting.verecon.utils.types.TaxeraDateTimeType", {
             constructor: function(oFormatOptions, oConstraints) {
                 DateTimeType.call(this, {
-                    pattern: "yyyy-MM-dd HH:mm:ss",
+                    //pattern: "yyyy-MM-dd HH:mm:ss",
                     ...oFormatOptions
                 }, oConstraints);
             }

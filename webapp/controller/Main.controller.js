@@ -495,6 +495,73 @@ sap.ui.define([
                     console.log("[_ensureFilterControlsVisible] Invalidating SmartFilterBar to force re-render");
                     oSmartFilterBar.invalidate();
                 }
+                
+                // Wait a bit and check DOM again - controls might render after invalidate
+                setTimeout(() => {
+                    console.log("[_ensureFilterControlsVisible] Checking DOM after invalidate...");
+                    const oCountryInputCheck = this.getView().byId("countryListFilter");
+                    const oCompanyCodeInputCheck = this.getView().byId("companyCodeListFilter");
+                    
+                    if (oCountryInputCheck) {
+                        const oCountryDomRef = oCountryInputCheck.getDomRef ? oCountryInputCheck.getDomRef() : null;
+                        console.log("[_ensureFilterControlsVisible] CountryInput DOM ref after invalidate:", oCountryDomRef ? "exists" : "still null");
+                    }
+                    if (oCompanyCodeInputCheck) {
+                        const oCompanyCodeDomRef = oCompanyCodeInputCheck.getDomRef ? oCompanyCodeInputCheck.getDomRef() : null;
+                        console.log("[_ensureFilterControlsVisible] CompanyCodeInput DOM ref after invalidate:", oCompanyCodeDomRef ? "exists" : "still null");
+                    }
+                }, 500);
+                
+                // Try to access the internal FilterBar and show items
+                if (typeof oSmartFilterBar.getFilterBar === "function") {
+                    const oFilterBar = oSmartFilterBar.getFilterBar();
+                    console.log("[_ensureFilterControlsVisible] Internal FilterBar:", oFilterBar ? oFilterBar.getId() : "null");
+                    if (oFilterBar) {
+                        // Try to get filter group from FilterBar
+                        if (typeof oFilterBar.getFilterGroup === "function") {
+                            const oFilterGroup = oFilterBar.getFilterGroup();
+                            console.log("[_ensureFilterControlsVisible] FilterBar FilterGroup:", oFilterGroup ? oFilterGroup.getId() : "null");
+                            if (oFilterGroup) {
+                                // Try to get group items and ensure CountryList/CompanyCodeList are visible
+                                if (typeof oFilterGroup.getGroupItems === "function") {
+                                    const aGroupItems = oFilterGroup.getGroupItems();
+                                    console.log("[_ensureFilterControlsVisible] FilterGroup items:", aGroupItems ? aGroupItems.length : "null");
+                                    if (aGroupItems) {
+                                        aGroupItems.forEach((oGroupItem) => {
+                                            const sItemName = oGroupItem.getName ? oGroupItem.getName() : "unknown";
+                                            if (sItemName === "CountryList" || sItemName === "CompanyCodeList") {
+                                                console.log(`[_ensureFilterControlsVisible] Found ${sItemName} in FilterGroup`);
+                                                if (typeof oGroupItem.setVisible === "function") {
+                                                    oGroupItem.setVisible(true);
+                                                    console.log(`[_ensureFilterControlsVisible] Set ${sItemName} group item visible`);
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    console.log("[_ensureFilterControlsVisible] getFilterBar method not available");
+                }
+                
+                // Check if we can get the UI state and modify it
+                if (typeof oSmartFilterBar.getUiState === "function") {
+                    const oUiState = oSmartFilterBar.getUiState();
+                    console.log("[_ensureFilterControlsVisible] UI State:", oUiState);
+                    if (oUiState && oUiState.filterItems) {
+                        console.log("[_ensureFilterControlsVisible] UI State filterItems:", oUiState.filterItems);
+                        // Check if CountryList and CompanyCodeList are in the UI state
+                        const aFilterItems = oUiState.filterItems || [];
+                        const oCountryFilter = aFilterItems.find(item => item.name === "CountryList");
+                        const oCompanyCodeFilter = aFilterItems.find(item => item.name === "CompanyCodeList");
+                        console.log("[_ensureFilterControlsVisible] CountryList in UI state:", !!oCountryFilter, oCountryFilter);
+                        console.log("[_ensureFilterControlsVisible] CompanyCodeList in UI state:", !!oCompanyCodeFilter, oCompanyCodeFilter);
+                    }
+                } else {
+                    console.log("[_ensureFilterControlsVisible] getUiState method not available");
+                }
             } catch (oError) {
                 console.error("[_ensureFilterControlsVisible] Error:", oError);
                 console.error("[_ensureFilterControlsVisible] Error stack:", oError.stack);

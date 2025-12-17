@@ -1,6 +1,203 @@
 <mvc:View controllerName="tech.taxera.taxreporting.verecon.controller.Main"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m">
-    <Page id="page" title="{i18n>title}">
-    </Page>
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:st="sap.ui.comp.smarttable"
+    xmlns:sfb="sap.ui.comp.smartfilterbar"
+    xmlns:sv="sap.ui.comp.smartvariants"
+    xmlns:customData="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+    <f:DynamicPage id="dynamicPageId" class="sapUiNoContentPadding" headerExpanded="{view>/reconciliationList/headerExpanded}" busyIndicatorDelay="{view>/busyIndicatorDelay}">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <sv:SmartVariantManagement id="tech.taxera.taxreporting.verecon.rlmv.id" persistencyKey="tech.taxera.taxreporting.verecon.rlmv.pk" showShare="true" showExecuteOnSelection="true" entitySet="Reconciliation">
+                        <sv:personalizableControls>
+                            <sv:PersonalizableInfo
+                                dataSource="Reconciliation"
+                                control="reconciliationsTable"
+                                keyName="persistencyKey"
+                                type="table"
+                            />
+                            <sv:PersonalizableInfo
+                                dataSource="Reconciliation"
+                                control="smartFilterBar"
+                                keyName="persistencyKey"
+                                type="filterBar"
+                            />
+                        </sv:personalizableControls>
+                    </sv:SmartVariantManagement>
+                </f:heading>
+                <f:snappedContent>
+                    <Text id="statusText"></Text>
+                </f:snappedContent>
+
+                <f:actions>
+                    <Button text="{i18n>reconciliationList.Create}" icon="sap-icon://add" type="Emphasized" press="onReconciliationCreate"/>
+                </f:actions>
+
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <!-- DynamicPage Header -->
+        <f:header>
+            <f:DynamicPageHeader pinnable="true">
+                <f:content>
+                    <sfb:SmartFilterBar id="smartFilterBar" useProvidedNavigationProperties="true" liveMode="true" smartVariant="tech.taxera.taxreporting.verecon.rlmv.id" useToolbar="false" entitySet="Reconciliation" persistencyKey="tech.taxera.taxreporting.verecon.rlmv.pk" assignedFiltersChanged="onAssignedFiltersChanged" enableBasicSearch="false">
+                        <sfb:controlConfiguration>
+                            <sfb:ControlConfiguration key="CountryList" visibleInAdvancedArea="false" visible="true" label="{i18n>reconciliationList.CountryList}">
+                                <sfb:customControl>
+                                    <Input id="countryListFilter" value="{view>/filters/selectedCountriesDisplay}" editable="false" placeholder="{i18n>reconciliationList.SelectCountries}" showValueHelp="true" valueHelpRequest="onCountryValueHelpRequest"/>
+                                </sfb:customControl>
+                            </sfb:ControlConfiguration>
+                            <sfb:ControlConfiguration key="CompanyCodeList" visibleInAdvancedArea="false" visible="true" label="{i18n>reconciliationList.CompanyCodeList}">
+                                <sfb:customControl>
+                                    <Input id="companyCodeListFilter" value="{view>/filters/selectedCompanyCodesDisplay}" editable="false" placeholder="{i18n>reconciliationList.SelectCompanyCodes}" showValueHelp="true" valueHelpRequest="onCompanyCodeValueHelpRequest"/>
+                                </sfb:customControl>
+                            </sfb:ControlConfiguration>
+                            <sfb:ControlConfiguration key="ConvCreatedAt" label="{i18n>reconciliationList.CreatedAt}" conditionType="{
+                                module: 'sap.ui.comp.config.condition.DateRangeType',
+                                ignoreTime: false
+                            }" visibleInAdvancedArea="true">
+                            </sfb:ControlConfiguration>
+                        </sfb:controlConfiguration>
+                        <!-- layout data used to make the table growing but the filter bar fixed -->
+                        <sfb:layoutData>
+                            <FlexItemData shrinkFactor="0"/>
+                        </sfb:layoutData>
+                        <dependents>
+                            <!-- Value Help Dialog for Countries -->
+                            <Dialog id="countryValueHelpDialog" title="{i18n>reconciliationList.SelectCountries}" contentWidth="500px" contentHeight="600px">
+                                <content>
+                                    <List id="countryList" mode="MultiSelect" items="{view>/filters/availableCountries}">
+                                        <StandardListItem title="{view>code}" description="{view>name}" selected="{view>selected}"/>
+                                    </List>
+                                </content>
+                                <beginButton>
+                                    <Button text="{i18n>common.OK}" type="Emphasized" press="onCountryValueHelpConfirm"/>
+                                </beginButton>
+                                <endButton>
+                                    <Button text="{i18n>common.Cancel}" press="onCountryValueHelpCancel"/>
+                                </endButton>
+                            </Dialog>
+                            
+                            <!-- Value Help Dialog for Company Codes -->
+                            <Dialog id="companyCodeValueHelpDialog" title="{i18n>reconciliationList.SelectCompanyCodes}" contentWidth="500px" contentHeight="600px">
+                                <content>
+                                    <List id="companyCodeList" mode="MultiSelect" items="{view>/filters/availableCompanyCodes}">
+                                        <StandardListItem title="{view>code}" description="{view>name}" selected="{view>selected}"/>
+                                    </List>
+                                </content>
+                                <beginButton>
+                                    <Button text="{i18n>common.OK}" type="Emphasized" press="onCompanyCodeValueHelpConfirm"/>
+                                </beginButton>
+                                <endButton>
+                                    <Button text="{i18n>common.Cancel}" press="onCompanyCodeValueHelpCancel"/>
+                                </endButton>
+                            </Dialog>
+                        </dependents>
+                    </sfb:SmartFilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <st:SmartTable id="reconciliationsTable" 
+            placeToolbarInTable="true"
+            smartVariant="tech.taxera.taxreporting.verecon.rlmv.id" beforeRebindTable="onBeforeRebindTable" persistencyKey="tech.taxera.taxreporting.verecon.rlmv.pk" entitySet="Reconciliation" smartFilterId="smartFilterBar" tableType="ResponsiveTable" useExportToExcel="true" useVariantManagement="true" enableAutoBinding="true" requestAtLeastFields="Id,CountryList,CompanyCodeList,FromDate,ToDate,CreatedBy,ConvCreatedAt,Status,StatusText,LastChangedBy,ConvLastChangedAt" useTablePersonalisation="true" showRowCount="true">
+                <st:layoutData>
+                    <FlexItemData growFactor="1" baseSize="0%"/>
+                </st:layoutData>
+                <st:customToolbar>
+                    <OverflowToolbar design="Transparent">
+                        <ToolbarSpacer/>
+                        <OverflowToolbarToggleButton tooltip="{i18n>reconciliationList.Edit}" text="{i18n>reconciliationList.Edit}" icon="sap-icon://edit" pressed="{view>/reconciliationList/bEditMode}"/>
+                        <OverflowToolbarButton icon="sap-icon://delete" tooltip="{i18n>reconciliationList.Delete}" press="onDeleteReconciliation" enabled="{= ${view>/reconciliationList/bEditMode} &amp;&amp; ${view>/reconciliationList/bDeleteEnabled} }"/>
+                    </OverflowToolbar>
+                </st:customToolbar>
+                <Table id="reconcilesTable" sticky="ColumnHeaders,HeaderToolbar" mode="{= ${view>/reconciliationList/bEditMode} ? 'SingleSelectLeft' : 'None'}" selectionChange="onSelectReconciliation" growing="true" growingScrollToLoad="true" growingThreshold="100">
+                    <columns>
+                        <Column>
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "CountryList","columnIndex":"0", "leadingProperty": "CountryList", "filterProperty": "CountryList", "sortProperty": "CountryList", "type": "string"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationList.CountryList}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Tablet">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "CompanyCodeList","columnIndex":"1", "leadingProperty": "CompanyCodeList", "filterProperty": "CompanyCodeList", "sortProperty": "CompanyCodeList", "type": "string"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationList.CompanyCodeList}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Tablet">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "FromDate","columnIndex":"2", "leadingProperty": "FromDate", "filterProperty": "FromDate", "sortProperty": "FromDate", "type": "date"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationList.FromDate}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Tablet">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "ToDate","columnIndex":"3", "leadingProperty": "ToDate", "filterProperty": "ToDate", "sortProperty": "ToDate", "type": "date"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationList.ToDate}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Tablet">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "CreatedBy","columnIndex":"4", "leadingProperty": "CreatedByName", "filterProperty": "CreatedByName", "sortProperty": "CreatedByName", "type": "string"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationList.CreatedBy}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Tablet">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "ConvCreatedAt","columnIndex":"5", "leadingProperty": "ConvCreatedAt", "filterProperty": "ConvCreatedAt", "sortProperty": "ConvCreatedAt", "type": "date"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationList.CreatedAt}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "Status","columnIndex":"6", "leadingProperty": "Status", "filterProperty": "Status", "sortProperty": "Status", "type": "string"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationList.Status}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "LastChangedBy","columnIndex":"7", "leadingProperty": "LastChangedByName", "filterProperty": "LastChangedByName", "sortProperty": "LastChangedByName", "type": "string"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationList.LastChangedBy}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "ConvLastChangedAt","columnIndex":"8", "leadingProperty": "ConvLastChangedAt", "filterProperty": "ConvLastChangedAt", "sortProperty": "ConvLastChangedAt", "type": "date"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationList.LastChangedAt}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "Actions","columnIndex":"9"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationList.Actions}"/>
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem type="Navigation" press="onReconciliationPress">
+                            <cells>
+                                <Text text="{CountryList}"/>
+                                <Text text="{CompanyCodeList}"/>
+                                <Text text="{path: 'FromDate', type: '.types.TaxeraDateType'}"/>
+                                <Text text="{path: 'ToDate', type: '.types.TaxeraDateType'}"/>
+                                <Text text="{CreatedByName}"/>
+                                <Text text="{path: 'ConvCreatedAt', type: '.types.TaxeraDateTimeType'}"/>
+                                <ObjectStatus inverted="false" text="{StatusText}" icon="{path: 'Status', formatter: '.formatter.formatStatusIcon' }" state="{path: 'Status', formatter: '.formatter.formatStatusColor' }"/>
+                                <Text text="{LastChangedByName}"/>
+                                <Text text="{path: 'ConvLastChangedAt', type: '.types.TaxeraDateTimeType'}"/>
+                                <HBox wrap='Wrap'>
+                                    <Button class="sapUiTinyMarginEnd" type="Emphasized" icon="sap-icon://action" tooltip="{i18n>reconciliationList.ViewDetails}" press="onViewReconciliationDetails"/>
+                                </HBox>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </st:SmartTable>
+        </f:content>
+    </f:DynamicPage>
 </mvc:View>

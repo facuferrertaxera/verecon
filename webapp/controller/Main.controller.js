@@ -5,9 +5,10 @@ sap.ui.define([
     "sap/m/MessageBox",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
+    "sap/ui/model/json/JSONModel",
     "tech/taxera/taxreporting/verecon/utils/types",
     "tech/taxera/taxreporting/verecon/utils/formatter"
-], (Controller, Sorter, MessageToast, MessageBox, Filter, FilterOperator, types, formatter) => {
+], (Controller, Sorter, MessageToast, MessageBox, Filter, FilterOperator, JSONModel, types, formatter) => {
     "use strict";
 
     const MainController = Controller.extend("tech.taxera.taxreporting.verecon.controller.Main", {
@@ -16,7 +17,7 @@ sap.ui.define([
         formatter: formatter,
         onInit() {
             // Initialize view model
-            const oViewModel = new sap.ui.model.json.JSONModel({
+            const oViewModel = new JSONModel({
                 reconciliationList: {
                     headerExpanded: true,
                     bEditMode: false,
@@ -33,10 +34,6 @@ sap.ui.define([
                 }
             });
             this.getView().setModel(oViewModel, "view");
-
-            // Load countries and company codes from service
-            this._loadAvailableCountries();
-            this._loadAvailableCompanyCodes();
 
             // Attach route matched handler if routing is available
             const oRouter = this.getOwnerComponent().getRouter();
@@ -171,6 +168,12 @@ sap.ui.define([
             if (oModel && oModel.hasPendingChanges && oModel.hasPendingChanges(true)) {
                 oModel.resetChanges();
             }
+            
+            // Load countries and company codes from service
+            // This happens here because OData model metadata may not be ready in onInit
+            this._loadAvailableCountries();
+            this._loadAvailableCompanyCodes();
+            
             this._refreshView();
         },
 

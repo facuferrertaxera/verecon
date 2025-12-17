@@ -262,8 +262,21 @@ sap.ui.define([
             const oSmartFilterBar = oEvent.getSource();
             console.log("[_onSmartFilterBarInitialized] SmartFilterBar isInitialised:", typeof oSmartFilterBar.isInitialised === "function" ? oSmartFilterBar.isInitialised() : "method not available");
             
-            // Now we can safely ensure filter controls are visible
-            this._ensureFilterControlsVisible();
+            // Wait for the next rendering cycle to ensure DOM is ready
+            // The initialized event fires before DOM rendering is complete
+            if (window.requestAnimationFrame) {
+                requestAnimationFrame(() => {
+                    // Then wait a bit more for SmartFilterBar to finish its internal rendering
+                    setTimeout(() => {
+                        this._ensureFilterControlsVisible();
+                    }, 150);
+                });
+            } else {
+                // Fallback for older browsers
+                setTimeout(() => {
+                    this._ensureFilterControlsVisible();
+                }, 300);
+            }
         },
 
         /**
@@ -561,6 +574,37 @@ sap.ui.define([
                     }
                 } else {
                     console.log("[_ensureFilterControlsVisible] getUiState method not available");
+                }
+                
+                // Try to access SmartVariantManagement and ensure filters are in variant
+                const oSmartVariantManagement = this.getView().byId("tech.taxera.taxreporting.verecon.rlmv.id");
+                if (oSmartVariantManagement) {
+                    console.log("[_ensureFilterControlsVisible] SmartVariantManagement found:", oSmartVariantManagement.getId());
+                    // Try to get current variant
+                    if (typeof oSmartVariantManagement.getCurrentVariant === "function") {
+                        const oCurrentVariant = oSmartVariantManagement.getCurrentVariant();
+                        console.log("[_ensureFilterControlsVisible] Current variant:", oCurrentVariant);
+                    }
+                    // Try to get variant content
+                    if (typeof oSmartVariantManagement.getVariantContent === "function") {
+                        const oVariantContent = oSmartVariantManagement.getVariantContent();
+                        console.log("[_ensureFilterControlsVisible] Variant content:", oVariantContent);
+                        if (oVariantContent && oVariantContent.filterBar && oVariantContent.filterBar.filterItems) {
+                            const aVariantFilterItems = oVariantContent.filterBar.filterItems;
+                            console.log("[_ensureFilterControlsVisible] Variant filter items:", aVariantFilterItems);
+                            const bCountryInVariant = aVariantFilterItems.some(item => item.name === "CountryList");
+                            const bCompanyCodeInVariant = aVariantFilterItems.some(item => item.name === "CompanyCodeList");
+                            console.log("[_ensureFilterControlsVisible] CountryList in variant:", bCountryInVariant);
+                            console.log("[_ensureFilterControlsVisible] CompanyCodeList in variant:", bCompanyCodeInVariant);
+                            
+                            // If filters are not in variant, we might need to add them
+                            if (!bCountryInVariant || !bCompanyCodeInVariant) {
+                                console.log("[_ensureFilterControlsVisible] Filters missing from variant - may need to add them");
+                            }
+                        }
+                    }
+                } else {
+                    console.log("[_ensureFilterControlsVisible] SmartVariantManagement not found");
                 }
             } catch (oError) {
                 console.error("[_ensureFilterControlsVisible] Error:", oError);

@@ -6,6 +6,7 @@ sap.ui.define([
     return {
         /**
          * Format status icon based on status code
+         * Uses dynamic status data from OData service and pattern matching
          * @param {string} sStatus - Status code
          * @returns {string} Icon path
          */
@@ -13,19 +14,53 @@ sap.ui.define([
             if (!sStatus) {
                 return "";
             }
-            const mStatusIcons = {
-                "C": "sap-icon://status-in-process",  // Created/In Process
-                "P": "sap-icon://pending",            // Pending
-                "RP": "sap-icon://complete",          // Ready/Processed
-                "SS": "sap-icon://accept",            // Success
-                "E": "sap-icon://error",              // Error
-                "W": "sap-icon://warning"            // Warning
-            };
-            return mStatusIcons[sStatus] || "";
+            
+            // Get status map from controller if available
+            const mStatusMap = (this._oController && this._oController._mStatusMap) ? this._oController._mStatusMap : {};
+            
+            // Pattern-based icon determination
+            // Success statuses (start with S): S, SR, SV, ST, SX, SS
+            if (sStatus.indexOf("S") === 0) {
+                return "sap-icon://accept";
+            }
+            
+            // Failed statuses (start with F): F, FR, FV, FT, FX, FS, FE
+            if (sStatus.indexOf("F") === 0) {
+                return "sap-icon://error";
+            }
+            
+            // In Progress statuses (end with P): P, RP, VP, XP
+            if (sStatus.lastIndexOf("P") === sStatus.length - 1) {
+                return "sap-icon://status-in-process";
+            }
+            
+            // Extracted
+            if (sStatus === "E") {
+                return "sap-icon://complete";
+            }
+            
+            // Created
+            if (sStatus === "C") {
+                return "sap-icon://status-in-process";
+            }
+            
+            // Pending Archiving
+            if (sStatus === "PA") {
+                return "sap-icon://pending";
+            }
+            
+            // Tax Authority Review
+            if (sStatus === "TR") {
+                return "sap-icon://status-in-process";
+            }
+            
+            // Default fallback
+            return "sap-icon://status-in-process";
         },
 
         /**
          * Format status color based on status code
+         * Uses dynamic status data from OData service and pattern matching
          * @param {string} sStatus - Status code
          * @returns {string} Status state (None, Success, Warning, Error)
          */
@@ -33,15 +68,48 @@ sap.ui.define([
             if (!sStatus) {
                 return "None";
             }
-            const mStatusColors = {
-                "C": "Warning",      // Created/In Process
-                "P": "Warning",      // Pending
-                "RP": "Success",     // Ready/Processed
-                "SS": "Success",     // Success
-                "E": "Error",        // Error
-                "W": "Warning"       // Warning
-            };
-            return mStatusColors[sStatus] || "None";
+            
+            // Get status map from controller if available
+            const mStatusMap = (this._oController && this._oController._mStatusMap) ? this._oController._mStatusMap : {};
+            
+            // Pattern-based color determination
+            // Success statuses (start with S): S, SR, SV, ST, SX, SS
+            if (sStatus.indexOf("S") === 0) {
+                return "Success";
+            }
+            
+            // Failed statuses (start with F): F, FR, FV, FT, FX, FS, FE
+            if (sStatus.indexOf("F") === 0) {
+                return "Error";
+            }
+            
+            // In Progress statuses (end with P): P, RP, VP, XP
+            if (sStatus.lastIndexOf("P") === sStatus.length - 1) {
+                return "Warning";
+            }
+            
+            // Extracted
+            if (sStatus === "E") {
+                return "Success";
+            }
+            
+            // Created
+            if (sStatus === "C") {
+                return "Warning";
+            }
+            
+            // Pending Archiving
+            if (sStatus === "PA") {
+                return "Warning";
+            }
+            
+            // Tax Authority Review
+            if (sStatus === "TR") {
+                return "Warning";
+            }
+            
+            // Default fallback
+            return "None";
         },
 
         /**

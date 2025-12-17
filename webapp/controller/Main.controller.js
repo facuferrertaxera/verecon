@@ -43,9 +43,10 @@ sap.ui.define([
             });
             this.getView().setModel(oViewModel, "view");
 
-            // Initialize country and company code maps
+            // Initialize country, company code, and status maps
             this._mCountryMap = {};
             this._mCompanyCodeMap = {};
+            this._mStatusMap = {};
 
             // Set controller reference in formatter for token formatting
             formatter.setController(this);
@@ -183,6 +184,45 @@ sap.ui.define([
         },
 
         /**
+         * Load available statuses from xTAXERAxI_SF_STATUS_VH entity set
+         */
+        _loadAvailableStatuses: function() {
+            const oModel = this.getModel();
+            if (!oModel) {
+                return;
+            }
+
+            // Read statuses from xTAXERAxI_SF_STATUS_VH entity set
+            oModel.read("/xTAXERAxI_SF_STATUS_VH", {
+                urlParameters: {
+                    "$select": "Status,Description,value_position"
+                },
+                sorters: [
+                    new Sorter("value_position", false)
+                ],
+                success: (oResponse) => {
+                    // OData v2 uses results array
+                    const aResults = oResponse.results || [];
+                    
+                    // Create status code to description mapping for formatter
+                    this._mStatusMap = {};
+                    aResults.forEach((oStatus) => {
+                        this._mStatusMap[oStatus.Status] = {
+                            description: oStatus.Description || oStatus.Status,
+                            status: oStatus.Status
+                        };
+                    });
+
+                    console.log("[_loadAvailableStatuses] Status map populated with", Object.keys(this._mStatusMap).length, "statuses");
+                },
+                error: (oError) => {
+                    console.error("[_loadAvailableStatuses] Error loading statuses:", oError);
+                    this._mStatusMap = {};
+                }
+            });
+        },
+
+        /**
          * Get the router instance
          */
         getRouter: function() {
@@ -228,11 +268,12 @@ sap.ui.define([
                 oModel.resetChanges();
             }
             
-            // Load countries and company codes from service
+            // Load countries, company codes, and statuses from service
             // This happens here because OData model metadata may not be ready in onInit
-            console.log("[_onReconciliationListMatched] Loading countries and company codes");
+            console.log("[_onReconciliationListMatched] Loading countries, company codes, and statuses");
             this._loadAvailableCountries();
             this._loadAvailableCompanyCodes();
+            this._loadAvailableStatuses();
             
             // Note: Filter controls visibility is handled in _onSmartFilterBarInitialized event
             // which fires after SmartFilterBar is fully initialized

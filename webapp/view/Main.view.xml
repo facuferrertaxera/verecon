@@ -47,17 +47,17 @@
                 <f:content>
                     <sfb:SmartFilterBar id="smartFilterBar" useProvidedNavigationProperties="true" liveMode="true" smartVariant="tech.taxera.taxreporting.verecon.rlmv.id" useToolbar="false" entitySet="Reconciliation" persistencyKey="tech.taxera.taxreporting.verecon.rlmv.pk" assignedFiltersChanged="onAssignedFiltersChanged" enableBasicSearch="false">
                         <sfb:controlConfiguration>
-                            <sfb:ControlConfiguration key="CountryList" visibleInAdvancedArea="false" visible="true" label="{i18n>reconciliationList.CountryList}">
+                            <sfb:ControlConfiguration index="1"key="CountryList" visibleInAdvancedArea="false" visible="true" label="{i18n>reconciliationList.CountryList}">
                                 <sfb:customControl>
                                     <MultiInput id="countryListFilter" valueHelpRequest="onCountryValueHelpRequest" showValueHelp="true" placeholder="{i18n>reconciliationList.SelectCountries}" enableMultiLineMode="true"/>
                                 </sfb:customControl>
                             </sfb:ControlConfiguration>
-                            <sfb:ControlConfiguration key="CompanyCodeList" visibleInAdvancedArea="false" visible="true" label="{i18n>reconciliationList.CompanyCodeList}">
+                            <sfb:ControlConfiguration index="2" key="CompanyCodeList" visibleInAdvancedArea="false" visible="true" label="{i18n>reconciliationList.CompanyCodeList}">
                                 <sfb:customControl>
                                     <MultiInput id="companyCodeListFilter" valueHelpRequest="onCompanyCodeValueHelpRequest" showValueHelp="true" placeholder="{i18n>reconciliationList.SelectCompanyCodes}" enableMultiLineMode="true"/>
                                 </sfb:customControl>
                             </sfb:ControlConfiguration>
-                            <sfb:ControlConfiguration key="ConvCreatedAt" label="{i18n>reconciliationList.CreatedAt}" conditionType="{
+                            <sfb:ControlConfiguration index="3"  key="ConvCreatedAt" label="{i18n>reconciliationList.CreatedAt}" conditionType="{
                                 module: 'sap.ui.comp.config.condition.DateRangeType',
                                 ignoreTime: false
                             }" visibleInAdvancedArea="true">

@@ -154,8 +154,8 @@
                     <items>
                         <ColumnListItem type="Navigation" press="onReconciliationPress">
                             <cells>
-                                <Tokenizer id="countryListCellTokenizer" editable="false" class="sapUiTinyMargin"/>
-                                <Tokenizer id="companyCodeListCellTokenizer" editable="false" class="sapUiTinyMargin"/>
+                                <Tokenizer id="countryListCellTokenizer" editable="false" class="sapUiTinyMargin" width="100%"/>
+                                <Tokenizer id="companyCodeListCellTokenizer" editable="false" class="sapUiTinyMargin" width="100%"/>
                                 <Text text="{path: 'FromDate', type: '.types.TaxeraDateType'}"/>
                                 <Text text="{path: 'ToDate', type: '.types.TaxeraDateType'}"/>
                                 <ObjectStatus inverted="false" text="{StatusText}" icon="{path: 'Status', formatter: '.formatter.formatStatusIcon' }" state="{path: 'Status', formatter: '.formatter.formatStatusColor' }"/>

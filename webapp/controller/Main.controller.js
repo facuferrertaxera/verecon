@@ -399,32 +399,51 @@ sap.ui.define([
                             type: oFilterItem.getMetadata ? oFilterItem.getMetadata().getName() : "unknown",
                             hasGetKey: typeof oFilterItem.getKey === "function",
                             hasGetName: typeof oFilterItem.getName === "function",
+                            hasSetVisibleInFilterBar: typeof oFilterItem.setVisibleInFilterBar === "function",
+                            hasSetPartOfCurrentVariant: typeof oFilterItem.setPartOfCurrentVariant === "function",
                             hasSetVisible: typeof oFilterItem.setVisible === "function",
                             hasSetVisibleInAdvancedArea: typeof oFilterItem.setVisibleInAdvancedArea === "function",
-                            visible: oFilterItem.getVisible ? oFilterItem.getVisible() : "N/A"
+                            visibleInFilterBar: oFilterItem.getVisibleInFilterBar ? oFilterItem.getVisibleInFilterBar() : "N/A",
+                            partOfCurrentVariant: oFilterItem.getPartOfCurrentVariant ? oFilterItem.getPartOfCurrentVariant() : "N/A"
                         });
 
                         if (sKey === "CountryList" || sKey === "CompanyCodeList") {
                             console.log(`[_ensureFilterControlsVisible] Found target filter item: ${sKey}`);
                             
-                            // Log current state
+                            // Log current state - check for the correct properties
                             console.log(`[_ensureFilterControlsVisible] ${sKey} current state:`, {
+                                visibleInFilterBar: oFilterItem.getVisibleInFilterBar ? oFilterItem.getVisibleInFilterBar() : "N/A",
+                                partOfCurrentVariant: oFilterItem.getPartOfCurrentVariant ? oFilterItem.getPartOfCurrentVariant() : "N/A",
                                 visible: oFilterItem.getVisible ? oFilterItem.getVisible() : "N/A",
                                 visibleInAdvancedArea: oFilterItem.getVisibleInAdvancedArea ? oFilterItem.getVisibleInAdvancedArea() : "N/A",
                                 getParent: typeof oFilterItem.getParent === "function" ? "exists" : "N/A"
                             });
                             
+                            // SOLUTION 1: Use setVisibleInFilterBar() - This is the correct method that controls FilterGroupItem rendering
+                            // SmartFilterBar creates controls lazily, and setVisibleInFilterBar(true) triggers the control creation
+                            if (typeof oFilterItem.setVisibleInFilterBar === "function") {
+                                oFilterItem.setVisibleInFilterBar(true);
+                                console.log(`[_ensureFilterControlsVisible] Set ${sKey} visibleInFilterBar: true, actual:`, oFilterItem.getVisibleInFilterBar ? oFilterItem.getVisibleInFilterBar() : "N/A");
+                            } else {
+                                console.warn(`[_ensureFilterControlsVisible] ${sKey} filterItem has no setVisibleInFilterBar method`);
+                            }
+                            
+                            // Also set partOfCurrentVariant to ensure variant management doesn't hide it
+                            if (typeof oFilterItem.setPartOfCurrentVariant === "function") {
+                                oFilterItem.setPartOfCurrentVariant(true);
+                                console.log(`[_ensureFilterControlsVisible] Set ${sKey} partOfCurrentVariant: true, actual:`, oFilterItem.getPartOfCurrentVariant ? oFilterItem.getPartOfCurrentVariant() : "N/A");
+                            } else {
+                                console.warn(`[_ensureFilterControlsVisible] ${sKey} filterItem has no setPartOfCurrentVariant method`);
+                            }
+                            
+                            // Keep the old methods as fallback
                             if (typeof oFilterItem.setVisible === "function") {
                                 oFilterItem.setVisible(true);
                                 console.log(`[_ensureFilterControlsVisible] Set ${sKey} visible:`, oFilterItem.getVisible ? oFilterItem.getVisible() : "N/A");
-                            } else {
-                                console.warn(`[_ensureFilterControlsVisible] ${sKey} filterItem has no setVisible method`);
                             }
                             if (typeof oFilterItem.setVisibleInAdvancedArea === "function") {
                                 oFilterItem.setVisibleInAdvancedArea(false);
                                 console.log(`[_ensureFilterControlsVisible] Set ${sKey} visibleInAdvancedArea: false, actual:`, oFilterItem.getVisibleInAdvancedArea ? oFilterItem.getVisibleInAdvancedArea() : "N/A");
-                            } else {
-                                console.warn(`[_ensureFilterControlsVisible] ${sKey} filterItem has no setVisibleInAdvancedArea method`);
                             }
                             
                             // Try to get the control from the filter item and ensure it's visible
@@ -465,12 +484,51 @@ sap.ui.define([
                     console.warn("[_ensureFilterControlsVisible] No filter items found or empty array");
                 }
 
+                // Diagnostic: Check control instances using getControlByKey
+                console.log("[_ensureFilterControlsVisible] === DIAGNOSTICS ===");
+                ["CountryList", "CompanyCodeList"].forEach((sFieldName) => {
+                    // Check FilterGroupItem state
+                    const oFilterItem = aFilterItems.find(i => {
+                        const sName = i.getName ? i.getName() : (i.getKey ? i.getKey() : null);
+                        return sName === sFieldName;
+                    });
+                    
+                    if (oFilterItem) {
+                        console.log(`\n${sFieldName} FilterGroupItem:`);
+                        console.log("  visibleInFilterBar:", oFilterItem.getVisibleInFilterBar ? oFilterItem.getVisibleInFilterBar() : "N/A");
+                        console.log("  partOfCurrentVariant:", oFilterItem.getPartOfCurrentVariant ? oFilterItem.getPartOfCurrentVariant() : "N/A");
+                        console.log("  visible:", oFilterItem.getVisible ? oFilterItem.getVisible() : "N/A");
+                    }
+                    
+                    // Check control instance using getControlByKey
+                    if (typeof oSmartFilterBar.getControlByKey === "function") {
+                        const oControl = oSmartFilterBar.getControlByKey(sFieldName);
+                        console.log(`\n${sFieldName} Control (getControlByKey):`);
+                        console.log("  Found:", !!oControl);
+                        console.log("  Type:", oControl ? oControl.getMetadata().getName() : "N/A");
+                        console.log("  DOM ref exists:", oControl ? !!oControl.getDomRef() : false);
+                        if (oControl && oControl.getDomRef()) {
+                            console.log("  ✅ Control is rendered in DOM!");
+                        } else {
+                            console.log("  ❌ Control not yet rendered (lazy rendering)");
+                        }
+                    } else {
+                        console.log(`\n${sFieldName}: getControlByKey method not available`);
+                    }
+                });
+                
                 // Try to expand filter bar if collapsed
                 if (typeof oSmartFilterBar.setFilterBarExpanded === "function") {
                     console.log("[_ensureFilterControlsVisible] Expanding filter bar");
                     oSmartFilterBar.setFilterBarExpanded(true);
                 } else {
                     console.log("[_ensureFilterControlsVisible] setFilterBarExpanded method not available");
+                }
+                
+                // Force re-layout after setting visibleInFilterBar
+                if (typeof oSmartFilterBar.invalidate === "function") {
+                    console.log("[_ensureFilterControlsVisible] Invalidating SmartFilterBar to force re-layout");
+                    oSmartFilterBar.invalidate();
                 }
                 
                 // Try to get the FilterGroup and show items there

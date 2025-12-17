@@ -182,7 +182,40 @@ sap.ui.define([
             this._loadAvailableCountries();
             this._loadAvailableCompanyCodes();
             
+            // Ensure custom filter controls are visible
+            this._ensureFilterControlsVisible();
+            
             this._refreshView();
+        },
+
+        /**
+         * Ensure custom filter controls are visible in SmartFilterBar
+         */
+        _ensureFilterControlsVisible: function() {
+            const oSmartFilterBar = this.getView().byId("smartFilterBar");
+            if (oSmartFilterBar) {
+                // Use setTimeout to ensure SmartFilterBar is fully initialized
+                setTimeout(() => {
+                    try {
+                        // Get the filter items and ensure CountryList and CompanyCodeList are visible
+                        const aFilterItems = oSmartFilterBar.getFilterItems();
+                        aFilterItems.forEach((oFilterItem) => {
+                            const sName = oFilterItem.getName();
+                            if (sName === "CountryList" || sName === "CompanyCodeList") {
+                                oFilterItem.setVisible(true);
+                                oFilterItem.setVisibleInAdvancedArea(false);
+                                // Ensure the control itself is visible
+                                const oControl = oFilterItem.getControl();
+                                if (oControl) {
+                                    oControl.setVisible(true);
+                                }
+                            }
+                        });
+                    } catch (oError) {
+                        console.warn("Error ensuring filter controls visible:", oError);
+                    }
+                }, 100);
+            }
         },
 
         /**

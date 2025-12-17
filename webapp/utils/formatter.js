@@ -89,13 +89,11 @@ sap.ui.define([
             }
             
             const aCompanyCodes = sCompanyCodeList.split(",").map(s => s.trim()).filter(s => s);
-            const mCompanyCodeMap = this._oController && this._oController._mCompanyCodeMap ? this._oController._mCompanyCodeMap : {};
             
             return aCompanyCodes.map((sCode) => {
-                const sCompanyName = mCompanyCodeMap[sCode] || sCode;
                 return new Token({
                     key: sCode,
-                    text: sCompanyName !== sCode ? sCompanyName + " (" + sCode + ")" : sCode
+                    text: sCode
                 });
             });
         }

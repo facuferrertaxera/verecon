@@ -48,12 +48,12 @@
                         <sfb:controlConfiguration>
                             <sfb:ControlConfiguration key="CountryList" visibleInAdvancedArea="false" visible="true" label="{i18n>reconciliationList.CountryList}">
                                 <sfb:customControl>
-                                    <Input id="countryListFilter" value="{view>/filters/selectedCountriesDisplay}" editable="false" placeholder="{i18n>reconciliationList.SelectCountries}" showValueHelp="true" valueHelpRequest="onCountryValueHelpRequest"/>
+                                    <Input id="countryListFilter" value="{view>/filters/selectedCountriesDisplay}" placeholder="{i18n>reconciliationList.SelectCountries}" showValueHelp="true" valueHelpRequest="onCountryValueHelpRequest"/>
                                 </sfb:customControl>
                             </sfb:ControlConfiguration>
                             <sfb:ControlConfiguration key="CompanyCodeList" visibleInAdvancedArea="false" visible="true" label="{i18n>reconciliationList.CompanyCodeList}">
                                 <sfb:customControl>
-                                    <Input id="companyCodeListFilter" value="{view>/filters/selectedCompanyCodesDisplay}" editable="false" placeholder="{i18n>reconciliationList.SelectCompanyCodes}" showValueHelp="true" valueHelpRequest="onCompanyCodeValueHelpRequest"/>
+                                    <Input id="companyCodeListFilter" value="{view>/filters/selectedCompanyCodesDisplay}" placeholder="{i18n>reconciliationList.SelectCompanyCodes}" showValueHelp="true" valueHelpRequest="onCompanyCodeValueHelpRequest"/>
                                 </sfb:customControl>
                             </sfb:ControlConfiguration>
                             <sfb:ControlConfiguration key="ConvCreatedAt" label="{i18n>reconciliationList.CreatedAt}" conditionType="{

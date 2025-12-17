@@ -630,6 +630,34 @@ sap.ui.define([
          */
         onCompanyCodeValueHelpAfterClose: function() {
             // Cleanup if needed
+        },
+
+        /**
+         * Factory function to create a country token
+         * @param {string} sId - ID for the token
+         * @param {object} oContext - Binding context
+         * @returns {sap.m.Token} Token object
+         */
+        createCountryToken: function(sId, oContext) {
+            const oData = oContext.getObject();
+            return new Token(sId, {
+                key: oData.code,
+                text: oData.text
+            });
+        },
+
+        /**
+         * Factory function to create a company code token
+         * @param {string} sId - ID for the token
+         * @param {object} oContext - Binding context
+         * @returns {sap.m.Token} Token object
+         */
+        createCompanyCodeToken: function(sId, oContext) {
+            const oData = oContext.getObject();
+            return new Token(sId, {
+                key: oData.code,
+                text: oData.text
+            });
         }
     });
 

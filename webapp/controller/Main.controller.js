@@ -59,6 +59,17 @@ sap.ui.define([
                 }
             }
 
+            // Attach to SmartFilterBar initialized event to ensure custom controls are visible
+            this.getView().attachAfterRendering(() => {
+                const oSmartFilterBar = this.getView().byId("smartFilterBar");
+                if (oSmartFilterBar) {
+                    console.log("[onInit] Attaching to SmartFilterBar initialized event");
+                    oSmartFilterBar.attachInitialized(this._onSmartFilterBarInitialized.bind(this));
+                } else {
+                    console.warn("[onInit] SmartFilterBar not found in afterRendering");
+                }
+            });
+
             // Attach to table dataReceived event to populate tokenizers
             this.getView().attachAfterRendering(() => {
                 const oTable = this.getView().byId("reconcilesTable");
@@ -114,12 +125,18 @@ sap.ui.define([
                         this._mCountryMap[oCountry.Country] = oCountry.Country_Text || oCountry.CountryName || oCountry.Country;
                     });
 
+                    console.log("[_loadAvailableCountries] Country map populated with", Object.keys(this._mCountryMap).length, "countries");
+
                     // Update view model
                     this.getView().getModel("view").setProperty("/filters/availableCountries", aCountries);
+                    
+                    // Refresh tokenizers in table if data is already loaded
+                    // This ensures country names are displayed correctly even if formatter ran before map was ready
+                    this._refreshTableTokenizers();
                 },
                 error: (oError) => {
                     // If error loading, fall back to empty array or show error
-                    console.error("Error loading countries:", oError);
+                    console.error("[_loadAvailableCountries] Error loading countries:", oError);
                     this.getView().getModel("view").setProperty("/filters/availableCountries", []);
                 }
             });
@@ -160,12 +177,17 @@ sap.ui.define([
                         this._mCompanyCodeMap[oCompany.CompanyCode] = oCompany.Name || oCompany.CompanyCode;
                     });
 
+                    console.log("[_loadAvailableCompanyCodes] Company code map populated with", Object.keys(this._mCompanyCodeMap).length, "company codes");
+
                     // Update view model
                     this.getView().getModel("view").setProperty("/filters/availableCompanyCodes", aCompanyCodes);
+                    
+                    // Refresh tokenizers in table if data is already loaded
+                    this._refreshTableTokenizers();
                 },
                 error: (oError) => {
                     // If error loading, fall back to empty array or show error
-                    console.error("Error loading company codes:", oError);
+                    console.error("[_loadAvailableCompanyCodes] Error loading company codes:", oError);
                     this.getView().getModel("view").setProperty("/filters/availableCompanyCodes", []);
                 }
             });
@@ -223,16 +245,27 @@ sap.ui.define([
             this._loadAvailableCountries();
             this._loadAvailableCompanyCodes();
             
-            // Ensure custom filter controls are visible
-            console.log("[_onReconciliationListMatched] Ensuring filter controls visible");
-            this._ensureFilterControlsVisible();
+            // Note: Filter controls visibility is handled in _onSmartFilterBarInitialized event
+            // which fires after SmartFilterBar is fully initialized
             
             console.log("[_onReconciliationListMatched] Refreshing view");
             this._refreshView();
         },
 
         /**
+         * Handler for SmartFilterBar initialized event
+         * This fires after the FilterBar has been initialized, the user's default variant
+         * has been applied, and a stable filter state has been achieved
+         */
+        _onSmartFilterBarInitialized: function(oEvent) {
+            console.log("[_onSmartFilterBarInitialized] SmartFilterBar initialized event fired");
+            // Now we can safely ensure filter controls are visible
+            this._ensureFilterControlsVisible();
+        },
+
+        /**
          * Ensure custom filter controls are visible in SmartFilterBar
+         * This is called after SmartFilterBar is initialized, so filter items should be available
          */
         _ensureFilterControlsVisible: function() {
             console.log("[_ensureFilterControlsVisible] Function called");
@@ -243,151 +276,149 @@ sap.ui.define([
             }
             console.log("[_ensureFilterControlsVisible] SmartFilterBar found:", oSmartFilterBar.getId());
 
-            // Function to ensure controls are visible
-            const fnEnsureVisible = (sAttempt) => {
-                console.log(`[_ensureFilterControlsVisible] Attempt: ${sAttempt}`);
-                try {
-                    // Directly access the MultiInput controls by ID and ensure they're visible
-                    const oCountryInput = this.getView().byId("countryListFilter");
-                    const oCompanyCodeInput = this.getView().byId("companyCodeListFilter");
-                    
-                    console.log("[_ensureFilterControlsVisible] CountryInput found:", !!oCountryInput, oCountryInput ? oCountryInput.getId() : "N/A");
-                    console.log("[_ensureFilterControlsVisible] CompanyCodeInput found:", !!oCompanyCodeInput, oCompanyCodeInput ? oCompanyCodeInput.getId() : "N/A");
-                    
-                    if (oCountryInput) {
-                        console.log("[_ensureFilterControlsVisible] Setting CountryInput visible");
-                        oCountryInput.setVisible(true);
-                        console.log("[_ensureFilterControlsVisible] CountryInput visible:", oCountryInput.getVisible());
-                        // Also ensure parent is visible if it exists
-                        const oCountryParent = oCountryInput.getParent();
-                        if (oCountryParent) {
-                            console.log("[_ensureFilterControlsVisible] CountryInput parent:", oCountryParent.getId(), oCountryParent.getMetadata().getName());
-                            if (oCountryParent.setVisible) {
-                                oCountryParent.setVisible(true);
-                                console.log("[_ensureFilterControlsVisible] CountryInput parent visible:", oCountryParent.getVisible());
-                            }
-                        } else {
-                            console.log("[_ensureFilterControlsVisible] CountryInput has no parent");
-                        }
-                    } else {
-                        console.warn("[_ensureFilterControlsVisible] CountryInput NOT FOUND by ID 'countryListFilter'");
-                    }
-                    
-                    if (oCompanyCodeInput) {
-                        console.log("[_ensureFilterControlsVisible] Setting CompanyCodeInput visible");
-                        oCompanyCodeInput.setVisible(true);
-                        console.log("[_ensureFilterControlsVisible] CompanyCodeInput visible:", oCompanyCodeInput.getVisible());
-                        // Also ensure parent is visible if it exists
-                        const oCompanyCodeParent = oCompanyCodeInput.getParent();
-                        if (oCompanyCodeParent) {
-                            console.log("[_ensureFilterControlsVisible] CompanyCodeInput parent:", oCompanyCodeParent.getId(), oCompanyCodeParent.getMetadata().getName());
-                            if (oCompanyCodeParent.setVisible) {
-                                oCompanyCodeParent.setVisible(true);
-                                console.log("[_ensureFilterControlsVisible] CompanyCodeInput parent visible:", oCompanyCodeParent.getVisible());
-                            }
-                        } else {
-                            console.log("[_ensureFilterControlsVisible] CompanyCodeInput has no parent");
-                        }
-                    } else {
-                        console.warn("[_ensureFilterControlsVisible] CompanyCodeInput NOT FOUND by ID 'companyCodeListFilter'");
-                    }
-
-                    // Get all filter items and update visibility
-                    console.log("[_ensureFilterControlsVisible] Checking SmartFilterBar methods...");
-                    console.log("[_ensureFilterControlsVisible] getAllFilterItems exists:", typeof oSmartFilterBar.getAllFilterItems === "function");
-                    console.log("[_ensureFilterControlsVisible] getFilterItems exists:", typeof oSmartFilterBar.getFilterItems === "function");
-                    console.log("[_ensureFilterControlsVisible] getFilterGroup exists:", typeof oSmartFilterBar.getFilterGroup === "function");
-                    
-                    let aFilterItems = [];
-                    if (typeof oSmartFilterBar.getAllFilterItems === "function") {
-                        aFilterItems = oSmartFilterBar.getAllFilterItems();
-                        console.log("[_ensureFilterControlsVisible] getAllFilterItems returned:", aFilterItems ? aFilterItems.length : "null", "items");
-                    } else if (typeof oSmartFilterBar.getFilterItems === "function") {
-                        aFilterItems = oSmartFilterBar.getFilterItems();
-                        console.log("[_ensureFilterControlsVisible] getFilterItems returned:", aFilterItems ? aFilterItems.length : "null", "items");
-                    } else {
-                        console.warn("[_ensureFilterControlsVisible] Neither getAllFilterItems nor getFilterItems available!");
-                    }
-
-                    if (aFilterItems && aFilterItems.length > 0) {
-                        console.log("[_ensureFilterControlsVisible] Processing", aFilterItems.length, "filter items");
-                        aFilterItems.forEach((oFilterItem, iIndex) => {
-                            let sKey = null;
-                            // Try different methods to get the key/name
-                            if (typeof oFilterItem.getKey === "function") {
-                                sKey = oFilterItem.getKey();
-                            } else if (typeof oFilterItem.getName === "function") {
-                                sKey = oFilterItem.getName();
-                            } else if (oFilterItem.key) {
-                                sKey = oFilterItem.key;
-                            } else if (oFilterItem.name) {
-                                sKey = oFilterItem.name;
-                            }
-                            
-                            console.log(`[_ensureFilterControlsVisible] FilterItem[${iIndex}]:`, {
-                                key: sKey,
-                                type: oFilterItem.getMetadata ? oFilterItem.getMetadata().getName() : "unknown",
-                                hasGetKey: typeof oFilterItem.getKey === "function",
-                                hasGetName: typeof oFilterItem.getName === "function",
-                                hasSetVisible: typeof oFilterItem.setVisible === "function",
-                                hasSetVisibleInAdvancedArea: typeof oFilterItem.setVisibleInAdvancedArea === "function",
-                                visible: oFilterItem.getVisible ? oFilterItem.getVisible() : "N/A"
-                            });
-
-                            if (sKey === "CountryList" || sKey === "CompanyCodeList") {
-                                console.log(`[_ensureFilterControlsVisible] Found target filter item: ${sKey}`);
-                                if (typeof oFilterItem.setVisible === "function") {
-                                    oFilterItem.setVisible(true);
-                                    console.log(`[_ensureFilterControlsVisible] Set ${sKey} visible:`, oFilterItem.getVisible ? oFilterItem.getVisible() : "N/A");
-                                } else {
-                                    console.warn(`[_ensureFilterControlsVisible] ${sKey} filterItem has no setVisible method`);
-                                }
-                                if (typeof oFilterItem.setVisibleInAdvancedArea === "function") {
-                                    oFilterItem.setVisibleInAdvancedArea(false);
-                                    console.log(`[_ensureFilterControlsVisible] Set ${sKey} visibleInAdvancedArea: false`);
-                                } else {
-                                    console.warn(`[_ensureFilterControlsVisible] ${sKey} filterItem has no setVisibleInAdvancedArea method`);
-                                }
-                            }
+            try {
+                // Try to access ControlConfiguration aggregation directly
+                console.log("[_ensureFilterControlsVisible] Checking ControlConfiguration aggregation...");
+                const aControlConfigs = oSmartFilterBar.getControlConfiguration ? oSmartFilterBar.getControlConfiguration() : [];
+                console.log("[_ensureFilterControlsVisible] ControlConfiguration items:", aControlConfigs ? aControlConfigs.length : "null");
+                
+                if (aControlConfigs && aControlConfigs.length > 0) {
+                    aControlConfigs.forEach((oConfig, iIndex) => {
+                        const sKey = oConfig.getKey ? oConfig.getKey() : (oConfig.key || "unknown");
+                        console.log(`[_ensureFilterControlsVisible] ControlConfig[${iIndex}]:`, {
+                            key: sKey,
+                            visible: oConfig.getVisible ? oConfig.getVisible() : "N/A",
+                            visibleInAdvancedArea: oConfig.getVisibleInAdvancedArea ? oConfig.getVisibleInAdvancedArea() : "N/A"
                         });
-                    } else {
-                        console.warn("[_ensureFilterControlsVisible] No filter items found or empty array");
-                    }
-
-                    // Try to expand filter bar if collapsed
-                    if (typeof oSmartFilterBar.setFilterBarExpanded === "function") {
-                        console.log("[_ensureFilterControlsVisible] Expanding filter bar");
-                        oSmartFilterBar.setFilterBarExpanded(true);
-                    } else {
-                        console.log("[_ensureFilterControlsVisible] setFilterBarExpanded method not available");
-                    }
-                    
-                    // Try to get filter group
-                    if (typeof oSmartFilterBar.getFilterGroup === "function") {
-                        const oFilterGroup = oSmartFilterBar.getFilterGroup();
-                        console.log("[_ensureFilterControlsVisible] FilterGroup:", oFilterGroup ? oFilterGroup.getId() : "null");
-                    }
-                } catch (oError) {
-                    console.error("[_ensureFilterControlsVisible] Error:", oError);
-                    console.error("[_ensureFilterControlsVisible] Error stack:", oError.stack);
+                        
+                        if (sKey === "CountryList" || sKey === "CompanyCodeList") {
+                            console.log(`[_ensureFilterControlsVisible] Found target ControlConfig: ${sKey}`);
+                            if (typeof oConfig.setVisible === "function") {
+                                oConfig.setVisible(true);
+                                console.log(`[_ensureFilterControlsVisible] Set ControlConfig ${sKey} visible:`, oConfig.getVisible());
+                            }
+                            if (typeof oConfig.setVisibleInAdvancedArea === "function") {
+                                oConfig.setVisibleInAdvancedArea(false);
+                                console.log(`[_ensureFilterControlsVisible] Set ControlConfig ${sKey} visibleInAdvancedArea: false`);
+                            }
+                        }
+                    });
                 }
-            };
 
-            // Try immediately
-            fnEnsureVisible.call(this, "Immediate");
+                // Directly access the MultiInput controls by ID and ensure they're visible
+                const oCountryInput = this.getView().byId("countryListFilter");
+                const oCompanyCodeInput = this.getView().byId("companyCodeListFilter");
+                
+                console.log("[_ensureFilterControlsVisible] CountryInput found:", !!oCountryInput, oCountryInput ? oCountryInput.getId() : "N/A");
+                console.log("[_ensureFilterControlsVisible] CompanyCodeInput found:", !!oCompanyCodeInput, oCompanyCodeInput ? oCompanyCodeInput.getId() : "N/A");
+                
+                if (oCountryInput) {
+                    console.log("[_ensureFilterControlsVisible] Setting CountryInput visible");
+                    oCountryInput.setVisible(true);
+                    console.log("[_ensureFilterControlsVisible] CountryInput visible:", oCountryInput.getVisible());
+                    // Also ensure parent is visible if it exists
+                    const oCountryParent = oCountryInput.getParent();
+                    if (oCountryParent) {
+                        console.log("[_ensureFilterControlsVisible] CountryInput parent:", oCountryParent.getId(), oCountryParent.getMetadata().getName());
+                        if (oCountryParent.setVisible) {
+                            oCountryParent.setVisible(true);
+                            console.log("[_ensureFilterControlsVisible] CountryInput parent visible:", oCountryParent.getVisible());
+                        }
+                    }
+                } else {
+                    console.warn("[_ensureFilterControlsVisible] CountryInput NOT FOUND by ID 'countryListFilter'");
+                }
+                
+                if (oCompanyCodeInput) {
+                    console.log("[_ensureFilterControlsVisible] Setting CompanyCodeInput visible");
+                    oCompanyCodeInput.setVisible(true);
+                    console.log("[_ensureFilterControlsVisible] CompanyCodeInput visible:", oCompanyCodeInput.getVisible());
+                    // Also ensure parent is visible if it exists
+                    const oCompanyCodeParent = oCompanyCodeInput.getParent();
+                    if (oCompanyCodeParent) {
+                        console.log("[_ensureFilterControlsVisible] CompanyCodeInput parent:", oCompanyCodeParent.getId(), oCompanyCodeParent.getMetadata().getName());
+                        if (oCompanyCodeParent.setVisible) {
+                            oCompanyCodeParent.setVisible(true);
+                            console.log("[_ensureFilterControlsVisible] CompanyCodeInput parent visible:", oCompanyCodeParent.getVisible());
+                        }
+                    }
+                } else {
+                    console.warn("[_ensureFilterControlsVisible] CompanyCodeInput NOT FOUND by ID 'companyCodeListFilter'");
+                }
 
-            // Retry with delays to catch late initialization
-            setTimeout(() => {
-                fnEnsureVisible.call(this, "300ms delay");
-            }, 300);
+                // Get all filter items and update visibility
+                console.log("[_ensureFilterControlsVisible] Checking SmartFilterBar methods...");
+                console.log("[_ensureFilterControlsVisible] getAllFilterItems exists:", typeof oSmartFilterBar.getAllFilterItems === "function");
+                console.log("[_ensureFilterControlsVisible] getFilterItems exists:", typeof oSmartFilterBar.getFilterItems === "function");
+                console.log("[_ensureFilterControlsVisible] getControlConfiguration exists:", typeof oSmartFilterBar.getControlConfiguration === "function");
+                
+                let aFilterItems = [];
+                if (typeof oSmartFilterBar.getAllFilterItems === "function") {
+                    aFilterItems = oSmartFilterBar.getAllFilterItems();
+                    console.log("[_ensureFilterControlsVisible] getAllFilterItems returned:", aFilterItems ? aFilterItems.length : "null", "items");
+                } else if (typeof oSmartFilterBar.getFilterItems === "function") {
+                    aFilterItems = oSmartFilterBar.getFilterItems();
+                    console.log("[_ensureFilterControlsVisible] getFilterItems returned:", aFilterItems ? aFilterItems.length : "null", "items");
+                } else {
+                    console.warn("[_ensureFilterControlsVisible] Neither getAllFilterItems nor getFilterItems available!");
+                }
 
-            setTimeout(() => {
-                fnEnsureVisible.call(this, "800ms delay");
-            }, 800);
+                if (aFilterItems && aFilterItems.length > 0) {
+                    console.log("[_ensureFilterControlsVisible] Processing", aFilterItems.length, "filter items");
+                    aFilterItems.forEach((oFilterItem, iIndex) => {
+                        let sKey = null;
+                        // Try different methods to get the key/name
+                        if (typeof oFilterItem.getKey === "function") {
+                            sKey = oFilterItem.getKey();
+                        } else if (typeof oFilterItem.getName === "function") {
+                            sKey = oFilterItem.getName();
+                        } else if (oFilterItem.key) {
+                            sKey = oFilterItem.key;
+                        } else if (oFilterItem.name) {
+                            sKey = oFilterItem.name;
+                        }
+                        
+                        console.log(`[_ensureFilterControlsVisible] FilterItem[${iIndex}]:`, {
+                            key: sKey,
+                            type: oFilterItem.getMetadata ? oFilterItem.getMetadata().getName() : "unknown",
+                            hasGetKey: typeof oFilterItem.getKey === "function",
+                            hasGetName: typeof oFilterItem.getName === "function",
+                            hasSetVisible: typeof oFilterItem.setVisible === "function",
+                            hasSetVisibleInAdvancedArea: typeof oFilterItem.setVisibleInAdvancedArea === "function",
+                            visible: oFilterItem.getVisible ? oFilterItem.getVisible() : "N/A"
+                        });
 
-            setTimeout(() => {
-                fnEnsureVisible.call(this, "1500ms delay");
-            }, 1500);
+                        if (sKey === "CountryList" || sKey === "CompanyCodeList") {
+                            console.log(`[_ensureFilterControlsVisible] Found target filter item: ${sKey}`);
+                            if (typeof oFilterItem.setVisible === "function") {
+                                oFilterItem.setVisible(true);
+                                console.log(`[_ensureFilterControlsVisible] Set ${sKey} visible:`, oFilterItem.getVisible ? oFilterItem.getVisible() : "N/A");
+                            } else {
+                                console.warn(`[_ensureFilterControlsVisible] ${sKey} filterItem has no setVisible method`);
+                            }
+                            if (typeof oFilterItem.setVisibleInAdvancedArea === "function") {
+                                oFilterItem.setVisibleInAdvancedArea(false);
+                                console.log(`[_ensureFilterControlsVisible] Set ${sKey} visibleInAdvancedArea: false`);
+                            } else {
+                                console.warn(`[_ensureFilterControlsVisible] ${sKey} filterItem has no setVisibleInAdvancedArea method`);
+                            }
+                        }
+                    });
+                } else {
+                    console.warn("[_ensureFilterControlsVisible] No filter items found or empty array");
+                }
+
+                // Try to expand filter bar if collapsed
+                if (typeof oSmartFilterBar.setFilterBarExpanded === "function") {
+                    console.log("[_ensureFilterControlsVisible] Expanding filter bar");
+                    oSmartFilterBar.setFilterBarExpanded(true);
+                } else {
+                    console.log("[_ensureFilterControlsVisible] setFilterBarExpanded method not available");
+                }
+            } catch (oError) {
+                console.error("[_ensureFilterControlsVisible] Error:", oError);
+                console.error("[_ensureFilterControlsVisible] Error stack:", oError.stack);
+            }
         },
 
         /**
@@ -790,17 +821,86 @@ sap.ui.define([
         },
 
         /**
+         * Refresh tokenizers in table rows with updated country/company code maps
+         * This is called after country/company code maps are loaded to update
+         * tokenizers that were populated before the maps were ready
+         */
+        _refreshTableTokenizers: function() {
+            console.log("[_refreshTableTokenizers] Refreshing table tokenizers");
+            const oTable = this.getView().byId("reconcilesTable");
+            if (!oTable) {
+                console.log("[_refreshTableTokenizers] Table not found");
+                return;
+            }
+
+            const aItems = oTable.getItems();
+            if (!aItems || aItems.length === 0) {
+                console.log("[_refreshTableTokenizers] No table items found");
+                return;
+            }
+
+            console.log("[_refreshTableTokenizers] Refreshing", aItems.length, "table rows");
+            aItems.forEach((oItem, iIndex) => {
+                const oContext = oItem.getBindingContext();
+                if (!oContext) {
+                    return;
+                }
+
+                const oData = oContext.getObject();
+                const aCells = oItem.getCells();
+                
+                // Update country list tokenizer (first cell)
+                if (aCells && aCells.length > 0) {
+                    const oCountryTokenizer = aCells[0];
+                    if (oCountryTokenizer && 
+                        oCountryTokenizer.isA && 
+                        oCountryTokenizer.isA("sap.m.Tokenizer") &&
+                        typeof oCountryTokenizer.removeAllTokens === "function") {
+                        oCountryTokenizer.removeAllTokens();
+                        const aCountryTokens = this.formatter.formatCountryListToTokens(oData.CountryList);
+                        console.log(`[_refreshTableTokenizers] Row ${iIndex}: Refreshing ${aCountryTokens.length} country tokens`);
+                        aCountryTokens.forEach((oToken) => {
+                            if (oToken && typeof oCountryTokenizer.addToken === "function") {
+                                oCountryTokenizer.addToken(oToken);
+                            }
+                        });
+                    }
+                }
+
+                // Update company code list tokenizer (second cell)
+                if (aCells && aCells.length > 1) {
+                    const oCompanyCodeTokenizer = aCells[1];
+                    if (oCompanyCodeTokenizer && 
+                        oCompanyCodeTokenizer.isA && 
+                        oCompanyCodeTokenizer.isA("sap.m.Tokenizer") &&
+                        typeof oCompanyCodeTokenizer.removeAllTokens === "function") {
+                        oCompanyCodeTokenizer.removeAllTokens();
+                        const aCompanyCodeTokens = this.formatter.formatCompanyCodeListToTokens(oData.CompanyCodeList);
+                        console.log(`[_refreshTableTokenizers] Row ${iIndex}: Refreshing ${aCompanyCodeTokens.length} company code tokens`);
+                        aCompanyCodeTokens.forEach((oToken) => {
+                            if (oToken && typeof oCompanyCodeTokenizer.addToken === "function") {
+                                oCompanyCodeTokenizer.addToken(oToken);
+                            }
+                        });
+                    }
+                }
+            });
+        },
+
+        /**
          * Handler for table data received - populate tokenizers
          * Note: setTokens() exists on ValueHelpDialog, but for Tokenizer controls
          * we must use removeAllTokens() and addToken() methods
          */
         _onTableDataReceived: function() {
+            console.log("[_onTableDataReceived] Table data received, populating tokenizers");
             const oTable = this.getView().byId("reconcilesTable");
             if (!oTable) {
                 return;
             }
 
             const aItems = oTable.getItems();
+            console.log("[_onTableDataReceived] Processing", aItems ? aItems.length : 0, "table items");
             aItems.forEach((oItem) => {
                 const oContext = oItem.getBindingContext();
                 if (!oContext) {
@@ -819,6 +919,7 @@ sap.ui.define([
                         typeof oCountryTokenizer.removeAllTokens === "function") {
                         oCountryTokenizer.removeAllTokens();
                         const aCountryTokens = this.formatter.formatCountryListToTokens(oData.CountryList);
+                        console.log("[_onTableDataReceived] Country tokens created:", aCountryTokens.length, "CountryList:", oData.CountryList);
                         aCountryTokens.forEach((oToken) => {
                             if (oToken && typeof oCountryTokenizer.addToken === "function") {
                                 oCountryTokenizer.addToken(oToken);
@@ -836,6 +937,7 @@ sap.ui.define([
                         typeof oCompanyCodeTokenizer.removeAllTokens === "function") {
                         oCompanyCodeTokenizer.removeAllTokens();
                         const aCompanyCodeTokens = this.formatter.formatCompanyCodeListToTokens(oData.CompanyCodeList);
+                        console.log("[_onTableDataReceived] Company code tokens created:", aCompanyCodeTokens.length, "CompanyCodeList:", oData.CompanyCodeList);
                         aCompanyCodeTokens.forEach((oToken) => {
                             if (oToken && typeof oCompanyCodeTokenizer.addToken === "function") {
                                 oCompanyCodeTokenizer.addToken(oToken);

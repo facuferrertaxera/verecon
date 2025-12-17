@@ -95,7 +95,7 @@
         <f:content>
             <st:SmartTable id="reconciliationsTable" 
             placeToolbarInTable="true"
-            smartVariant="tech.taxera.taxreporting.verecon.rlmv.id" beforeRebindTable="onBeforeRebindTable" persistencyKey="tech.taxera.taxreporting.verecon.rlmv.pk" entitySet="Reconciliation" smartFilterId="smartFilterBar" tableType="ResponsiveTable" useExportToExcel="true" useVariantManagement="true" enableAutoBinding="true" requestAtLeastFields="Id,CountryList,CompanyCodeList,FromDate,ToDate,CreatedBy,ConvCreatedAt,Status,StatusText,LastChangedBy,ConvLastChangedAt" useTablePersonalisation="true" showRowCount="true">
+            smartVariant="tech.taxera.taxreporting.verecon.rlmv.id" beforeRebindTable="onBeforeRebindTable" persistencyKey="tech.taxera.taxreporting.verecon.rlmv.pk" entitySet="Reconciliation" smartFilterId="smartFilterBar" tableType="ResponsiveTable" useExportToExcel="true" useVariantManagement="true" enableAutoBinding="true" requestAtLeastFields="Id,CountryList,CompanyCodeList,FromDate,ToDate,Status,StatusText,LastChangedBy,ConvLastChangedAt" useTablePersonalisation="true" showRowCount="true">
                 <st:layoutData>
                     <FlexItemData growFactor="1" baseSize="0%"/>
                 </st:layoutData>
@@ -108,13 +108,13 @@
                 </st:customToolbar>
                 <Table id="reconcilesTable" sticky="ColumnHeaders,HeaderToolbar" mode="{= ${view>/reconciliationList/bEditMode} ? 'SingleSelectLeft' : 'None'}" selectionChange="onSelectReconciliation" growing="true" growingScrollToLoad="true" growingThreshold="100">
                     <columns>
-                        <Column>
+                        <Column width="20rem">
                             <customData>
                                 <core:CustomData key="p13nData" value='\{"columnKey": "CountryList","columnIndex":"0", "leadingProperty": "CountryList", "filterProperty": "CountryList", "sortProperty": "CountryList", "type": "string"}'/>
                             </customData>
                             <Text text="{i18n>reconciliationList.CountryList}"/>
                         </Column>
-                        <Column demandPopin="true" minScreenWidth="Tablet">
+                        <Column width="20rem" demandPopin="true" minScreenWidth="Tablet">
                             <customData>
                                 <core:CustomData key="p13nData" value='\{"columnKey": "CompanyCodeList","columnIndex":"1", "leadingProperty": "CompanyCodeList", "filterProperty": "CompanyCodeList", "sortProperty": "CompanyCodeList", "type": "string"}'/>
                             </customData>
@@ -132,41 +132,23 @@
                             </customData>
                             <Text text="{i18n>reconciliationList.ToDate}"/>
                         </Column>
-                        <Column demandPopin="true" minScreenWidth="Tablet">
-                            <customData>
-                                <core:CustomData key="p13nData" value='\{"columnKey": "CreatedBy","columnIndex":"4", "leadingProperty": "CreatedByName", "filterProperty": "CreatedByName", "sortProperty": "CreatedByName", "type": "string"}'/>
-                            </customData>
-                            <Text text="{i18n>reconciliationList.CreatedBy}"/>
-                        </Column>
-                        <Column demandPopin="true" minScreenWidth="Tablet">
-                            <customData>
-                                <core:CustomData key="p13nData" value='\{"columnKey": "ConvCreatedAt","columnIndex":"5", "leadingProperty": "ConvCreatedAt", "filterProperty": "ConvCreatedAt", "sortProperty": "ConvCreatedAt", "type": "date"}'/>
-                            </customData>
-                            <Text text="{i18n>reconciliationList.CreatedAt}"/>
-                        </Column>
                         <Column demandPopin="true" minScreenWidth="Desktop">
                             <customData>
-                                <core:CustomData key="p13nData" value='\{"columnKey": "Status","columnIndex":"6", "leadingProperty": "Status", "filterProperty": "Status", "sortProperty": "Status", "type": "string"}'/>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "Status","columnIndex":"4", "leadingProperty": "Status", "filterProperty": "Status", "sortProperty": "Status", "type": "string"}'/>
                             </customData>
                             <Text text="{i18n>reconciliationList.Status}"/>
                         </Column>
                         <Column demandPopin="true" minScreenWidth="Desktop">
                             <customData>
-                                <core:CustomData key="p13nData" value='\{"columnKey": "LastChangedBy","columnIndex":"7", "leadingProperty": "LastChangedByName", "filterProperty": "LastChangedByName", "sortProperty": "LastChangedByName", "type": "string"}'/>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "LastChangedBy","columnIndex":"5", "leadingProperty": "LastChangedByName", "filterProperty": "LastChangedByName", "sortProperty": "LastChangedByName", "type": "string"}'/>
                             </customData>
                             <Text text="{i18n>reconciliationList.LastChangedBy}"/>
                         </Column>
                         <Column demandPopin="true" minScreenWidth="Desktop">
                             <customData>
-                                <core:CustomData key="p13nData" value='\{"columnKey": "ConvLastChangedAt","columnIndex":"8", "leadingProperty": "ConvLastChangedAt", "filterProperty": "ConvLastChangedAt", "sortProperty": "ConvLastChangedAt", "type": "date"}'/>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "ConvLastChangedAt","columnIndex":"6", "leadingProperty": "ConvLastChangedAt", "filterProperty": "ConvLastChangedAt", "sortProperty": "ConvLastChangedAt", "type": "date"}'/>
                             </customData>
                             <Text text="{i18n>reconciliationList.LastChangedAt}"/>
-                        </Column>
-                        <Column demandPopin="true" minScreenWidth="Desktop">
-                            <customData>
-                                <core:CustomData key="p13nData" value='\{"columnKey": "Actions","columnIndex":"9"}'/>
-                            </customData>
-                            <Text text="{i18n>reconciliationList.Actions}"/>
                         </Column>
                     </columns>
                     <items>
@@ -176,14 +158,9 @@
                                 <Tokenizer id="companyCodeListCellTokenizer" editable="false" class="sapUiTinyMargin"/>
                                 <Text text="{path: 'FromDate', type: '.types.TaxeraDateType'}"/>
                                 <Text text="{path: 'ToDate', type: '.types.TaxeraDateType'}"/>
-                                <Text text="{CreatedByName}"/>
-                                <Text text="{path: 'ConvCreatedAt', type: '.types.TaxeraDateTimeType'}"/>
                                 <ObjectStatus inverted="false" text="{StatusText}" icon="{path: 'Status', formatter: '.formatter.formatStatusIcon' }" state="{path: 'Status', formatter: '.formatter.formatStatusColor' }"/>
                                 <Text text="{LastChangedByName}"/>
                                 <Text text="{path: 'ConvLastChangedAt', type: '.types.TaxeraDateTimeType'}"/>
-                                <HBox wrap='Wrap'>
-                                    <Button class="sapUiTinyMarginEnd" type="Emphasized" icon="sap-icon://action" tooltip="{i18n>reconciliationList.ViewDetails}" press="onViewReconciliationDetails"/>
-                                </HBox>
                             </cells>
                         </ColumnListItem>
                     </items>

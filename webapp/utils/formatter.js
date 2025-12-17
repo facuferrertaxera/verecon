@@ -67,10 +67,12 @@ sap.ui.define([
             }
             
             const aCountryCodes = sCountryList.split(",").map(s => s.trim()).filter(s => s);
-            const mCountryMap = this._oController && this._oController._mCountryMap ? this._oController._mCountryMap : {};
+            const mCountryMap = (this._oController && this._oController._mCountryMap) ? this._oController._mCountryMap : {};
             
             return aCountryCodes.map((sCode) => {
-                const sCountryName = mCountryMap[sCode] || sCode;
+                // Get country name from map, fallback to code if not found
+                const sCountryName = (mCountryMap && mCountryMap[sCode]) ? mCountryMap[sCode] : sCode;
+                // Format as "CountryName (CODE)"
                 return new Token({
                     key: sCode,
                     text: sCountryName + " (" + sCode + ")"

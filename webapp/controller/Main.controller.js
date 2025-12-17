@@ -43,6 +43,10 @@ sap.ui.define([
             });
             this.getView().setModel(oViewModel, "view");
 
+            // Initialize country and company code maps
+            this._mCountryMap = {};
+            this._mCompanyCodeMap = {};
+
             // Set controller reference in formatter for token formatting
             formatter.setController(this);
 

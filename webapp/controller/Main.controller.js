@@ -411,13 +411,9 @@ sap.ui.define([
                 return;
             }
 
-            // Clear existing tokens first to prevent duplication
-            const aExistingTokens = oVHD.getTokens();
-            if (aExistingTokens && aExistingTokens.length > 0) {
-                aExistingTokens.forEach((oToken) => {
-                    oVHD.removeToken(oToken);
-                });
-            }
+            // Clear existing tokens first by setting empty array, then set new tokens
+            // This prevents duplication when opening the dialog multiple times
+            oVHD.setTokens([]);
             
             // Clone tokens from MultiInput to avoid reference issues
             const aTokens = oMultiInput.getTokens();
@@ -546,13 +542,9 @@ sap.ui.define([
                 return;
             }
 
-            // Clear existing tokens first to prevent duplication
-            const aExistingTokens = oVHD.getTokens();
-            if (aExistingTokens && aExistingTokens.length > 0) {
-                aExistingTokens.forEach((oToken) => {
-                    oVHD.removeToken(oToken);
-                });
-            }
+            // Clear existing tokens first by setting empty array, then set new tokens
+            // This prevents duplication when opening the dialog multiple times
+            oVHD.setTokens([]);
             
             // Clone tokens from MultiInput to avoid reference issues
             const aTokens = oMultiInput.getTokens();

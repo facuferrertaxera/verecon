@@ -49,12 +49,12 @@
                         <sfb:controlConfiguration>
                             <sfb:ControlConfiguration key="CountryList" visibleInAdvancedArea="false" visible="true" label="{i18n>reconciliationList.CountryList}">
                                 <sfb:customControl>
-                                    <MultiInput id="countryListFilter" valueHelpRequest="onCountryValueHelpRequest" showValueHelp="true" placeholder="{i18n>reconciliationList.SelectCountries}"/>
+                                    <MultiInput id="countryListFilter" valueHelpRequest="onCountryValueHelpRequest" showValueHelp="true" placeholder="{i18n>reconciliationList.SelectCountries}" enableMultiLineMode="true"/>
                                 </sfb:customControl>
                             </sfb:ControlConfiguration>
                             <sfb:ControlConfiguration key="CompanyCodeList" visibleInAdvancedArea="false" visible="true" label="{i18n>reconciliationList.CompanyCodeList}">
                                 <sfb:customControl>
-                                    <MultiInput id="companyCodeListFilter" valueHelpRequest="onCompanyCodeValueHelpRequest" showValueHelp="true" placeholder="{i18n>reconciliationList.SelectCompanyCodes}"/>
+                                    <MultiInput id="companyCodeListFilter" valueHelpRequest="onCompanyCodeValueHelpRequest" showValueHelp="true" placeholder="{i18n>reconciliationList.SelectCompanyCodes}" enableMultiLineMode="true"/>
                                 </sfb:customControl>
                             </sfb:ControlConfiguration>
                             <sfb:ControlConfiguration key="ConvCreatedAt" label="{i18n>reconciliationList.CreatedAt}" conditionType="{
@@ -154,8 +154,8 @@
                     <items>
                         <ColumnListItem type="Navigation" press="onReconciliationPress">
                             <cells>
-                                <Tokenizer id="countryListCellTokenizer" editable="false" class="sapUiTinyMargin" width="100%"/>
-                                <Tokenizer id="companyCodeListCellTokenizer" editable="false" class="sapUiTinyMargin" width="100%"/>
+                                <Tokenizer id="countryListCellTokenizer" editable="false" class="sapUiTinyMargin" width="100%" multiLine="true"/>
+                                <Tokenizer id="companyCodeListCellTokenizer" editable="false" class="sapUiTinyMargin" width="100%" multiLine="true"/>
                                 <Text text="{path: 'FromDate', type: '.types.TaxeraDateType'}"/>
                                 <Text text="{path: 'ToDate', type: '.types.TaxeraDateType'}"/>
                                 <ObjectStatus inverted="false" text="{StatusText}" icon="{path: 'Status', formatter: '.formatter.formatStatusIcon' }" state="{path: 'Status', formatter: '.formatter.formatStatusColor' }"/>

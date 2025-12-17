@@ -54,6 +54,25 @@ sap.ui.define([
                     oRoute.attachMatched(this._onReconciliationListMatched, this);
                 }
             }
+
+            // Attach to table dataReceived event to populate tokenizers
+            this.getView().attachAfterRendering(() => {
+                const oTable = this.getView().byId("reconcilesTable");
+                if (oTable) {
+                    const oBinding = oTable.getBinding("items");
+                    if (oBinding) {
+                        oBinding.attachEvent("dataReceived", this._onTableDataReceived.bind(this));
+                    } else {
+                        // If binding not ready, try again after a delay
+                        setTimeout(() => {
+                            const oBindingRetry = oTable.getBinding("items");
+                            if (oBindingRetry) {
+                                oBindingRetry.attachEvent("dataReceived", this._onTableDataReceived.bind(this));
+                            }
+                        }, 500);
+                    }
+                }
+            });
         },
 
         /**
@@ -209,7 +228,7 @@ sap.ui.define([
         _ensureFilterControlsVisible: function() {
             const oSmartFilterBar = this.getView().byId("smartFilterBar");
             if (oSmartFilterBar) {
-                // Use setTimeout to ensure SmartFilterBar is fully initialized
+                // Use multiple timeouts to ensure SmartFilterBar is fully initialized
                 setTimeout(() => {
                     try {
                         // Get the filter items and ensure CountryList and CompanyCodeList are visible
@@ -226,10 +245,31 @@ sap.ui.define([
                                 }
                             }
                         });
+                        
+                        // Also try to show the basic filter area
+                        if (oSmartFilterBar.setFilterBarExpanded) {
+                            oSmartFilterBar.setFilterBarExpanded(true);
+                        }
                     } catch (oError) {
                         console.warn("Error ensuring filter controls visible:", oError);
                     }
-                }, 100);
+                }, 200);
+                
+                // Try again after a longer delay to catch late initialization
+                setTimeout(() => {
+                    try {
+                        const aFilterItems = oSmartFilterBar.getFilterItems();
+                        aFilterItems.forEach((oFilterItem) => {
+                            const sName = oFilterItem.getName();
+                            if (sName === "CountryList" || sName === "CompanyCodeList") {
+                                oFilterItem.setVisible(true);
+                                oFilterItem.setVisibleInAdvancedArea(false);
+                            }
+                        });
+                    } catch (oError) {
+                        // Ignore errors on second attempt
+                    }
+                }, 500);
             }
         },
 
@@ -633,30 +673,36 @@ sap.ui.define([
         },
 
         /**
-         * Factory function to create a country token
-         * @param {string} sId - ID for the token
-         * @param {object} oContext - Binding context
-         * @returns {sap.m.Token} Token object
+         * Handler for table data received - populate tokenizers
          */
-        createCountryToken: function(sId, oContext) {
-            const oData = oContext.getObject();
-            return new Token(sId, {
-                key: oData.code,
-                text: oData.text
-            });
-        },
+        _onTableDataReceived: function() {
+            const oTable = this.getView().byId("reconcilesTable");
+            if (!oTable) {
+                return;
+            }
 
-        /**
-         * Factory function to create a company code token
-         * @param {string} sId - ID for the token
-         * @param {object} oContext - Binding context
-         * @returns {sap.m.Token} Token object
-         */
-        createCompanyCodeToken: function(sId, oContext) {
-            const oData = oContext.getObject();
-            return new Token(sId, {
-                key: oData.code,
-                text: oData.text
+            const aItems = oTable.getItems();
+            aItems.forEach((oItem) => {
+                const oContext = oItem.getBindingContext();
+                if (!oContext) {
+                    return;
+                }
+
+                const oData = oContext.getObject();
+                
+                // Update country list tokenizer
+                const oCountryTokenizer = oItem.getCells()[0];
+                if (oCountryTokenizer && oCountryTokenizer.isA("sap.m.Tokenizer")) {
+                    const aCountryTokens = this.formatter.formatCountryListToTokens(oData.CountryList);
+                    oCountryTokenizer.setTokens(aCountryTokens);
+                }
+
+                // Update company code list tokenizer
+                const oCompanyCodeTokenizer = oItem.getCells()[1];
+                if (oCompanyCodeTokenizer && oCompanyCodeTokenizer.isA("sap.m.Tokenizer")) {
+                    const aCompanyCodeTokens = this.formatter.formatCompanyCodeListToTokens(oData.CompanyCodeList);
+                    oCompanyCodeTokenizer.setTokens(aCompanyCodeTokens);
+                }
             });
         }
     });

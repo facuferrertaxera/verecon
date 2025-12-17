@@ -57,11 +57,11 @@ sap.ui.define([
         },
 
         /**
-         * Format country list to array of objects for binding
+         * Format country list to tokens array
          * @param {string} sCountryList - Comma-separated country codes
-         * @returns {Array} Array of objects with code and name
+         * @returns {Array} Array of Token objects
          */
-        formatCountryListToArray: function(sCountryList) {
+        formatCountryListToTokens: function(sCountryList) {
             if (!sCountryList) {
                 return [];
             }
@@ -71,20 +71,19 @@ sap.ui.define([
             
             return aCountryCodes.map((sCode) => {
                 const sCountryName = mCountryMap[sCode] || sCode;
-                return {
-                    code: sCode,
-                    name: sCountryName,
+                return new Token({
+                    key: sCode,
                     text: sCountryName + " (" + sCode + ")"
-                };
+                });
             });
         },
 
         /**
-         * Format company code list to array of objects for binding
+         * Format company code list to tokens array
          * @param {string} sCompanyCodeList - Comma-separated company codes
-         * @returns {Array} Array of objects with code and name
+         * @returns {Array} Array of Token objects
          */
-        formatCompanyCodeListToArray: function(sCompanyCodeList) {
+        formatCompanyCodeListToTokens: function(sCompanyCodeList) {
             if (!sCompanyCodeList) {
                 return [];
             }
@@ -94,11 +93,10 @@ sap.ui.define([
             
             return aCompanyCodes.map((sCode) => {
                 const sCompanyName = mCompanyCodeMap[sCode] || sCode;
-                return {
-                    code: sCode,
-                    name: sCompanyName,
+                return new Token({
+                    key: sCode,
                     text: sCompanyName !== sCode ? sCompanyName + " (" + sCode + ")" : sCode
-                };
+                });
             });
         }
     };

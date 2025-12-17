@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+
+specVersion: "4.0"
+metadata:
+  name: tech.taxera.taxreporting.verecon
+type: application
+builder:
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**
+  customTasks:
+    - name: deploy-to-abap
+      afterTask: generateCachebusterInfo
+      configuration:
+        target:
+          destination: abap-cloud
+          url: https://7ec63dd8-7f4b-4098-9f2b-2383f094b0b0.abap.eu10.hana.ondemand.com
+          scp: true
+        app:
+          name: /TAXERA/VERECON
+          package: /TAXERA/VERECON
+          transport: DEVK905754
+        exclude:
+          - /test/

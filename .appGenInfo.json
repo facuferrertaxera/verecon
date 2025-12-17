@@ -1,0 +1,24 @@
+{
+  "generationParameters": {
+    "generationDate": "Wed Dec 17 2025 15:49:29 GMT+0000 (Coordinated Universal Time)",
+    "generatorPlatform": "SAP Business Application Studio",
+    "serviceType": "SAP System (ABAP Cloud)",
+    "metadataFilename": "",
+    "serviceUrl": "N/A",
+    "appName": "verecon",
+    "appTitle": "Reconcilition - VAT Returns EC Sales List ",
+    "appDescription": "An SAP Fiori application.",
+    "appNamespace": "tech.taxera.taxreporting",
+    "ui5Theme": "sap_horizon",
+    "ui5Version": "1.143.2",
+    "enableCodeAssist": true,
+    "enableEslint": true,
+    "enableTypeScript": false,
+    "showMockDataInfo": false,
+    "generatorVersion": "1.20.0",
+    "template": "Basic",
+    "generatorName": "SAP Fiori Application Generator",
+    "entityRelatedConfig": [],
+    "launchText": "To launch the generated application, run the following from the generated application root folder:\n\n```\n    npm start\n```"
+  }
+}

@@ -58,7 +58,7 @@ sap.ui.define([
             }
 
             // Read countries from Country entity set
-            // For OData v4, read() returns a promise
+            // For OData v2, response is in oResponse.results
             oModel.read("/Country", {
                 urlParameters: {
                     "$select": "Country,Country_Text,CountryName"
@@ -67,7 +67,8 @@ sap.ui.define([
                     new Sorter("Country", false)
                 ],
                 success: (oResponse) => {
-                    const aResults = oResponse.results || oResponse.value || [];
+                    // OData v2 uses results array
+                    const aResults = oResponse.results || [];
                     const aCountries = aResults.map((oCountry) => {
                         return {
                             code: oCountry.Country,
@@ -97,6 +98,7 @@ sap.ui.define([
             }
 
             // Read company codes from CompanyVH entity set
+            // For OData v2, response is in oResponse.results
             oModel.read("/CompanyVH", {
                 urlParameters: {
                     "$select": "CompanyCode,Name,Country,CountryName"
@@ -105,7 +107,8 @@ sap.ui.define([
                     new Sorter("CompanyCode", false)
                 ],
                 success: (oResponse) => {
-                    const aResults = oResponse.results || oResponse.value || [];
+                    // OData v2 uses results array
+                    const aResults = oResponse.results || [];
                     const aCompanyCodes = aResults.map((oCompany) => {
                         return {
                             code: oCompany.CompanyCode,

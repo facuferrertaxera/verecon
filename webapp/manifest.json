@@ -17,7 +17,7 @@
     },
     "dataSources": {
       "mainService": {
-        "uri": "/sap/opu/odata/",
+        "uri": "/sap/opu/odata/TAXERA/VERECON_UI_O2/",
         "type": "OData",
         "settings": {
           "annotations": [],

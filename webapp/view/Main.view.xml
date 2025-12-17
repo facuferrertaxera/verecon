@@ -172,8 +172,8 @@
                     <items>
                         <ColumnListItem type="Navigation" press="onReconciliationPress">
                             <cells>
-                                <Text text="{CountryList}"/>
-                                <Text text="{CompanyCodeList}"/>
+                                <Tokenizer editable="false" tokens="{path: 'CountryList', formatter: '.formatter.formatCountryListToTokens'}" class="sapUiTinyMargin"/>
+                                <Tokenizer editable="false" tokens="{path: 'CompanyCodeList', formatter: '.formatter.formatCompanyCodeListToTokens'}" class="sapUiTinyMargin"/>
                                 <Text text="{path: 'FromDate', type: '.types.TaxeraDateType'}"/>
                                 <Text text="{path: 'ToDate', type: '.types.TaxeraDateType'}"/>
                                 <Text text="{CreatedByName}"/>

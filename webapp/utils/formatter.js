@@ -1,4 +1,6 @@
-sap.ui.define([], () => {
+sap.ui.define([
+    "sap/m/Token"
+], (Token) => {
     "use strict";
 
     return {
@@ -40,6 +42,62 @@ sap.ui.define([], () => {
                 "W": "Warning"       // Warning
             };
             return mStatusColors[sStatus] || "None";
+        },
+
+        /**
+         * Store controller reference for formatters
+         */
+        _oController: null,
+
+        /**
+         * Set controller reference
+         */
+        setController: function(oController) {
+            this._oController = oController;
+        },
+
+        /**
+         * Format country list to tokens array
+         * @param {string} sCountryList - Comma-separated country codes
+         * @returns {Array} Array of Token objects
+         */
+        formatCountryListToTokens: function(sCountryList) {
+            if (!sCountryList) {
+                return [];
+            }
+            
+            const aCountryCodes = sCountryList.split(",").map(s => s.trim()).filter(s => s);
+            const mCountryMap = this._oController && this._oController._mCountryMap ? this._oController._mCountryMap : {};
+            
+            return aCountryCodes.map((sCode) => {
+                const sCountryName = mCountryMap[sCode] || sCode;
+                return new Token({
+                    key: sCode,
+                    text: sCountryName + " (" + sCode + ")"
+                });
+            });
+        },
+
+        /**
+         * Format company code list to tokens array
+         * @param {string} sCompanyCodeList - Comma-separated company codes
+         * @returns {Array} Array of Token objects
+         */
+        formatCompanyCodeListToTokens: function(sCompanyCodeList) {
+            if (!sCompanyCodeList) {
+                return [];
+            }
+            
+            const aCompanyCodes = sCompanyCodeList.split(",").map(s => s.trim()).filter(s => s);
+            const mCompanyCodeMap = this._oController && this._oController._mCompanyCodeMap ? this._oController._mCompanyCodeMap : {};
+            
+            return aCompanyCodes.map((sCode) => {
+                const sCompanyName = mCompanyCodeMap[sCode] || sCode;
+                return new Token({
+                    key: sCode,
+                    text: sCompanyName !== sCode ? sCompanyName + " (" + sCode + ")" : sCode
+                });
+            });
         }
     };
 });

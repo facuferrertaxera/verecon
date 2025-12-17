@@ -43,6 +43,9 @@ sap.ui.define([
             });
             this.getView().setModel(oViewModel, "view");
 
+            // Set controller reference in formatter for token formatting
+            formatter.setController(this);
+
             // Attach route matched handler if routing is available
             const oRouter = this.getOwnerComponent().getRouter();
             if (oRouter) {
@@ -80,6 +83,12 @@ sap.ui.define([
                             name: oCountry.Country_Text || oCountry.CountryName || oCountry.Country,
                             selected: false
                         };
+                    });
+
+                    // Create country code to name mapping for formatter
+                    this._mCountryMap = {};
+                    aResults.forEach((oCountry) => {
+                        this._mCountryMap[oCountry.Country] = oCountry.Country_Text || oCountry.CountryName || oCountry.Country;
                     });
 
                     // Update view model
@@ -120,6 +129,12 @@ sap.ui.define([
                             name: oCompany.Name || oCompany.CompanyCode,
                             selected: false
                         };
+                    });
+
+                    // Create company code to name mapping for formatter
+                    this._mCompanyCodeMap = {};
+                    aResults.forEach((oCompany) => {
+                        this._mCompanyCodeMap[oCompany.CompanyCode] = oCompany.Name || oCompany.CompanyCode;
                     });
 
                     // Update view model
@@ -462,12 +477,18 @@ sap.ui.define([
             const aTokens = oEvent.getParameter("tokens");
             const oMultiInput = this.byId("countryListFilter");
             const oViewModel = this.getView().getModel("view");
+            const oVHD = this.getView().byId("countryValueHelpDialog");
             
             oMultiInput.setTokens(aTokens);
             
             // Extract selected country codes from tokens
             const aSelectedCountries = aTokens.map((oToken) => oToken.getKey());
             oViewModel.setProperty("/filters/selectedCountries", aSelectedCountries);
+            
+            // Close the dialog
+            if (oVHD) {
+                oVHD.close();
+            }
             
             // Trigger filter refresh
             const oSmartFilterBar = this.getView().byId("smartFilterBar");
@@ -576,12 +597,18 @@ sap.ui.define([
             const aTokens = oEvent.getParameter("tokens");
             const oMultiInput = this.byId("companyCodeListFilter");
             const oViewModel = this.getView().getModel("view");
+            const oVHD = this.getView().byId("companyCodeValueHelpDialog");
             
             oMultiInput.setTokens(aTokens);
             
             // Extract selected company codes from tokens
             const aSelectedCompanyCodes = aTokens.map((oToken) => oToken.getKey());
             oViewModel.setProperty("/filters/selectedCompanyCodes", aSelectedCompanyCodes);
+            
+            // Close the dialog
+            if (oVHD) {
+                oVHD.close();
+            }
             
             // Trigger filter refresh
             const oSmartFilterBar = this.getView().byId("smartFilterBar");

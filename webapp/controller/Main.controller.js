@@ -691,17 +691,52 @@ sap.ui.define([
                 const oData = oContext.getObject();
                 
                 // Update country list tokenizer
-                const oCountryTokenizer = oItem.getCells()[0];
-                if (oCountryTokenizer && oCountryTokenizer.isA("sap.m.Tokenizer")) {
-                    const aCountryTokens = this.formatter.formatCountryListToTokens(oData.CountryList);
-                    oCountryTokenizer.setTokens(aCountryTokens);
+                const aCells = oItem.getCells();
+                if (aCells && aCells.length > 0) {
+                    const oCountryCell = aCells[0];
+                    // Check if it's a Tokenizer or find Tokenizer within the cell
+                    let oCountryTokenizer = null;
+                    if (oCountryCell && oCountryCell.isA && oCountryCell.isA("sap.m.Tokenizer")) {
+                        oCountryTokenizer = oCountryCell;
+                    } else if (oCountryCell && oCountryCell.getContent && oCountryCell.getContent) {
+                        // If cell is a container, find Tokenizer inside
+                        const aContent = oCountryCell.getContent();
+                        oCountryTokenizer = aContent && aContent.find ? aContent.find(c => c.isA && c.isA("sap.m.Tokenizer")) : null;
+                    }
+                    
+                    if (oCountryTokenizer && typeof oCountryTokenizer.removeAllTokens === "function") {
+                        oCountryTokenizer.removeAllTokens();
+                        const aCountryTokens = this.formatter.formatCountryListToTokens(oData.CountryList);
+                        aCountryTokens.forEach((oToken) => {
+                            if (oToken && typeof oCountryTokenizer.addToken === "function") {
+                                oCountryTokenizer.addToken(oToken);
+                            }
+                        });
+                    }
                 }
 
                 // Update company code list tokenizer
-                const oCompanyCodeTokenizer = oItem.getCells()[1];
-                if (oCompanyCodeTokenizer && oCompanyCodeTokenizer.isA("sap.m.Tokenizer")) {
-                    const aCompanyCodeTokens = this.formatter.formatCompanyCodeListToTokens(oData.CompanyCodeList);
-                    oCompanyCodeTokenizer.setTokens(aCompanyCodeTokens);
+                if (aCells && aCells.length > 1) {
+                    const oCompanyCodeCell = aCells[1];
+                    // Check if it's a Tokenizer or find Tokenizer within the cell
+                    let oCompanyCodeTokenizer = null;
+                    if (oCompanyCodeCell && oCompanyCodeCell.isA && oCompanyCodeCell.isA("sap.m.Tokenizer")) {
+                        oCompanyCodeTokenizer = oCompanyCodeCell;
+                    } else if (oCompanyCodeCell && oCompanyCodeCell.getContent && oCompanyCodeCell.getContent) {
+                        // If cell is a container, find Tokenizer inside
+                        const aContent = oCompanyCodeCell.getContent();
+                        oCompanyCodeTokenizer = aContent && aContent.find ? aContent.find(c => c.isA && c.isA("sap.m.Tokenizer")) : null;
+                    }
+                    
+                    if (oCompanyCodeTokenizer && typeof oCompanyCodeTokenizer.removeAllTokens === "function") {
+                        oCompanyCodeTokenizer.removeAllTokens();
+                        const aCompanyCodeTokens = this.formatter.formatCompanyCodeListToTokens(oData.CompanyCodeList);
+                        aCompanyCodeTokens.forEach((oToken) => {
+                            if (oToken && typeof oCompanyCodeTokenizer.addToken === "function") {
+                                oCompanyCodeTokenizer.addToken(oToken);
+                            }
+                        });
+                    }
                 }
             });
         }

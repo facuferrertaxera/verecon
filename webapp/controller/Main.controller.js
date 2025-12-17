@@ -268,13 +268,13 @@ sap.ui.define([
                 requestAnimationFrame(() => {
                     // Then wait a bit more for SmartFilterBar to finish its internal rendering
                     setTimeout(() => {
-                        this._ensureFilterControlsVisible();
+                        //this._ensureFilterControlsVisible();
                     }, 150);
                 });
             } else {
                 // Fallback for older browsers
                 setTimeout(() => {
-                    this._ensureFilterControlsVisible();
+                    //this._ensureFilterControlsVisible();
                 }, 300);
             }
         },

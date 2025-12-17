@@ -484,39 +484,6 @@ sap.ui.define([
                     console.warn("[_ensureFilterControlsVisible] No filter items found or empty array");
                 }
 
-                // Diagnostic: Check control instances using getControlByKey
-                console.log("[_ensureFilterControlsVisible] === DIAGNOSTICS ===");
-                ["CountryList", "CompanyCodeList"].forEach((sFieldName) => {
-                    // Check FilterGroupItem state
-                    const oFilterItem = aFilterItems.find(i => {
-                        const sName = i.getName ? i.getName() : (i.getKey ? i.getKey() : null);
-                        return sName === sFieldName;
-                    });
-                    
-                    if (oFilterItem) {
-                        console.log(`\n${sFieldName} FilterGroupItem:`);
-                        console.log("  visibleInFilterBar:", oFilterItem.getVisibleInFilterBar ? oFilterItem.getVisibleInFilterBar() : "N/A");
-                        console.log("  partOfCurrentVariant:", oFilterItem.getPartOfCurrentVariant ? oFilterItem.getPartOfCurrentVariant() : "N/A");
-                        console.log("  visible:", oFilterItem.getVisible ? oFilterItem.getVisible() : "N/A");
-                    }
-                    
-                    // Check control instance using getControlByKey
-                    if (typeof oSmartFilterBar.getControlByKey === "function") {
-                        const oControl = oSmartFilterBar.getControlByKey(sFieldName);
-                        console.log(`\n${sFieldName} Control (getControlByKey):`);
-                        console.log("  Found:", !!oControl);
-                        console.log("  Type:", oControl ? oControl.getMetadata().getName() : "N/A");
-                        console.log("  DOM ref exists:", oControl ? !!oControl.getDomRef() : false);
-                        if (oControl && oControl.getDomRef()) {
-                            console.log("  ✅ Control is rendered in DOM!");
-                        } else {
-                            console.log("  ❌ Control not yet rendered (lazy rendering)");
-                        }
-                    } else {
-                        console.log(`\n${sFieldName}: getControlByKey method not available`);
-                    }
-                });
-                
                 // Try to expand filter bar if collapsed
                 if (typeof oSmartFilterBar.setFilterBarExpanded === "function") {
                     console.log("[_ensureFilterControlsVisible] Expanding filter bar");
@@ -530,6 +497,90 @@ sap.ui.define([
                     console.log("[_ensureFilterControlsVisible] Invalidating SmartFilterBar to force re-layout");
                     oSmartFilterBar.invalidate();
                 }
+                
+                // Wait for next rendering cycle, then check and set again if needed
+                // Sometimes SmartFilterBar resets the state, so we need to persist it
+                setTimeout(() => {
+                    console.log("[_ensureFilterControlsVisible] === POST-INVALIDATE DIAGNOSTICS ===");
+                    const aFilterItemsAfter = oSmartFilterBar.getAllFilterItems ? oSmartFilterBar.getAllFilterItems() : [];
+                    
+                    ["CountryList", "CompanyCodeList"].forEach((sFieldName) => {
+                        // Re-find the FilterGroupItem after invalidate
+                        const oFilterItem = aFilterItemsAfter.find(i => {
+                            const sName = i.getName ? i.getName() : (i.getKey ? i.getKey() : null);
+                            return sName === sFieldName;
+                        });
+                        
+                        if (oFilterItem) {
+                            console.log(`\n${sFieldName} FilterGroupItem (after invalidate):`);
+                            const bVisibleInFilterBar = oFilterItem.getVisibleInFilterBar ? oFilterItem.getVisibleInFilterBar() : false;
+                            const bPartOfCurrentVariant = oFilterItem.getPartOfCurrentVariant ? oFilterItem.getPartOfCurrentVariant() : false;
+                            console.log("  visibleInFilterBar:", bVisibleInFilterBar);
+                            console.log("  partOfCurrentVariant:", bPartOfCurrentVariant);
+                            console.log("  visible:", oFilterItem.getVisible ? oFilterItem.getVisible() : "N/A");
+                            
+                            // If it was reset, set it again and invalidate to force rendering
+                            if (!bVisibleInFilterBar && typeof oFilterItem.setVisibleInFilterBar === "function") {
+                                console.log(`  ⚠️ ${sFieldName} visibleInFilterBar was reset to false, setting to true again`);
+                                oFilterItem.setVisibleInFilterBar(true);
+                                // Force another invalidate after setting
+                                setTimeout(() => {
+                                    if (typeof oSmartFilterBar.invalidate === "function") {
+                                        oSmartFilterBar.invalidate();
+                                        console.log(`  🔄 Invalidated SmartFilterBar after re-setting ${sFieldName} visibleInFilterBar`);
+                                    }
+                                }, 100);
+                            }
+                            if (!bPartOfCurrentVariant && typeof oFilterItem.setPartOfCurrentVariant === "function") {
+                                console.log(`  ⚠️ ${sFieldName} partOfCurrentVariant was reset, setting to true again`);
+                                oFilterItem.setPartOfCurrentVariant(true);
+                            }
+                            
+                            // If visibleInFilterBar is still false, try using the ControlConfiguration approach
+                            if (!bVisibleInFilterBar) {
+                                console.log(`  🔧 Trying alternative approach for ${sFieldName}: using ControlConfiguration`);
+                                const aControlConfigs = oSmartFilterBar.getControlConfiguration ? oSmartFilterBar.getControlConfiguration() : [];
+                                const oControlConfig = aControlConfigs.find(cfg => {
+                                    const sCfgKey = cfg.getKey ? cfg.getKey() : null;
+                                    return sCfgKey === sFieldName;
+                                });
+                                if (oControlConfig) {
+                                    console.log(`  Found ControlConfiguration for ${sFieldName}`);
+                                    if (typeof oControlConfig.setVisible === "function") {
+                                        oControlConfig.setVisible(true);
+                                        console.log(`  Set ControlConfiguration ${sFieldName} visible: true`);
+                                    }
+                                    if (typeof oControlConfig.setVisibleInAdvancedArea === "function") {
+                                        oControlConfig.setVisibleInAdvancedArea(false);
+                                        console.log(`  Set ControlConfiguration ${sFieldName} visibleInAdvancedArea: false`);
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Check control instance using getControlByKey
+                        if (typeof oSmartFilterBar.getControlByKey === "function") {
+                            const oControl = oSmartFilterBar.getControlByKey(sFieldName);
+                            console.log(`\n${sFieldName} Control (getControlByKey):`);
+                            console.log("  Found:", !!oControl);
+                            console.log("  Type:", oControl ? oControl.getMetadata().getName() : "N/A");
+                            const bDomRefExists = oControl ? !!oControl.getDomRef() : false;
+                            console.log("  DOM ref exists:", bDomRefExists);
+                            if (bDomRefExists) {
+                                console.log("  ✅ Control is rendered in DOM!");
+                            } else {
+                                console.log("  ❌ Control not yet rendered (lazy rendering)");
+                                // If control exists but no DOM ref, try invalidating again after a delay
+                                if (oControl) {
+                                    setTimeout(() => {
+                                        oSmartFilterBar.invalidate();
+                                        console.log(`  🔄 Invalidated SmartFilterBar again for ${sFieldName}`);
+                                    }, 200);
+                                }
+                            }
+                        }
+                    });
+                }, 300);
                 
                 // Try to get the FilterGroup and show items there
                 if (typeof oSmartFilterBar.getFilterGroup === "function") {

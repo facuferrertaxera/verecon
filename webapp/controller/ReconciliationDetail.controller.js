@@ -15,7 +15,23 @@ sap.ui.define([
             const oViewModel = new JSONModel({
                 reconciliationDetail: {
                     headerExpanded: true,
-                    titleClickable: true
+                    titleClickable: true,
+                    chartFiltersVisible: true,
+                    chartsHeight: "200px",
+                    donutHeight: "150px",
+                    selectedCountry: "",
+                    bChartShowError: false,
+                    headerFilters: {
+                        statusDonutChart: {
+                            segments: []
+                        },
+                        documentTypeBarChart: {
+                            bars: []
+                        },
+                        submissionDateLineChart: {
+                            points: []
+                        }
+                    }
                 }
             });
             this.getView().setModel(oViewModel, "view");
@@ -111,6 +127,51 @@ sap.ui.define([
          */
         onCloseDetail: function() {
             this.getOwnerComponent().getRouter().navTo("RouteMain");
+        },
+
+        /**
+         * Factory method for creating donut chart segments (placeholder)
+         */
+        createDonutSegments: function(sId, oContext) {
+            // Placeholder - to be implemented
+            return null;
+        },
+
+        /**
+         * Factory method for creating bar chart bars (placeholder)
+         */
+        createBars: function(sId, oContext) {
+            // Placeholder - to be implemented
+            return null;
+        },
+
+        /**
+         * Factory method for creating line chart points (placeholder)
+         */
+        createPoints: function(sId, oContext) {
+            // Placeholder - to be implemented
+            return null;
+        },
+
+        /**
+         * Handler for status donut chart selection (placeholder)
+         */
+        onSelectStatus: function(oEvent) {
+            // Placeholder - to be implemented
+        },
+
+        /**
+         * Handler for document type bar chart selection (placeholder)
+         */
+        onSelectDocumentTypeFilter: function(oEvent) {
+            // Placeholder - to be implemented
+        },
+
+        /**
+         * Handler for submitted month line chart selection (placeholder)
+         */
+        onSelectSubmittedMonthFilter: function(oEvent) {
+            // Placeholder - to be implemented
         }
     });
 

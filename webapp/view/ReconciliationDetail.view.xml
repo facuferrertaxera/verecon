@@ -11,6 +11,7 @@
     xmlns:smartFilterBar="sap.ui.comp.smartfilterbar" 
     xmlns:table="sap.ui.table"
     xmlns:smartVariant="sap.ui.comp.smartvariants.SmartVariantManagement"
+    xmlns:mc="sap.suite.ui.microchart"
     xmlns:customData="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
     <f:DynamicPage headerExpanded="{view>/reconciliationDetail/headerExpanded}" toggleHeaderOnTitleClick="{view>/reconciliationDetail/titleClickable}" class="sapUiNoContentPadding">
         <f:title>
@@ -30,39 +31,36 @@
         <f:header>
             <f:DynamicPageHeader pinnable="true">
                 <f:content>
-                    <!-- SmartFilterBar with specific filters -->
-                    <smartFilterBar:SmartFilterBar
-                        id="smartFilterBar"
-                        entitySet="Document"
-                        persistencyKey="ReconciliationDetailFilterBarKey"
-                        useDateRangeType="true"
-                        liveMode="true">
-                        
-                        <!-- Custom Filters -->
-                        <smartFilterBar:controlConfiguration>
-                            <!-- Filter for DocumentNo -->
-                            <smartFilterBar:ControlConfiguration key="DocumentNo">
-                            </smartFilterBar:ControlConfiguration>
-                            
-                            <!-- Filter for PostingDate -->
-                            <smartFilterBar:ControlConfiguration key="PostingDate">
-                            </smartFilterBar:ControlConfiguration>
-                            
-                            <!-- Filter for TaxCode -->
-                            <smartFilterBar:ControlConfiguration key="TaxCode">
-                            </smartFilterBar:ControlConfiguration>
-                            
-                            <!-- Filter for CompanyCode -->
-                            <smartFilterBar:ControlConfiguration key="CompanyCode">
-                            </smartFilterBar:ControlConfiguration>
-                        </smartFilterBar:controlConfiguration>
-                    </smartFilterBar:SmartFilterBar>
+                    <!-- Charts for reconciliation overview -->
+                    <HBox alignItems="Start" class="sapUiNoContentPadding" visible="{view>/reconciliationDetail/chartFiltersVisible}" height="{view>/reconciliationDetail/chartsHeight}">
+                        <VBox alignItems="Start" class="sapUiNoContentPadding sapUiTinyMarginBeginEnd" width="20%" height="{view>/reconciliationDetail/donutHeight}">
+                            <Label text="{i18n>reconciliationDetail.StatusPerCountry}" class="smallLabel sapUiSmallMarginTopBottom" />
+                            <mc:InteractiveDonutChart selectionEnabled="true" displayedSegments="{= ${view>/reconciliationDetail/selectedCountry} === 'RO' ? 7 : 6}" id="statusDonut" selectionChanged="onSelectStatus" showError="{view>/reconciliationDetail/bChartShowError}" segments="{ path : 'view>/reconciliationDetail/headerFilters/statusDonutChart/segments' , factory: '.createDonutSegments'}" />
+                        </VBox>
+                        <VBox alignItems="Start" class="sapUiNoContentPadding sapUiTinyMarginBeginEnd" width="35%">
+                            <Label text="{i18n>reconciliationDetail.DocTypesPerCountry}" class="smallLabel sapUiSmallMarginTopBottom" />
+                            <mc:InteractiveBarChart
+                                id="documentTypeBarChart"
+                                labelWidth="30%"
+                                selectionChanged="onSelectDocumentTypeFilter"
+                                showError="{view>/reconciliationDetail/bChartShowError}"
+                                displayedBars="4"
+                                bars="{ 
+                                    path : 'view>/reconciliationDetail/headerFilters/documentTypeBarChart/bars' , factory: '.createBars'
+                                }"
+                            />
+                        </VBox>
+                        <VBox alignItems="Start" class="sapUiNoContentPadding sapUiTinyMarginBeginEnd" width="35%" height="150px">
+                            <Label text="{i18n>reconciliationDetail.SubmittedDocumentsPerMonth}" class="smallLabel sapUiSmallMarginTopBottom" />
+                            <mc:InteractiveLineChart id="submissionDateLineChart" selectionChanged="onSelectSubmittedMonthFilter" showError="{view>/reconciliationDetail/bChartShowError}" points="{ path : 'view>/reconciliationDetail/headerFilters/submissionDateLineChart/points' , factory: '.createPoints'}" />
+                        </VBox>
+                    </HBox>
                 </f:content>
             </f:DynamicPageHeader>
         </f:header>
         <f:content>
             <smartTable:SmartTable showDetailsButton="true" id="documentsSTable" entitySet="Document" beforeRebindTable="onBeforeRebind" tableType="Table" useVariantManagement="true" useTablePersonalisation="true" requestAtLeastFields="DocId"
-                header="{i18n>reconciliationDetail.Documents}" smartFilterId="smartFilterBar" persistencyKey="ReconciliationDetailTableKey" enableAutoBinding="false" customizeConfig="{'autoColumnWidth': {'*': {'min': 5, 'max': 10, 'gap': 2, 'truncateLabel': false}}}" enableAutoColumnWidth="true">
+                header="{i18n>reconciliationDetail.Documents}" persistencyKey="ReconciliationDetailTableKey" enableAutoBinding="false" customizeConfig="{'autoColumnWidth': {'*': {'min': 5, 'max': 10, 'gap': 2, 'truncateLabel': false}}}" enableAutoColumnWidth="true">
                 <Table
                     id="documentsTable"
                     sticky="ColumnHeaders,HeaderToolbar"

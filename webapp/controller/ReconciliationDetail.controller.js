@@ -1,14 +1,14 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller",
+    "tech/taxera/taxreporting/verecon/controller/BaseController",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/ui/model/json/JSONModel",
     "tech/taxera/taxreporting/verecon/utils/formatter",
     "tech/taxera/taxreporting/verecon/utils/types"
-], (Controller, Filter, FilterOperator, JSONModel, formatter, types) => {
+], (BaseController, Filter, FilterOperator, JSONModel, formatter, types) => {
     "use strict";
 
-    const ReconciliationDetailController = Controller.extend("tech.taxera.taxreporting.verecon.controller.ReconciliationDetail", {
+    const ReconciliationDetailController = BaseController.extend("tech.taxera.taxreporting.verecon.controller.ReconciliationDetail", {
         formatter: formatter,
         types: types,
 
@@ -50,7 +50,7 @@ sap.ui.define([
             this._loadAvailableCompanyCodes();
 
             // Get router and attach route matched handler
-            const oRouter = this.getOwnerComponent().getRouter();
+            const oRouter = this.getRouter();
             if (oRouter) {
                 oRouter.getRoute("ReconciliationDetail").attachPatternMatched(this._onRouteMatched, this);
             }
@@ -82,7 +82,7 @@ sap.ui.define([
                         this.getView().setBusy(false);
                         if (!oEvent.getParameter("data")) {
                             // Reconciliation not found
-                            this.getOwnerComponent().getRouter().navTo("RouteMain");
+                            this.getRouter().navTo("RouteMain");
                             return;
                         }
                         
@@ -130,7 +130,7 @@ sap.ui.define([
          * Handler for close button - navigate back to main view
          */
         onCloseDetail: function() {
-            this.getOwnerComponent().getRouter().navTo("RouteMain");
+            this.getRouter().navTo("RouteMain");
         },
 
         /**

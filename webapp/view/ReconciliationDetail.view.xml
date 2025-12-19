@@ -7,6 +7,7 @@
     xmlns:f="sap.f"
     xmlns:core="sap.ui.core"
     xmlns:layout="sap.ui.layout"
+    xmlns:cssgrid="sap.ui.layout.cssgrid"
     xmlns:smartTable="sap.ui.comp.smarttable"
     xmlns:smartFilterBar="sap.ui.comp.smartfilterbar" 
     xmlns:table="sap.ui.table"
@@ -32,29 +33,71 @@
             <f:DynamicPageHeader pinnable="true">
                 <f:content>
                     <!-- Charts for reconciliation overview -->
-                    <HBox alignItems="Start" class="sapUiNoContentPadding" visible="{view>/reconciliationDetail/chartFiltersVisible}" height="{view>/reconciliationDetail/chartsHeight}">
-                        <VBox alignItems="Start" class="sapUiNoContentPadding sapUiTinyMarginBeginEnd" width="20%" height="{view>/reconciliationDetail/donutHeight}">
-                            <Label text="{i18n>reconciliationDetail.StatusPerCountry}" class="smallLabel sapUiSmallMarginTopBottom" />
-                            <mc:InteractiveDonutChart selectionEnabled="true" displayedSegments="{= ${view>/reconciliationDetail/selectedCountry} === 'RO' ? 7 : 6}" id="statusDonut" selectionChanged="onSelectStatus" showError="{view>/reconciliationDetail/bChartShowError}" segments="{ path : 'view>/reconciliationDetail/headerFilters/statusDonutChart/segments' , factory: '.createDonutSegments'}" />
-                        </VBox>
-                        <VBox alignItems="Start" class="sapUiNoContentPadding sapUiTinyMarginBeginEnd" width="35%">
-                            <Label text="{i18n>reconciliationDetail.DocTypesPerCountry}" class="smallLabel sapUiSmallMarginTopBottom" />
-                            <mc:InteractiveBarChart
-                                id="documentTypeBarChart"
-                                labelWidth="30%"
-                                selectionChanged="onSelectDocumentTypeFilter"
-                                showError="{view>/reconciliationDetail/bChartShowError}"
-                                displayedBars="4"
-                                bars="{ 
-                                    path : 'view>/reconciliationDetail/headerFilters/documentTypeBarChart/bars' , factory: '.createBars'
-                                }"
-                            />
-                        </VBox>
-                        <VBox alignItems="Start" class="sapUiNoContentPadding sapUiTinyMarginBeginEnd" width="35%" height="150px">
-                            <Label text="{i18n>reconciliationDetail.SubmittedDocumentsPerMonth}" class="smallLabel sapUiSmallMarginTopBottom" />
-                            <mc:InteractiveLineChart id="submissionDateLineChart" selectionChanged="onSelectSubmittedMonthFilter" showError="{view>/reconciliationDetail/bChartShowError}" points="{ path : 'view>/reconciliationDetail/headerFilters/submissionDateLineChart/points' , factory: '.createPoints'}" />
-                        </VBox>
-                    </HBox>
+                    <cssgrid:CSSGrid
+                        gridTemplateColumns="repeat(12, 1fr)"
+                        gridGap="1rem"
+                        width="100%"
+                        visible="{view>/reconciliationDetail/chartFiltersVisible}">
+                        
+                        <!-- Status per Country Chart Card -->
+                        <f:Card class="sapUiMediumMarginBottom">
+                            <f:layoutData>
+                                <cssgrid:GridItemLayoutData gridColumn="span 3" />
+                            </f:layoutData>
+                            <f:content>
+                                <VBox class="sapUiSmallMargin" height="{view>/reconciliationDetail/donutHeight}">
+                                    <Label text="{i18n>reconciliationDetail.StatusPerCountry}" class="smallLabel sapUiSmallMarginTopBottom" />
+                                    <mc:InteractiveDonutChart 
+                                        selectionEnabled="true" 
+                                        displayedSegments="{= ${view>/reconciliationDetail/selectedCountry} === 'RO' ? 7 : 6}" 
+                                        id="statusDonut" 
+                                        selectionChanged="onSelectStatus" 
+                                        showError="{view>/reconciliationDetail/bChartShowError}" 
+                                        segments="{ path : 'view>/reconciliationDetail/headerFilters/statusDonutChart/segments' , factory: '.createDonutSegments'}" />
+                                </VBox>
+                            </f:content>
+                        </f:Card>
+                        
+                        <!-- Document Types per Country Chart Card -->
+                        <f:Card class="sapUiMediumMarginBottom">
+                            <f:layoutData>
+                                <cssgrid:GridItemLayoutData gridColumn="span 4" />
+                            </f:layoutData>
+                            <f:content>
+                                <VBox class="sapUiSmallMargin">
+                                    <Label text="{i18n>reconciliationDetail.DocTypesPerCountry}" class="smallLabel sapUiSmallMarginTopBottom" />
+                                    <mc:InteractiveBarChart
+                                        id="documentTypeBarChart"
+                                        labelWidth="30%"
+                                        selectionChanged="onSelectDocumentTypeFilter"
+                                        showError="{view>/reconciliationDetail/bChartShowError}"
+                                        displayedBars="4"
+                                        bars="{ 
+                                            path : 'view>/reconciliationDetail/headerFilters/documentTypeBarChart/bars' , factory: '.createBars'
+                                        }"
+                                    />
+                                </VBox>
+                            </f:content>
+                        </f:Card>
+                        
+                        <!-- Submitted Documents per Month Chart Card -->
+                        <f:Card class="sapUiMediumMarginBottom">
+                            <f:layoutData>
+                                <cssgrid:GridItemLayoutData gridColumn="span 5" />
+                            </f:layoutData>
+                            <f:content>
+                                <VBox class="sapUiSmallMargin" height="150px">
+                                    <Label text="{i18n>reconciliationDetail.SubmittedDocumentsPerMonth}" class="smallLabel sapUiSmallMarginTopBottom" />
+                                    <mc:InteractiveLineChart 
+                                        id="submissionDateLineChart" 
+                                        selectionChanged="onSelectSubmittedMonthFilter" 
+                                        showError="{view>/reconciliationDetail/bChartShowError}" 
+                                        points="{ path : 'view>/reconciliationDetail/headerFilters/submissionDateLineChart/points' , factory: '.createPoints'}" />
+                                </VBox>
+                            </f:content>
+                        </f:Card>
+                        
+                    </cssgrid:CSSGrid>
                 </f:content>
             </f:DynamicPageHeader>
         </f:header>

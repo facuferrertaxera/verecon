@@ -37,10 +37,11 @@
                         gridTemplateColumns="repeat(12, 1fr)"
                         gridGap="1rem"
                         width="100%"
+                        class="sapUiNoContentPadding"
                         visible="{view>/reconciliationDetail/chartFiltersVisible}">
                         
                         <!-- Status per Country Chart Card -->
-                        <f:Card class="sapUiMediumMarginBottom">
+                        <f:Card>
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 3" />
                             </f:layoutData>
@@ -59,7 +60,7 @@
                         </f:Card>
                         
                         <!-- Document Types per Country Chart Card -->
-                        <f:Card class="sapUiMediumMarginBottom">
+                        <f:Card>
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 4" />
                             </f:layoutData>
@@ -81,7 +82,7 @@
                         </f:Card>
                         
                         <!-- Submitted Documents per Month Chart Card -->
-                        <f:Card class="sapUiMediumMarginBottom">
+                        <f:Card>
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 5" />
                             </f:layoutData>

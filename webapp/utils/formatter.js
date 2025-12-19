@@ -166,6 +166,25 @@ sap.ui.define([
                     text: sCode
                 });
             });
+        },
+
+        /**
+         * Format difference amount state for ObjectNumber
+         * @param {number} fAmount - Difference amount
+         * @returns {string} State (None, Success, Warning, Error)
+         */
+        formatDiffAmountState: function(fAmount) {
+            if (fAmount === null || fAmount === undefined) {
+                return "None";
+            }
+            
+            // If difference is zero, show as success (no difference)
+            if (fAmount === 0) {
+                return "Success";
+            }
+            
+            // If there's a difference, show as error (mismatch)
+            return "Error";
         }
     };
 });

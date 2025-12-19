@@ -114,12 +114,23 @@
           "target": [
             "TargetMain"
           ]
+        },
+        {
+          "name": "ReconciliationDetail",
+          "pattern": "reconciliation/{reconId}",
+          "target": [
+            "TargetReconciliationDetail"
+          ]
         }
       ],
       "targets": {
         "TargetMain": {
           "id": "Main",
           "name": "Main"
+        },
+        "TargetReconciliationDetail": {
+          "id": "ReconciliationDetail",
+          "name": "ReconciliationDetail"
         }
       }
     },

@@ -1,0 +1,197 @@
+<mvc:View controllerName="tech.taxera.taxreporting.verecon.controller.ReconciliationDetail"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m"
+    xmlns:smartform="sap.ui.comp.smartform"
+    xmlns:smartField="sap.ui.comp.smartfield"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:smartFilterBar="sap.ui.comp.smartfilterbar" 
+    xmlns:table="sap.ui.table"
+    xmlns:smartVariant="sap.ui.comp.smartvariants.SmartVariantManagement"
+    xmlns:customData="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+    <f:DynamicPage headerExpanded="{view>/reconciliationDetail/headerExpanded}" toggleHeaderOnTitleClick="{view>/reconciliationDetail/titleClickable}" class="sapUiNoContentPadding">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:snappedContent>
+                    <Text id="statusText"></Text>
+                </f:snappedContent>
+                <f:navigationActions>
+                    <Button
+                        icon="sap-icon://decline"
+                        type="Transparent"
+                        press="onCloseDetail" />
+                </f:navigationActions>
+            </f:DynamicPageTitle>
+        </f:title>
+        <!-- DynamicPage Header -->
+        <f:header>
+            <f:DynamicPageHeader pinnable="true">
+                <f:content>
+                    <!-- SmartFilterBar with specific filters -->
+                    <smartFilterBar:SmartFilterBar
+                        id="smartFilterBar"
+                        entitySet="Document"
+                        persistencyKey="ReconciliationDetailFilterBarKey"
+                        useDateRangeType="true"
+                        liveMode="true">
+                        
+                        <!-- Custom Filters -->
+                        <smartFilterBar:controlConfiguration>
+                            <!-- Filter for DocumentNo -->
+                            <smartFilterBar:ControlConfiguration key="DocumentNo">
+                            </smartFilterBar:ControlConfiguration>
+                            
+                            <!-- Filter for PostingDate -->
+                            <smartFilterBar:ControlConfiguration key="PostingDate">
+                            </smartFilterBar:ControlConfiguration>
+                            
+                            <!-- Filter for TaxCode -->
+                            <smartFilterBar:ControlConfiguration key="TaxCode">
+                            </smartFilterBar:ControlConfiguration>
+                            
+                            <!-- Filter for CompanyCode -->
+                            <smartFilterBar:ControlConfiguration key="CompanyCode">
+                            </smartFilterBar:ControlConfiguration>
+                        </smartFilterBar:controlConfiguration>
+                    </smartFilterBar:SmartFilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <smartTable:SmartTable showDetailsButton="true" id="documentsSTable" entitySet="Document" beforeRebindTable="onBeforeRebind" tableType="Table" useVariantManagement="true" useTablePersonalisation="true" requestAtLeastFields="DocId"
+                header="{i18n>reconciliationDetail.Documents}" smartFilterId="smartFilterBar" persistencyKey="ReconciliationDetailTableKey" enableAutoBinding="false" customizeConfig="{'autoColumnWidth': {'*': {'min': 5, 'max': 10, 'gap': 2, 'truncateLabel': false}}}" enableAutoColumnWidth="true">
+                <Table
+                    id="documentsTable"
+                    sticky="ColumnHeaders,HeaderToolbar"
+                    growing="true"
+                    growingScrollToLoad="true"
+                    growingThreshold="100">
+                    
+                    <columns>
+                        <Column demandPopin="true" minScreenWidth="Tablet">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "CompanyCode","columnIndex":"1", "leadingProperty": "CompanyCode", "filterProperty": "CompanyCode", "sortProperty": "CompanyCode", "type": "string"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.CompanyCode}"/>
+                        </Column>
+                        <Column>
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "DocumentNo","columnIndex":"2", "leadingProperty": "DocumentNo", "filterProperty": "DocumentNo", "sortProperty": "DocumentNo", "type": "string"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.DocumentNo}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Tablet">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "FiscalYear","columnIndex":"3", "leadingProperty": "FiscalYear", "filterProperty": "FiscalYear", "sortProperty": "FiscalYear", "type": "string"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.FiscalYear}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Tablet">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "PostingDate","columnIndex":"4", "leadingProperty": "PostingDate", "filterProperty": "PostingDate", "sortProperty": "PostingDate", "type": "date"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.PostingDate}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Tablet">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "TaxCode","columnIndex":"5", "leadingProperty": "TaxCode", "filterProperty": "TaxCode", "sortProperty": "TaxCode", "type": "string"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.TaxCode}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Tablet">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "Currencycode","columnIndex":"6", "leadingProperty": "Currencycode", "filterProperty": "Currencycode", "sortProperty": "Currencycode", "type": "string"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.Currency}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop" hAlign="End" width="8rem">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "VatrBaseAmount","columnIndex":"7", "leadingProperty": "VatrBaseAmount", "filterProperty": "VatrBaseAmount", "sortProperty": "VatrBaseAmount", "type": "decimal"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.VatrBaseAmount}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop" hAlign="End" width="8rem">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "VatrTaxAmount","columnIndex":"8", "leadingProperty": "VatrTaxAmount", "filterProperty": "VatrTaxAmount", "sortProperty": "VatrTaxAmount", "type": "decimal"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.VatrTaxAmount}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop" hAlign="End" width="8rem">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "VatrGrossAmount","columnIndex":"9", "leadingProperty": "VatrGrossAmount", "filterProperty": "VatrGrossAmount", "sortProperty": "VatrGrossAmount", "type": "decimal"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.VatrGrossAmount}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop" hAlign="End" width="8rem">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "EcslBaseAmount","columnIndex":"10", "leadingProperty": "EcslBaseAmount", "filterProperty": "EcslBaseAmount", "sortProperty": "EcslBaseAmount", "type": "decimal"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.EcslBaseAmount}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop" hAlign="End" width="8rem">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "EcslTaxAmount","columnIndex":"11", "leadingProperty": "EcslTaxAmount", "filterProperty": "EcslTaxAmount", "sortProperty": "EcslTaxAmount", "type": "decimal"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.EcslTaxAmount}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop" hAlign="End" width="8rem">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "EcslGrossAmount","columnIndex":"12", "leadingProperty": "EcslGrossAmount", "filterProperty": "EcslGrossAmount", "sortProperty": "EcslGrossAmount", "type": "decimal"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.EcslGrossAmount}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop" hAlign="End" width="8rem">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "DiffBaseAmount","columnIndex":"13", "leadingProperty": "DiffBaseAmount", "filterProperty": "DiffBaseAmount", "sortProperty": "DiffBaseAmount", "type": "decimal"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.DiffBaseAmount}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop" hAlign="End" width="8rem">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "DiffTaxAmount","columnIndex":"14", "leadingProperty": "DiffTaxAmount", "filterProperty": "DiffTaxAmount", "sortProperty": "DiffTaxAmount", "type": "decimal"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.DiffTaxAmount}"/>
+                        </Column>
+                        <Column demandPopin="true" minScreenWidth="Desktop" hAlign="End" width="8rem">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "DiffGrossAmount","columnIndex":"15", "leadingProperty": "DiffGrossAmount", "filterProperty": "DiffGrossAmount", "sortProperty": "DiffGrossAmount", "type": "decimal"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.DiffGrossAmount}"/>
+                        </Column>
+                        <Column width="auto" hAlign="Center" importance="High" demandPopin="true" minScreenWidth="Desktop">
+                            <customData>
+                                <core:CustomData key="p13nData" value='\{"columnKey": "Status","columnIndex":"16", "leadingProperty": "Status", "filterProperty": "Status", "sortProperty": "Status", "type": "string"}'/>
+                            </customData>
+                            <Text text="{i18n>reconciliationDetail.Status}"/>
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem vAlign="Middle">
+                            <cells>
+                                <Text text="{CompanyCode}"/>
+                                <Text text="{DocumentNo}"/>
+                                <Text text="{FiscalYear}"/>
+                                <Text text="{path: 'PostingDate', type: 'sap.ui.model.type.Date', formatOptions: {style: 'medium'}}"/>
+                                <Text text="{TaxCode}"/>
+                                <Text text="{Currencycode}"/>
+                                <ObjectNumber number="{VatrBaseAmount}" unit="{Currencycode}"/>
+                                <ObjectNumber number="{VatrTaxAmount}" unit="{Currencycode}"/>
+                                <ObjectNumber number="{VatrGrossAmount}" unit="{Currencycode}"/>
+                                <ObjectNumber number="{EcslBaseAmount}" unit="{Currencycode}"/>
+                                <ObjectNumber number="{EcslTaxAmount}" unit="{Currencycode}"/>
+                                <ObjectNumber number="{EcslGrossAmount}" unit="{Currencycode}"/>
+                                <ObjectNumber number="{DiffBaseAmount}" unit="{Currencycode}" state="{path: 'DiffBaseAmount', formatter: '.formatter.formatDiffAmountState'}"/>
+                                <ObjectNumber number="{DiffTaxAmount}" unit="{Currencycode}" state="{path: 'DiffTaxAmount', formatter: '.formatter.formatDiffAmountState'}"/>
+                                <ObjectNumber number="{DiffGrossAmount}" unit="{Currencycode}" state="{path: 'DiffGrossAmount', formatter: '.formatter.formatDiffAmountState'}"/>
+                                <ObjectStatus text="{Status}" state="{path: 'Status', formatter: '.formatter.formatStatusColor'}"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </smartTable:SmartTable>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

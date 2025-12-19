@@ -304,9 +304,15 @@ sap.ui.define([
          */
         onReconciliationPress: function(oEvent) {
             const oReconciliation = oEvent.getSource().getBindingContext().getObject();
-            // TODO: Navigate to detail view based on status
-            // For now, just show a message
-            MessageToast.show(this.i18n("reconciliationList.NavigateToDetail"));
+            const sReconId = oReconciliation.Id;
+            
+            if (sReconId) {
+                this.getRouter().navTo("ReconciliationDetail", {
+                    reconId: sReconId
+                });
+            } else {
+                MessageToast.show(this.i18n("reconciliationList.NavigateToDetailError"));
+            }
         },
 
         /**

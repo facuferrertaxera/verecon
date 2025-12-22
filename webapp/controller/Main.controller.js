@@ -15,11 +15,13 @@ sap.ui.define([
     "sap/m/SearchField",
     "sap/m/Token",
     "tech/taxera/taxreporting/verecon/utils/types",
-    "tech/taxera/taxreporting/verecon/utils/formatter"
-], (Controller, Sorter, MessageToast, MessageBox, Filter, FilterOperator, JSONModel, ValueHelpDialog, UITableColumn, MColumn, Text, Label, ColumnListItem, SearchField, Token, types, formatter) => {
+    "tech/taxera/taxreporting/verecon/utils/formatter",
+    "tech/taxera/taxreporting/verecon/controller/main/newReconciliation"
+], (Controller, Sorter, MessageToast, MessageBox, Filter, FilterOperator, JSONModel, ValueHelpDialog, UITableColumn, MColumn, Text, Label, ColumnListItem, SearchField, Token, types, formatter, newReconciliation) => {
     "use strict";
 
-    const MainController = Controller.extend("tech.taxera.taxreporting.verecon.controller.Main", {
+    // Mix in newReconciliation methods
+    const MainController = Controller.extend("tech.taxera.taxreporting.verecon.controller.Main", Object.assign({
         // Add types and formatter to controller instance
         types: types,
         formatter: formatter,
@@ -292,11 +294,10 @@ sap.ui.define([
         },
 
         /**
-         * Handler for Create button
+         * Handler for Create button - opens new reconciliation dialog
          */
         onReconciliationCreate: function() {
-            // TODO: Implement create reconciliation dialog/navigation
-            MessageToast.show(this.i18n("reconciliationList.CreateNotImplemented"));
+            return newReconciliation.openNewReconciliation.call(this);
         },
 
         /**
@@ -835,7 +836,7 @@ sap.ui.define([
                 }
             });
         }
-    });
+    }, newReconciliation));
 
     return MainController;
 });

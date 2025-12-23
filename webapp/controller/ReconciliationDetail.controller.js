@@ -80,11 +80,6 @@ sap.ui.define([
                     },
                     dataReceived: (oEvent) => {
                         this.getView().setBusy(false);
-                        if (!oEvent.getParameter("data")) {
-                            // Reconciliation not found
-                            this.getRouter().navTo("RouteMain");
-                            return;
-                        }
                         
                         // Populate tokenizers with reconciliation data
                         this._populateReconciliationDetails();

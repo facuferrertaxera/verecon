@@ -68,8 +68,8 @@ sap.ui.define([
             }
 
             // Get the reconciliation context
-            const oModel = this.getModel();
-            const sReconciliationPath = `/Reconciliation('${sReconId}')`;
+            // Format GUID correctly for OData V2: guid'...'
+            const sReconciliationPath = `/Reconciliation(guid'${sReconId}')`;
             
             // Bind the view to the reconciliation
             this.getView().bindElement({
@@ -81,11 +81,24 @@ sap.ui.define([
                     dataReceived: (oEvent) => {
                         this.getView().setBusy(false);
                         
+                        // Check if binding was successful
+                        const oBindingContext = this.getView().getBindingContext();
+                        if (!oBindingContext) {
+                            this.showErrorMessage({ responseText: JSON.stringify({ error: { message: { value: "Failed to load reconciliation data" } } }) });
+                            return;
+                        }
+                        
                         // Populate tokenizers with reconciliation data
                         this._populateReconciliationDetails();
                         
                         // After reconciliation is loaded, bind the SmartTable
                         this._bindDocumentsTable(sReconciliationPath);
+                    },
+                    change: (oEvent) => {
+                        // Handle binding errors
+                        if (!oEvent.getParameter("bindingContext")) {
+                            this.getView().setBusy(false);
+                        }
                     }
                 }
             });
@@ -231,7 +244,12 @@ sap.ui.define([
          * Populate reconciliation details tokenizers
          */
         _populateReconciliationDetails: function() {
-            const oReconciliation = this.getView().getBindingContext().getObject();
+            const oBindingContext = this.getView().getBindingContext();
+            if (!oBindingContext) {
+                return;
+            }
+            
+            const oReconciliation = oBindingContext.getObject();
             if (!oReconciliation) {
                 return;
             }

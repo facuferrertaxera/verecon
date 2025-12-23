@@ -53,10 +53,54 @@ sap.ui.define([
             this._loadAvailableCountries();
             this._loadAvailableCompanyCodes();
 
+            // Initialize treemap data with mock data
+            this._setMockTreemapData();
+
             // Get router and attach route matched handler
             const oRouter = this.getRouter();
             if (oRouter) {
                 oRouter.getRoute("ReconciliationDetail").attachPatternMatched(this._onRouteMatched, this);
+            }
+
+            // Configure VizFrames after view is rendered
+            this.getView().addEventDelegate({
+                onAfterRendering: () => {
+                    this._configureTreemaps();
+                }
+            }, this);
+        },
+
+        /**
+         * Configure treemap VizFrames to hide titles
+         */
+        _configureTreemaps: function() {
+            const oCompanyCodeTreemap = this.byId("companyCodeTreemap");
+            const oTaxCodeTreemap = this.byId("taxCodeTreemap");
+
+            if (oCompanyCodeTreemap) {
+                oCompanyCodeTreemap.setVizProperties({
+                    plotArea: {
+                        dataLabel: {
+                            visible: true
+                        }
+                    },
+                    title: {
+                        visible: false
+                    }
+                });
+            }
+
+            if (oTaxCodeTreemap) {
+                oTaxCodeTreemap.setVizProperties({
+                    plotArea: {
+                        dataLabel: {
+                            visible: true
+                        }
+                    },
+                    title: {
+                        visible: false
+                    }
+                });
             }
         },
 
@@ -207,9 +251,12 @@ sap.ui.define([
         _setMockTreemapData: function() {
             const aCompanyCodes = [
                 { CompanyCode: "TXNO", DiffGrossAmount: 15000 },
-                { CompanyCode: "TXSE", DiffGrossAmount: 8500 },
                 { CompanyCode: "TXDE", DiffGrossAmount: 12000 },
-                { CompanyCode: "TXFR", DiffGrossAmount: 9500 }
+                { CompanyCode: "TXFR", DiffGrossAmount: 9500 },
+                { CompanyCode: "TXSE", DiffGrossAmount: 8500 },
+                { CompanyCode: "TXIT", DiffGrossAmount: 11000 },
+                { CompanyCode: "TXES", DiffGrossAmount: 7200 },
+                { CompanyCode: "TXNL", DiffGrossAmount: 6800 }
             ];
 
             const aTaxCodes = [
@@ -217,7 +264,16 @@ sap.ui.define([
                 { TaxCode: "B2", DiffGrossAmount: 12000 },
                 { TaxCode: "C3", DiffGrossAmount: 6500 },
                 { TaxCode: "D4", DiffGrossAmount: 11000 },
-                { TaxCode: "E5", DiffGrossAmount: 4500 }
+                { TaxCode: "E5", DiffGrossAmount: 4500 },
+                { TaxCode: "F6", DiffGrossAmount: 9500 },
+                { TaxCode: "G7", DiffGrossAmount: 7800 },
+                { TaxCode: "H8", DiffGrossAmount: 6200 },
+                { TaxCode: "I9", DiffGrossAmount: 10500 },
+                { TaxCode: "J10", DiffGrossAmount: 8800 },
+                { TaxCode: "K11", DiffGrossAmount: 5400 },
+                { TaxCode: "L12", DiffGrossAmount: 11200 },
+                { TaxCode: "M13", DiffGrossAmount: 6900 },
+                { TaxCode: "N14", DiffGrossAmount: 5100 }
             ];
 
             const oViewModel = this.getView().getModel("view");

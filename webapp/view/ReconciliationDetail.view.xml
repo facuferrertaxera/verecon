@@ -65,34 +65,31 @@
                                 <cssgrid:GridItemLayoutData gridColumn="span 4" />
                             </f:layoutData>
                             <f:content>
-                                <VBox class="sapUiMediumMargin" height="100%">
-                                    <Title text="{i18n>reconciliationDetail.CompanyCodeDifferences}" titleStyle="H4" class="sapUiSmallMarginBottom" />
-                                    <viz:VizFrame 
-                                        id="companyCodeTreemap"
-                                        uiConfig="{applicationSet:'fiori'}"
-                                        height="150px" 
-                                        width="100%" 
-                                        vizType="treemap">
-                                        <viz:dataset>
-                                            <viz.data:FlattenedDataset data="{view>/reconciliationDetail/treemapData/companyCodes}">
-                                                <viz.data:dimensions>
-                                                    <viz.data:DimensionDefinition name="CompanyCode" value="{CompanyCode}" />
-                                                </viz.data:dimensions>
-                                                <viz.data:measures>
-                                                    <viz.data:MeasureDefinition name="Differences" value="{DiffGrossAmount}" />
-                                                </viz.data:measures>
-                                            </viz.data:FlattenedDataset>
-                                        </viz:dataset>
-                                        <viz:feeds>
-                                            <viz.feeds:FeedItem uid="color" type="Measure" values="Differences" />
-                                            <viz.feeds:FeedItem uid="weight" type="Measure" values="Differences" />
-                                            <viz.feeds:FeedItem uid="title" type="Dimension" values="CompanyCode" />
-                                        </viz:feeds>
-                                        <viz:dependents>
-                                            <viz:Popover id="companyCodeTreemapPopover"></viz:Popover>
-                                        </viz:dependents>
-                                    </viz:VizFrame>
-                                </VBox>
+                                <viz:VizFrame 
+                                    id="companyCodeTreemap"
+                                    uiConfig="{applicationSet:'fiori'}"
+                                    height="100%" 
+                                    width="100%" 
+                                    vizType="treemap">
+                                    <viz:dataset>
+                                        <viz.data:FlattenedDataset data="{view>/reconciliationDetail/treemapData/companyCodes}">
+                                            <viz.data:dimensions>
+                                                <viz.data:DimensionDefinition name="CompanyCode" value="{CompanyCode}" />
+                                            </viz.data:dimensions>
+                                            <viz.data:measures>
+                                                <viz.data:MeasureDefinition name="Differences" value="{DiffGrossAmount}" />
+                                            </viz.data:measures>
+                                        </viz.data:FlattenedDataset>
+                                    </viz:dataset>
+                                    <viz:feeds>
+                                        <viz.feeds:FeedItem uid="color" type="Measure" values="Differences" />
+                                        <viz.feeds:FeedItem uid="weight" type="Measure" values="Differences" />
+                                        <viz.feeds:FeedItem uid="title" type="Dimension" values="CompanyCode" />
+                                    </viz:feeds>
+                                    <viz:dependents>
+                                        <viz:Popover id="companyCodeTreemapPopover"></viz:Popover>
+                                    </viz:dependents>
+                                </viz:VizFrame>
                             </f:content>
                         </f:Card>
                         
@@ -102,34 +99,31 @@
                                 <cssgrid:GridItemLayoutData gridColumn="span 5" />
                             </f:layoutData>
                             <f:content>
-                                <VBox class="sapUiMediumMargin" height="100%">
-                                    <Title text="{i18n>reconciliationDetail.TaxCodeDifferences}" titleStyle="H4" class="sapUiSmallMarginBottom" />
-                                    <viz:VizFrame 
-                                        id="taxCodeTreemap"
-                                        uiConfig="{applicationSet:'fiori'}"
-                                        height="150px" 
-                                        width="100%" 
-                                        vizType="treemap">
-                                        <viz:dataset>
-                                            <viz.data:FlattenedDataset data="{view>/reconciliationDetail/treemapData/taxCodes}">
-                                                <viz.data:dimensions>
-                                                    <viz.data:DimensionDefinition name="TaxCode" value="{TaxCode}" />
-                                                </viz.data:dimensions>
-                                                <viz.data:measures>
-                                                    <viz.data:MeasureDefinition name="Differences" value="{DiffGrossAmount}" />
-                                                </viz.data:measures>
-                                            </viz.data:FlattenedDataset>
-                                        </viz:dataset>
-                                        <viz:feeds>
-                                            <viz.feeds:FeedItem uid="color" type="Measure" values="Differences" />
-                                            <viz.feeds:FeedItem uid="weight" type="Measure" values="Differences" />
-                                            <viz.feeds:FeedItem uid="title" type="Dimension" values="TaxCode" />
-                                        </viz:feeds>
-                                        <viz:dependents>
-                                            <viz:Popover id="taxCodeTreemapPopover"></viz:Popover>
-                                        </viz:dependents>
-                                    </viz:VizFrame>
-                                </VBox>
+                                <viz:VizFrame 
+                                    id="taxCodeTreemap"
+                                    uiConfig="{applicationSet:'fiori'}"
+                                    height="100%" 
+                                    width="100%" 
+                                    vizType="treemap">
+                                    <viz:dataset>
+                                        <viz.data:FlattenedDataset data="{view>/reconciliationDetail/treemapData/taxCodes}">
+                                            <viz.data:dimensions>
+                                                <viz.data:DimensionDefinition name="TaxCode" value="{TaxCode}" />
+                                            </viz.data:dimensions>
+                                            <viz.data:measures>
+                                                <viz.data:MeasureDefinition name="Differences" value="{DiffGrossAmount}" />
+                                            </viz.data:measures>
+                                        </viz.data:FlattenedDataset>
+                                    </viz:dataset>
+                                    <viz:feeds>
+                                        <viz.feeds:FeedItem uid="color" type="Measure" values="Differences" />
+                                        <viz.feeds:FeedItem uid="weight" type="Measure" values="Differences" />
+                                        <viz.feeds:FeedItem uid="title" type="Dimension" values="TaxCode" />
+                                    </viz:feeds>
+                                    <viz:dependents>
+                                        <viz:Popover id="taxCodeTreemapPopover"></viz:Popover>
+                                    </viz:dependents>
+                                </viz:VizFrame>
                             </f:content>
                         </f:Card>
                         

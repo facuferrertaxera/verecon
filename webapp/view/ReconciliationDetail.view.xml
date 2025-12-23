@@ -36,18 +36,18 @@
                             <f:content>
                                 <VBox class="sapUiMediumMargin">
                                     <Title text="{i18n>reconciliationDetail.ReconciliationDetails}" titleStyle="H4" class="sapUiSmallMarginBottom" />
-                                    <VBox class="sapUiSmallMarginBottom">
-                                        <Label text="{i18n>reconciliationList.CountryList}" class="sapUiTinyMarginBottom" design="Bold" />
-                                        <Tokenizer id="reconciliationCountryListTokenizer" editable="false" width="100%" multiLine="true" class="sapUiTinyMarginTop"/>
-                                    </VBox>
-                                    <VBox class="sapUiSmallMarginBottom">
-                                        <Label text="{i18n>reconciliationList.CompanyCodeList}" class="sapUiTinyMarginBottom" design="Bold" />
-                                        <Tokenizer id="reconciliationCompanyCodeListTokenizer" editable="false" width="100%" multiLine="true" class="sapUiTinyMarginTop"/>
-                                    </VBox>
-                                    <VBox>
-                                        <Label text="{i18n>reconciliationDetail.DateRange}" class="sapUiTinyMarginBottom" design="Bold" />
-                                        <Text text="{path: 'FromDate', type: '.types.TaxeraDateType'} - {path: 'ToDate', type: '.types.TaxeraDateType'}" class="sapUiTinyMarginTop" />
-                                    </VBox>
+                                    <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                                        <Label text="{i18n>reconciliationList.CountryList}" design="Bold" width="8rem" class="sapUiTinyMarginEnd" />
+                                        <Tokenizer id="reconciliationCountryListTokenizer" editable="false" width="100%" multiLine="true"/>
+                                    </HBox>
+                                    <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                                        <Label text="{i18n>reconciliationList.CompanyCodeList}" design="Bold" width="8rem" class="sapUiTinyMarginEnd" />
+                                        <Tokenizer id="reconciliationCompanyCodeListTokenizer" editable="false" width="100%" multiLine="true"/>
+                                    </HBox>
+                                    <HBox alignItems="Center">
+                                        <Label text="{i18n>reconciliationDetail.DateRange}" design="Bold" width="8rem" class="sapUiTinyMarginEnd" />
+                                        <Text text="{path: 'FromDate', type: '.types.TaxeraDateType'} - {path: 'ToDate', type: '.types.TaxeraDateType'}" />
+                                    </HBox>
                                 </VBox>
                             </f:content>
                         </f:Card>

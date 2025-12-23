@@ -8,7 +8,7 @@
     xmlns:vhd="sap.ui.comp.valuehelpdialog"
     displayBlock="true">
     <Dialog id="ReconciliationDialog" showHeader="false" resizable="false" contentHeight="auto" contentWidth="500px" busyIndicatorDelay="{view>/busyIndicatorDelay}">
-        <form:Form editable="true" title="{i18n>reconciliationPopup.NewReconciliation}" class="sapUiSmallMargin">
+        <form:Form editable="true" title="{i18n>reconciliationPopup.NewReconciliation}">
             <form:layout>
                 <form:ColumnLayout columnsM="1" columnsL="1" columnsXL="1"/>
             </form:layout>

@@ -715,20 +715,16 @@ sap.ui.define([
          * tokenizers that were populated before the maps were ready
          */
         _refreshTableTokenizers: function() {
-            console.log("[_refreshTableTokenizers] Refreshing table tokenizers");
             const oTable = this.getView().byId("reconcilesTable");
             if (!oTable) {
-                console.log("[_refreshTableTokenizers] Table not found");
                 return;
             }
 
             const aItems = oTable.getItems();
             if (!aItems || aItems.length === 0) {
-                console.log("[_refreshTableTokenizers] No table items found");
                 return;
             }
 
-            console.log("[_refreshTableTokenizers] Refreshing", aItems.length, "table rows");
             aItems.forEach((oItem, iIndex) => {
                 const oContext = oItem.getBindingContext();
                 if (!oContext) {
@@ -747,7 +743,6 @@ sap.ui.define([
                         typeof oCountryTokenizer.removeAllTokens === "function") {
                         oCountryTokenizer.removeAllTokens();
                         const aCountryTokens = this.formatter.formatCountryListToTokens(oData.CountryList);
-                        console.log(`[_refreshTableTokenizers] Row ${iIndex}: Refreshing ${aCountryTokens.length} country tokens`);
                         aCountryTokens.forEach((oToken) => {
                             if (oToken && typeof oCountryTokenizer.addToken === "function") {
                                 oCountryTokenizer.addToken(oToken);
@@ -765,7 +760,6 @@ sap.ui.define([
                         typeof oCompanyCodeTokenizer.removeAllTokens === "function") {
                         oCompanyCodeTokenizer.removeAllTokens();
                         const aCompanyCodeTokens = this.formatter.formatCompanyCodeListToTokens(oData.CompanyCodeList);
-                        console.log(`[_refreshTableTokenizers] Row ${iIndex}: Refreshing ${aCompanyCodeTokens.length} company code tokens`);
                         aCompanyCodeTokens.forEach((oToken) => {
                             if (oToken && typeof oCompanyCodeTokenizer.addToken === "function") {
                                 oCompanyCodeTokenizer.addToken(oToken);
@@ -782,14 +776,12 @@ sap.ui.define([
          * we must use removeAllTokens() and addToken() methods
          */
         _onTableDataReceived: function() {
-            console.log("[_onTableDataReceived] Table data received, populating tokenizers");
             const oTable = this.getView().byId("reconcilesTable");
             if (!oTable) {
                 return;
             }
 
             const aItems = oTable.getItems();
-            console.log("[_onTableDataReceived] Processing", aItems ? aItems.length : 0, "table items");
             aItems.forEach((oItem) => {
                 const oContext = oItem.getBindingContext();
                 if (!oContext) {
@@ -808,7 +800,6 @@ sap.ui.define([
                         typeof oCountryTokenizer.removeAllTokens === "function") {
                         oCountryTokenizer.removeAllTokens();
                         const aCountryTokens = this.formatter.formatCountryListToTokens(oData.CountryList);
-                        console.log("[_onTableDataReceived] Country tokens created:", aCountryTokens.length, "CountryList:", oData.CountryList);
                         aCountryTokens.forEach((oToken) => {
                             if (oToken && typeof oCountryTokenizer.addToken === "function") {
                                 oCountryTokenizer.addToken(oToken);
@@ -826,7 +817,6 @@ sap.ui.define([
                         typeof oCompanyCodeTokenizer.removeAllTokens === "function") {
                         oCompanyCodeTokenizer.removeAllTokens();
                         const aCompanyCodeTokens = this.formatter.formatCompanyCodeListToTokens(oData.CompanyCodeList);
-                        console.log("[_onTableDataReceived] Company code tokens created:", aCompanyCodeTokens.length, "CompanyCodeList:", oData.CompanyCodeList);
                         aCompanyCodeTokens.forEach((oToken) => {
                             if (oToken && typeof oCompanyCodeTokenizer.addToken === "function") {
                                 oCompanyCodeTokenizer.addToken(oToken);

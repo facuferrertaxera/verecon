@@ -23,43 +23,47 @@
                     <!-- Charts for reconciliation overview -->
                     <cssgrid:CSSGrid
                         gridTemplateColumns="repeat(12, 1fr)"
-                        gridGap="1rem"
+                        gridGap="1.5rem"
                         width="100%"
-                        class="sapUiNoContentPadding"
+                        class="sapUiNoContentPadding sapUiSmallMarginBeginEnd"
                         visible="{view>/reconciliationDetail/chartFiltersVisible}">
                         
                         <!-- Reconciliation Details Card -->
-                        <f:Card>
+                        <f:Card class="sapUiNoContentPadding">
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 3" />
                             </f:layoutData>
+                            <f:header>
+                                <f:CardHeader title="{i18n>reconciliationDetail.ReconciliationDetails}" />
+                            </f:header>
                             <f:content>
-                                <VBox class="sapUiSmallMargin">
-                                    <Title text="{i18n>reconciliationDetail.ReconciliationDetails}" titleStyle="H4" class="sapUiSmallMarginBottom" />
-                                    <VBox class="sapUiTinyMarginTop">
-                                        <Label text="{i18n>reconciliationList.CountryList}" class="sapUiTinyMarginBottom" />
-                                        <Tokenizer id="reconciliationCountryListTokenizer" editable="false" class="sapUiTinyMargin" width="100%" multiLine="true"/>
+                                <VBox class="sapUiMediumMargin">
+                                    <VBox class="sapUiSmallMarginBottom">
+                                        <Label text="{i18n>reconciliationList.CountryList}" class="sapUiTinyMarginBottom" design="Bold" />
+                                        <Tokenizer id="reconciliationCountryListTokenizer" editable="false" width="100%" multiLine="true" class="sapUiTinyMarginTop"/>
                                     </VBox>
-                                    <VBox class="sapUiTinyMarginTop">
-                                        <Label text="{i18n>reconciliationList.CompanyCodeList}" class="sapUiTinyMarginBottom" />
-                                        <Tokenizer id="reconciliationCompanyCodeListTokenizer" editable="false" class="sapUiTinyMargin" width="100%" multiLine="true"/>
+                                    <VBox class="sapUiSmallMarginBottom">
+                                        <Label text="{i18n>reconciliationList.CompanyCodeList}" class="sapUiTinyMarginBottom" design="Bold" />
+                                        <Tokenizer id="reconciliationCompanyCodeListTokenizer" editable="false" width="100%" multiLine="true" class="sapUiTinyMarginTop"/>
                                     </VBox>
-                                    <VBox class="sapUiTinyMarginTop">
-                                        <Label text="{i18n>reconciliationDetail.DateRange}" class="sapUiTinyMarginBottom" />
-                                        <Text text="{path: 'FromDate', type: '.types.TaxeraDateType'} - {path: 'ToDate', type: '.types.TaxeraDateType'}" class="sapUiTinyMargin" />
+                                    <VBox>
+                                        <Label text="{i18n>reconciliationDetail.DateRange}" class="sapUiTinyMarginBottom" design="Bold" />
+                                        <Text text="{path: 'FromDate', type: '.types.TaxeraDateType'} - {path: 'ToDate', type: '.types.TaxeraDateType'}" class="sapUiTinyMarginTop" />
                                     </VBox>
                                 </VBox>
                             </f:content>
                         </f:Card>
                         
                         <!-- Document Types per Country Chart Card -->
-                        <f:Card>
+                        <f:Card class="sapUiNoContentPadding">
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 4" />
                             </f:layoutData>
+                            <f:header>
+                                <f:CardHeader title="{i18n>reconciliationDetail.DocTypesPerCountry}" />
+                            </f:header>
                             <f:content>
-                                <VBox class="sapUiSmallMargin">
-                                    <Label text="{i18n>reconciliationDetail.DocTypesPerCountry}" class="smallLabel sapUiSmallMarginTopBottom" />
+                                <VBox class="sapUiMediumMargin">
                                     <mc:InteractiveBarChart
                                         id="documentTypeBarChart"
                                         labelWidth="30%"
@@ -75,13 +79,15 @@
                         </f:Card>
                         
                         <!-- Submitted Documents per Month Chart Card -->
-                        <f:Card>
+                        <f:Card class="sapUiNoContentPadding">
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 5" />
                             </f:layoutData>
+                            <f:header>
+                                <f:CardHeader title="{i18n>reconciliationDetail.SubmittedDocumentsPerMonth}" />
+                            </f:header>
                             <f:content>
-                                <VBox class="sapUiSmallMargin" height="150px">
-                                    <Label text="{i18n>reconciliationDetail.SubmittedDocumentsPerMonth}" class="smallLabel sapUiSmallMarginTopBottom" />
+                                <VBox class="sapUiMediumMargin" height="180px">
                                     <mc:InteractiveLineChart 
                                         id="submissionDateLineChart" 
                                         selectionChanged="onSelectSubmittedMonthFilter" 
@@ -96,16 +102,18 @@
             </f:DynamicPageHeader>
         </f:header>
         <f:content>
-            <table:Table
-                id="documentsTable"
-                enableColumnFreeze="true"
-                visibleRowCountMode="Auto"
-                selectionMode="None">
-                <table:extension>
-                    <OverflowToolbar style="Clear">
-                        <Title text="{i18n>reconciliationDetail.Documents}"/>
-                    </OverflowToolbar>
-                </table:extension>
+            <VBox class="sapUiMediumMargin">
+                <table:Table
+                    id="documentsTable"
+                    enableColumnFreeze="true"
+                    visibleRowCountMode="Auto"
+                    selectionMode="None"
+                    class="sapUiNoContentPadding">
+                    <table:extension>
+                        <OverflowToolbar style="Clear" class="sapUiMediumMarginBottom">
+                            <Title text="{i18n>reconciliationDetail.Documents}" titleStyle="H3"/>
+                        </OverflowToolbar>
+                    </table:extension>
                 <table:columns>
                     <table:Column width="8rem" sortProperty="CompanyCode" filterProperty="CompanyCode">
                         <m:Label text="{i18n>reconciliationDetail.CompanyCode}" textAlign="Center" width="100%"/>
@@ -239,6 +247,7 @@
                     </table:Column>
                 </table:columns>
             </table:Table>
+            </VBox>
         </f:content>
     </f:DynamicPage>
 </mvc:View>

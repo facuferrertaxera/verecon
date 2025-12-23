@@ -33,11 +33,9 @@
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 3" />
                             </f:layoutData>
-                            <f:header>
-                                <f:CardHeader title="{i18n>reconciliationDetail.ReconciliationDetails}" />
-                            </f:header>
                             <f:content>
                                 <VBox class="sapUiMediumMargin">
+                                    <Title text="{i18n>reconciliationDetail.ReconciliationDetails}" titleStyle="H4" class="sapUiSmallMarginBottom" />
                                     <VBox class="sapUiSmallMarginBottom">
                                         <Label text="{i18n>reconciliationList.CountryList}" class="sapUiTinyMarginBottom" design="Bold" />
                                         <Tokenizer id="reconciliationCountryListTokenizer" editable="false" width="100%" multiLine="true" class="sapUiTinyMarginTop"/>
@@ -59,11 +57,9 @@
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 4" />
                             </f:layoutData>
-                            <f:header>
-                                <f:CardHeader title="{i18n>reconciliationDetail.DocTypesPerCountry}" />
-                            </f:header>
                             <f:content>
                                 <VBox class="sapUiMediumMargin">
+                                    <Title text="{i18n>reconciliationDetail.DocTypesPerCountry}" titleStyle="H4" class="sapUiSmallMarginBottom" />
                                     <mc:InteractiveBarChart
                                         id="documentTypeBarChart"
                                         labelWidth="30%"
@@ -83,11 +79,9 @@
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 5" />
                             </f:layoutData>
-                            <f:header>
-                                <f:CardHeader title="{i18n>reconciliationDetail.SubmittedDocumentsPerMonth}" />
-                            </f:header>
                             <f:content>
                                 <VBox class="sapUiMediumMargin" height="180px">
+                                    <Title text="{i18n>reconciliationDetail.SubmittedDocumentsPerMonth}" titleStyle="H4" class="sapUiSmallMarginBottom" />
                                     <mc:InteractiveLineChart 
                                         id="submissionDateLineChart" 
                                         selectionChanged="onSelectSubmittedMonthFilter" 

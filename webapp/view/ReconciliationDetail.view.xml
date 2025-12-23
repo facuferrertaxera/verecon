@@ -34,21 +34,21 @@
                                 <cssgrid:GridItemLayoutData gridColumn="span 3" />
                             </f:layoutData>
                             <f:content>
-                                <VBox class="sapUiMediumMargin">
+                                <VBox class="sapUiMediumMargin" width="100%">
                                     <Title text="{i18n>reconciliationDetail.ReconciliationDetails}" titleStyle="H4" class="sapUiSmallMarginBottom" />
                                     <HBox width="100%" justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
                                         <Label text="{i18n>reconciliationList.CountryList}" design="Bold" />
-                                        <VBox width="100%" class="sapUiTinyMarginBegin">
+                                        <VBox width="100%" class="sapUiTinyMarginBegin" alignItems="End">
                                             <Tokenizer id="reconciliationCountryListTokenizer" editable="false" width="100%" multiLine="true"/>
                                         </VBox>
                                     </HBox>
                                     <HBox width="100%" justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
                                         <Label text="{i18n>reconciliationList.CompanyCodeList}" design="Bold" />
-                                        <VBox width="100%" class="sapUiTinyMarginBegin">
+                                        <VBox width="100%" class="sapUiTinyMarginBegin" alignItems="End">
                                             <Tokenizer id="reconciliationCompanyCodeListTokenizer" editable="false" width="100%" multiLine="true"/>
                                         </VBox>
                                     </HBox>
-                                    <HBox width="100%" justifyContent="SpaceBetween" alignItems="Center">
+                                    <HBox width="100%" justifyContent="SpaceBetween" alignItems="End">
                                         <Label text="{i18n>reconciliationDetail.DateRange}" design="Bold" />
                                         <Text text="{path: 'FromDate', type: '.types.TaxeraDateType'} - {path: 'ToDate', type: '.types.TaxeraDateType'}" class="sapUiTinyMarginBegin"/>
                                     </HBox>

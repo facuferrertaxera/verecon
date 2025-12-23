@@ -8,13 +8,15 @@
     xmlns:vhd="sap.ui.comp.valuehelpdialog"
     displayBlock="true">
     <Dialog id="ReconciliationDialog" showHeader="false" resizable="false" contentHeight="auto" contentWidth="500px" busyIndicatorDelay="{view>/busyIndicatorDelay}">
-        <sform:SmartForm editable="true" title="{i18n>reconciliationPopup.NewReconciliation}">
-            <sform:layout>
-                <sform:ColumnLayout columnsM="1" columnsL="1" columnsXL="1"/>
-            </sform:layout>
-            <sform:Group>
-                <sform:GroupElement>
-                    <Label text="{i18n>reconciliationList.CountryList}" required="true" class="sapUiSmallMarginBottom"/>
+        <form:Form editable="true" title="{i18n>reconciliationPopup.NewReconciliation}" class="sapUiSmallMargin">
+            <form:layout>
+                <form:ColumnLayout columnsM="1" columnsL="1" columnsXL="1"/>
+            </form:layout>
+            <form:FormContainer>
+                <form:FormElement>
+                    <form:label>
+                        <Label text="{i18n>reconciliationList.CountryList}" required="true"/>
+                    </form:label>
                     <MultiInput 
                         id="reconciliationCountryListInput" 
                         valueHelpOnly="true" 
@@ -24,9 +26,11 @@
                         enableMultiLineMode="true"
                         valueState="{view>/reconciliationList/newReconciliation/CountryListValueState}"
                         valueStateText="{view>/reconciliationList/newReconciliation/CountryListValueStateText}"/>
-                </sform:GroupElement>
-                <sform:GroupElement>
-                    <Label text="{i18n>reconciliationList.CompanyCodeList}" required="true" class="sapUiSmallMarginBottom"/>
+                </form:FormElement>
+                <form:FormElement>
+                    <form:label>
+                        <Label text="{i18n>reconciliationList.CompanyCodeList}" required="true"/>
+                    </form:label>
                     <MultiInput 
                         id="reconciliationCompanyCodeListInput" 
                         valueHelpOnly="true" 
@@ -36,9 +40,9 @@
                         enableMultiLineMode="true"
                         valueState="{view>/reconciliationList/newReconciliation/CompanyCodeListValueState}"
                         valueStateText="{view>/reconciliationList/newReconciliation/CompanyCodeListValueStateText}"/>
-                </sform:GroupElement>
-            </sform:Group>
-        </sform:SmartForm>
+                </form:FormElement>
+            </form:FormContainer>
+        </form:Form>
         <form:Form editable="true" class="sapUiSmallMargin">
             <form:layout>
                 <form:ColumnLayout columnsM="1" columnsL="1" columnsXL="1"/>

@@ -71,7 +71,7 @@ sap.ui.define([
         },
 
         /**
-         * Configure treemap VizFrames to hide titles
+         * Configure treemap VizFrames to hide titles and format currency
          */
         _configureTreemaps: function() {
             const oCompanyCodeTreemap = this.byId("companyCodeTreemap");
@@ -81,11 +81,17 @@ sap.ui.define([
                 oCompanyCodeTreemap.setVizProperties({
                     plotArea: {
                         dataLabel: {
-                            visible: true
+                            visible: true,
+                            formatString: "#,##0.00 EUR"
                         }
                     },
                     title: {
                         visible: false
+                    },
+                    valueAxis: {
+                        label: {
+                            formatString: "#,##0.00 EUR"
+                        }
                     }
                 });
             }
@@ -94,11 +100,17 @@ sap.ui.define([
                 oTaxCodeTreemap.setVizProperties({
                     plotArea: {
                         dataLabel: {
-                            visible: true
+                            visible: true,
+                            formatString: "#,##0.00 EUR"
                         }
                     },
                     title: {
                         visible: false
+                    },
+                    valueAxis: {
+                        label: {
+                            formatString: "#,##0.00 EUR"
+                        }
                     }
                 });
             }
@@ -212,7 +224,8 @@ sap.ui.define([
                     if (!mCompanyCodeAggregation[sCompanyCode]) {
                         mCompanyCodeAggregation[sCompanyCode] = {
                             CompanyCode: sCompanyCode,
-                            DiffGrossAmount: 0
+                            DiffGrossAmount: 0,
+                            Currency: "EUR"
                         };
                     }
                     mCompanyCodeAggregation[sCompanyCode].DiffGrossAmount += fDiffAmount;
@@ -221,7 +234,8 @@ sap.ui.define([
                     if (!mTaxCodeAggregation[sTaxCode]) {
                         mTaxCodeAggregation[sTaxCode] = {
                             TaxCode: sTaxCode,
-                            DiffGrossAmount: 0
+                            DiffGrossAmount: 0,
+                            Currency: "EUR"
                         };
                     }
                     mTaxCodeAggregation[sTaxCode].DiffGrossAmount += fDiffAmount;
@@ -250,30 +264,30 @@ sap.ui.define([
          */
         _setMockTreemapData: function() {
             const aCompanyCodes = [
-                { CompanyCode: "TXNO", DiffGrossAmount: 15000 },
-                { CompanyCode: "TXDE", DiffGrossAmount: 12000 },
-                { CompanyCode: "TXFR", DiffGrossAmount: 9500 },
-                { CompanyCode: "TXSE", DiffGrossAmount: 8500 },
-                { CompanyCode: "TXIT", DiffGrossAmount: 11000 },
-                { CompanyCode: "TXES", DiffGrossAmount: 7200 },
-                { CompanyCode: "TXNL", DiffGrossAmount: 6800 }
+                { CompanyCode: "TXNO", DiffGrossAmount: 15000, Currency: "EUR" },
+                { CompanyCode: "TXDE", DiffGrossAmount: 12000, Currency: "EUR" },
+                { CompanyCode: "TXFR", DiffGrossAmount: 9500, Currency: "EUR" },
+                { CompanyCode: "TXSE", DiffGrossAmount: 8500, Currency: "EUR" },
+                { CompanyCode: "TXIT", DiffGrossAmount: 11000, Currency: "EUR" },
+                { CompanyCode: "TXES", DiffGrossAmount: 7200, Currency: "EUR" },
+                { CompanyCode: "TXNL", DiffGrossAmount: 6800, Currency: "EUR" }
             ];
 
             const aTaxCodes = [
-                { TaxCode: "A1", DiffGrossAmount: 8000 },
-                { TaxCode: "B2", DiffGrossAmount: 12000 },
-                { TaxCode: "C3", DiffGrossAmount: 6500 },
-                { TaxCode: "D4", DiffGrossAmount: 11000 },
-                { TaxCode: "E5", DiffGrossAmount: 4500 },
-                { TaxCode: "F6", DiffGrossAmount: 9500 },
-                { TaxCode: "G7", DiffGrossAmount: 7800 },
-                { TaxCode: "H8", DiffGrossAmount: 6200 },
-                { TaxCode: "I9", DiffGrossAmount: 10500 },
-                { TaxCode: "J10", DiffGrossAmount: 8800 },
-                { TaxCode: "K11", DiffGrossAmount: 5400 },
-                { TaxCode: "L12", DiffGrossAmount: 11200 },
-                { TaxCode: "M13", DiffGrossAmount: 6900 },
-                { TaxCode: "N14", DiffGrossAmount: 5100 }
+                { TaxCode: "A1", DiffGrossAmount: 8000, Currency: "EUR" },
+                { TaxCode: "B2", DiffGrossAmount: 12000, Currency: "EUR" },
+                { TaxCode: "C3", DiffGrossAmount: 6500, Currency: "EUR" },
+                { TaxCode: "D4", DiffGrossAmount: 11000, Currency: "EUR" },
+                { TaxCode: "E5", DiffGrossAmount: 4500, Currency: "EUR" },
+                { TaxCode: "F6", DiffGrossAmount: 9500, Currency: "EUR" },
+                { TaxCode: "G7", DiffGrossAmount: 7800, Currency: "EUR" },
+                { TaxCode: "H8", DiffGrossAmount: 6200, Currency: "EUR" },
+                { TaxCode: "I9", DiffGrossAmount: 10500, Currency: "EUR" },
+                { TaxCode: "J10", DiffGrossAmount: 8800, Currency: "EUR" },
+                { TaxCode: "K11", DiffGrossAmount: 5400, Currency: "EUR" },
+                { TaxCode: "L12", DiffGrossAmount: 11200, Currency: "EUR" },
+                { TaxCode: "M13", DiffGrossAmount: 6900, Currency: "EUR" },
+                { TaxCode: "N14", DiffGrossAmount: 5100, Currency: "EUR" }
             ];
 
             const oViewModel = this.getView().getModel("view");

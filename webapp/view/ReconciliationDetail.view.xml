@@ -14,7 +14,10 @@
     xmlns:m="sap.m"
     xmlns:smartVariant="sap.ui.comp.smartvariants.SmartVariantManagement"
     xmlns:mc="sap.suite.ui.microchart"
-    xmlns:customData="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+    xmlns:customData="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds">
     <f:DynamicPage headerExpanded="{view>/reconciliationDetail/headerExpanded}" toggleHeaderOnTitleClick="{view>/reconciliationDetail/titleClickable}" class="sapUiNoContentPadding">
         <!-- DynamicPage Header -->
         <f:header>
@@ -56,41 +59,76 @@
                             </f:content>
                         </f:Card>
                         
-                        <!-- Document Types per Country Chart Card -->
+                        <!-- Company Code Differences Treemap Card -->
                         <f:Card class="sapUiNoContentPadding" height="220px">
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 4" />
                             </f:layoutData>
                             <f:content>
-                                <VBox class="sapUiMediumMargin">
-                                    <Title text="{i18n>reconciliationDetail.DocTypesPerCountry}" titleStyle="H4" class="sapUiSmallMarginBottom" />
-                                    <mc:InteractiveBarChart
-                                        id="documentTypeBarChart"
-                                        labelWidth="30%"
-                                        selectionChanged="onSelectDocumentTypeFilter"
-                                        showError="{view>/reconciliationDetail/bChartShowError}"
-                                        displayedBars="4"
-                                        bars="{ 
-                                            path : 'view>/reconciliationDetail/headerFilters/documentTypeBarChart/bars' , factory: '.createBars'
-                                        }"
-                                    />
+                                <VBox class="sapUiMediumMargin" height="100%">
+                                    <Title text="{i18n>reconciliationDetail.CompanyCodeDifferences}" titleStyle="H4" class="sapUiSmallMarginBottom" />
+                                    <viz:VizFrame 
+                                        id="companyCodeTreemap"
+                                        uiConfig="{applicationSet:'fiori'}"
+                                        height="150px" 
+                                        width="100%" 
+                                        vizType="treemap">
+                                        <viz:dataset>
+                                            <viz.data:FlattenedDataset data="{view>/reconciliationDetail/treemapData/companyCodes}">
+                                                <viz.data:dimensions>
+                                                    <viz.data:DimensionDefinition name="CompanyCode" value="{CompanyCode}" />
+                                                </viz.data:dimensions>
+                                                <viz.data:measures>
+                                                    <viz.data:MeasureDefinition name="Differences" value="{DiffGrossAmount}" />
+                                                </viz.data:measures>
+                                            </viz.data:FlattenedDataset>
+                                        </viz:dataset>
+                                        <viz:feeds>
+                                            <viz.feeds:FeedItem uid="color" type="Measure" values="Differences" />
+                                            <viz.feeds:FeedItem uid="weight" type="Measure" values="Differences" />
+                                            <viz.feeds:FeedItem uid="title" type="Dimension" values="CompanyCode" />
+                                        </viz:feeds>
+                                        <viz:dependents>
+                                            <viz:Popover id="companyCodeTreemapPopover"></viz:Popover>
+                                        </viz:dependents>
+                                    </viz:VizFrame>
                                 </VBox>
                             </f:content>
                         </f:Card>
                         
-                        <!-- Submitted Documents per Month Chart Card -->
+                        <!-- Tax Code Differences Treemap Card -->
                         <f:Card class="sapUiNoContentPadding" height="220px">
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 5" />
                             </f:layoutData>
                             <f:content>
-                                <VBox class="sapUiMediumMargin" height="180px">
-                                    <Title text="{i18n>reconciliationDetail.SubmittedDocumentsPerMonth}" titleStyle="H4" class="sapUiSmallMarginBottom" />
-                                    <mc:InteractiveLineChart 
-                                        id="submissionDateLineChart" 
-                                        selectionChanged="onSelectSubmittedMonthFilter" 
-                                        showError="{view>/reconciliationDetail/bChartShowError}" 
-                                        points="{ path : 'view>/reconciliationDetail/headerFilters/submissionDateLineChart/points' , factory: '.createPoints'}" />
+                                <VBox class="sapUiMediumMargin" height="100%">
+                                    <Title text="{i18n>reconciliationDetail.TaxCodeDifferences}" titleStyle="H4" class="sapUiSmallMarginBottom" />
+                                    <viz:VizFrame 
+                                        id="taxCodeTreemap"
+                                        uiConfig="{applicationSet:'fiori'}"
+                                        height="150px" 
+                                        width="100%" 
+                                        vizType="treemap">
+                                        <viz:dataset>
+                                            <viz.data:FlattenedDataset data="{view>/reconciliationDetail/treemapData/taxCodes}">
+                                                <viz.data:dimensions>
+                                                    <viz.data:DimensionDefinition name="TaxCode" value="{TaxCode}" />
+                                                </viz.data:dimensions>
+                                                <viz.data:measures>
+                                                    <viz.data:MeasureDefinition name="Differences" value="{DiffGrossAmount}" />
+                                                </viz.data:measures>
+                                            </viz.data:FlattenedDataset>
+                                        </viz:dataset>
+                                        <viz:feeds>
+                                            <viz.feeds:FeedItem uid="color" type="Measure" values="Differences" />
+                                            <viz.feeds:FeedItem uid="weight" type="Measure" values="Differences" />
+                                            <viz.feeds:FeedItem uid="title" type="Dimension" values="TaxCode" />
+                                        </viz:feeds>
+                                        <viz:dependents>
+                                            <viz:Popover id="taxCodeTreemapPopover"></viz:Popover>
+                                        </viz:dependents>
+                                    </viz:VizFrame>
                                 </VBox>
                             </f:content>
                         </f:Card>

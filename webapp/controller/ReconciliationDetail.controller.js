@@ -33,6 +33,10 @@ sap.ui.define([
                         submissionDateLineChart: {
                             points: []
                         }
+                    },
+                    treemapData: {
+                        companyCodes: [],
+                        taxCodes: []
                     }
                 }
             });
@@ -118,11 +122,108 @@ sap.ui.define([
                         dataRequested: () => {
                             this.getView().setBusy(true);
                         },
-                        dataReceived: () => {
+                        dataReceived: (oEvent) => {
                             this.getView().setBusy(false);
+                            // Aggregate documents for treemap visualizations
+                            this._populateTreemapData();
                         }
                     }
                 });
+            }
+        },
+
+        /**
+         * Aggregate document data for treemap visualizations
+         */
+        _populateTreemapData: function() {
+            const oTable = this.byId("documentsTable");
+            if (!oTable) {
+                return;
+            }
+
+            const oBinding = oTable.getBinding("rows");
+            if (!oBinding) {
+                // If no binding yet, use mock data
+                this._setMockTreemapData();
+                return;
+            }
+
+            const aContexts = oBinding.getContexts();
+            const mCompanyCodeAggregation = {};
+            const mTaxCodeAggregation = {};
+
+            // Aggregate by CompanyCode and TaxCode
+            aContexts.forEach((oContext) => {
+                if (oContext) {
+                    const oDocument = oContext.getObject();
+                    if (!oDocument) {
+                        return;
+                    }
+
+                    const sCompanyCode = oDocument.CompanyCode || "Unknown";
+                    const sTaxCode = oDocument.TaxCode || "Unknown";
+                    const fDiffAmount = Math.abs(oDocument.DiffGrossAmount || 0);
+
+                    // Aggregate by CompanyCode
+                    if (!mCompanyCodeAggregation[sCompanyCode]) {
+                        mCompanyCodeAggregation[sCompanyCode] = {
+                            CompanyCode: sCompanyCode,
+                            DiffGrossAmount: 0
+                        };
+                    }
+                    mCompanyCodeAggregation[sCompanyCode].DiffGrossAmount += fDiffAmount;
+
+                    // Aggregate by TaxCode
+                    if (!mTaxCodeAggregation[sTaxCode]) {
+                        mTaxCodeAggregation[sTaxCode] = {
+                            TaxCode: sTaxCode,
+                            DiffGrossAmount: 0
+                        };
+                    }
+                    mTaxCodeAggregation[sTaxCode].DiffGrossAmount += fDiffAmount;
+                }
+            });
+
+            // Convert to arrays and update view model
+            const aCompanyCodes = Object.values(mCompanyCodeAggregation);
+            const aTaxCodes = Object.values(mTaxCodeAggregation);
+
+            // If no data, use mock data for demonstration
+            if (aCompanyCodes.length === 0 && aTaxCodes.length === 0) {
+                this._setMockTreemapData();
+                return;
+            }
+
+            const oViewModel = this.getView().getModel("view");
+            if (oViewModel) {
+                oViewModel.setProperty("/reconciliationDetail/treemapData/companyCodes", aCompanyCodes);
+                oViewModel.setProperty("/reconciliationDetail/treemapData/taxCodes", aTaxCodes);
+            }
+        },
+
+        /**
+         * Set mock data for treemap visualizations
+         */
+        _setMockTreemapData: function() {
+            const aCompanyCodes = [
+                { CompanyCode: "TXNO", DiffGrossAmount: 15000 },
+                { CompanyCode: "TXSE", DiffGrossAmount: 8500 },
+                { CompanyCode: "TXDE", DiffGrossAmount: 12000 },
+                { CompanyCode: "TXFR", DiffGrossAmount: 9500 }
+            ];
+
+            const aTaxCodes = [
+                { TaxCode: "A1", DiffGrossAmount: 8000 },
+                { TaxCode: "B2", DiffGrossAmount: 12000 },
+                { TaxCode: "C3", DiffGrossAmount: 6500 },
+                { TaxCode: "D4", DiffGrossAmount: 11000 },
+                { TaxCode: "E5", DiffGrossAmount: 4500 }
+            ];
+
+            const oViewModel = this.getView().getModel("view");
+            if (oViewModel) {
+                oViewModel.setProperty("/reconciliationDetail/treemapData/companyCodes", aCompanyCodes);
+                oViewModel.setProperty("/reconciliationDetail/treemapData/taxCodes", aTaxCodes);
             }
         },
 

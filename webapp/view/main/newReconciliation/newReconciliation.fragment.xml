@@ -62,12 +62,6 @@
                                 utc: true
                             }">
                         </sfb:ControlConfiguration>
-                        <sfb:ControlConfiguration 
-                            key="variant" 
-                            mandatory="notMandatory" 
-                            index="4" 
-                            visibleInAdvancedArea="true">
-                        </sfb:ControlConfiguration>
                     </sfb:controlConfiguration>
                     <sfb:customData>
                         <core:CustomData key="dateFormatSettings" value='\{"UTC":true\}' />

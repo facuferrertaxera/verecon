@@ -14,27 +14,27 @@
                     <Title text="{i18n>reconciliationPopup.NewReconciliation}"/>
                 </contentLeft>
                 <contentRight>
-                    <Label text="{i18n>reconciliationPopup.Variant}" labelFor="reconciliationVariantSelect" class="sapUiTinyMarginEnd"/>
-                    <Select 
-                        id="reconciliationVariantSelect" 
-                        width="200px"
-                        change="onReconciliationVariantChange"
+                    <VariantManagement 
+                        id="reconciliationVariantManagement"
+                        select="onReconciliationVariantSelect"
+                        save="onReconciliationVariantSave"
+                        manage="onReconciliationVariantManage"
+                        showFooter="true"
                         items="{
                             path: 'view>/reconciliationList/newReconciliation/variants',
                             templateShareable: false
                         }">
-                        <core:Item key="{view>key}" text="{view>text}"/>
-                    </Select>
-                    <Button 
-                        icon="sap-icon://save" 
-                        tooltip="{i18n>reconciliationPopup.SaveVariant}" 
-                        press="onSaveReconciliationVariant"
-                        type="Transparent"/>
-                    <Button 
-                        icon="sap-icon://action-settings" 
-                        tooltip="{i18n>reconciliationPopup.ManageVariants}" 
-                        press="onManageReconciliationVariants"
-                        type="Transparent"/>
+                        <VariantItem 
+                            key="{view>key}" 
+                            title="{view>title}"
+                            author="{view>author}"
+                            favorite="{view>favorite}"
+                            executeOnSelect="true"
+                            rename="true"
+                            changeable="true"
+                            remove="true"
+                            sharing="{view>sharing}"/>
+                    </VariantManagement>
                 </contentRight>
             </Bar>
         </customHeader>
@@ -117,29 +117,6 @@
                 descriptionKey="Name"
                 supportMultiselect="true"/>
             
-            <!-- Manage Variants Dialog -->
-            <Dialog id="reconciliationManageVariantsDialog" 
-                title="{i18n>reconciliationPopup.ManageVariants}"
-                contentWidth="400px">
-                <content>
-                    <List 
-                        id="reconciliationVariantsList"
-                        mode="Delete"
-                        delete="onDeleteReconciliationVariant"
-                        items="{
-                            path: 'view>/reconciliationList/newReconciliation/manageVariants',
-                            templateShareable: false
-                        }">
-                        <StandardListItem 
-                            title="{view>text}"
-                            type="Active"
-                            press="onSelectReconciliationVariantFromManage"/>
-                    </List>
-                </content>
-                <buttons>
-                    <Button text="{i18n>common.OK}" press="onCloseManageVariantsDialog"/>
-                </buttons>
-            </Dialog>
         </dependents>
     </Dialog>
 </core:FragmentDefinition>

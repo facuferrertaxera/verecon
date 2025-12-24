@@ -85,24 +85,6 @@ sap.ui.define([
 
             // Get filters from SmartFilterBar
             let aFilters = oSmartFilterBar.getFilters();
-            
-            // Extract values from filters for validation and processing
-            const mFilterValues = this._extractFilterValues(aFilters);
-            
-            if (!mFilterValues.companycodes || mFilterValues.companycodes.length === 0) {
-                MessageToast.show(this.i18n("reconciliationPopup.CompanyCodeListMandatory"));
-                return;
-            }
-            
-            if (!mFilterValues.countries || mFilterValues.countries.length === 0) {
-                MessageToast.show(this.i18n("reconciliationPopup.CountryListMandatory"));
-                return;
-            }
-            
-            if (!mFilterValues.reporting_date) {
-                MessageToast.show(this.i18n("reconciliationPopup.DateRangeMandatory"));
-                return;
-            }
 
             // Get variant name from SmartVariantManagement
             // SmartVariantManagement manages variants for SmartFilterBar
@@ -128,60 +110,22 @@ sap.ui.define([
             // Fix UTC for date filters
             this._fixUTC("reporting_date", aFilters);
 
+            // Add variant filter if provided (variant name from SmartVariantManagement)
+            if (sVariant) {
+                aFilters.push(new Filter("variant", FilterOperator.EQ, sVariant));
+            }
+
             try {
                 oReconciliationDialog.setBusy(true);
                 
-                // Read NewRecParameter for each companycode+country combination
-                const aReadPromises = [];
-                const aReconIds = [];
-                const aCompanyCodes = mFilterValues.companycodes;
-                const aCountries = mFilterValues.countries;
-                const oReportingDate = mFilterValues.reporting_date;
-
-                // Create read operations for each combination
-                for (let i = 0; i < aCompanyCodes.length; i++) {
-                    const sCompanyCode = aCompanyCodes[i];
-                    
-                    for (let j = 0; j < aCountries.length; j++) {
-                        const sCountry = aCountries[j];
-                        
-                        // Build filters for this combination (required filters for composite key + reporting_date)
-                        const aCombinationFilters = [
-                            new Filter("companycode", FilterOperator.EQ, sCompanyCode),
-                            new Filter("country", FilterOperator.EQ, sCountry),
-                            new Filter("reporting_date", FilterOperator.EQ, oReportingDate)
-                        ];
-                        
-                        // Add variant filter if provided (variant name from SmartVariantManagement)
-                        if (sVariant) {
-                            aCombinationFilters.push(new Filter("variant", FilterOperator.EQ, sVariant));
-                        }
-
-                        // Use promRead helper (from BaseController)
-                        const oReadPromise = this.promRead("/NewRecParameter", {
-                            filters: aCombinationFilters,
-                            urlParameters: {
-                                "$select": "companycode,country,reporting_date,recon_id"
-                            }
-                        }).then(function(oData) {
-                            // Handle single result or array
-                            const oResult = Array.isArray(oData.results) ? oData.results[0] : oData;
-                            if (oResult && oResult.recon_id) {
-                                aReconIds.push({
-                                    companycode: sCompanyCode,
-                                    country: sCountry,
-                                    recon_id: oResult.recon_id
-                                });
-                            }
-                            return oResult;
-                        });
-                        
-                        aReadPromises.push(oReadPromise);
+                // Single read to NewRecParameter with all filters
+                // Backend will handle finding all matching records and doing the reconciliation
+                const oResponse = await this.promRead("/NewRecParameter", {
+                    filters: aFilters,
+                    urlParameters: {
+                        "$select": "companycode,country,reporting_date,recon_id"
                     }
-                }
-
-                // Wait for all reads to complete
-                await Promise.all(aReadPromises);
+                });
                 
                 oReconciliationDialog.close();
                 oSmartFilterBar.fireClear();

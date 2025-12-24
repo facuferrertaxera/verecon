@@ -48,6 +48,9 @@ sap.ui.define([
             // Set controller reference in formatter for token formatting
             // Maps are stored on component, not controller
             formatter.setController(this);
+            
+            // Flag to track if dataReceived event is attached
+            this._bDataReceivedAttached = false;
 
             // Attach route matched handler if routing is available
             const oRouter = this.getOwnerComponent().getRouter();
@@ -57,25 +60,6 @@ sap.ui.define([
                     oRoute.attachMatched(this._onReconciliationListMatched, this);
                 }
             }
-
-            // Attach to table dataReceived event to populate tokenizers
-            this.getView().attachAfterRendering(() => {
-                const oTable = this.getView().byId("reconcilesTable");
-                if (oTable) {
-                    const oBinding = oTable.getBinding("items");
-                    if (oBinding) {
-                        oBinding.attachEvent("dataReceived", this._onTableDataReceived.bind(this));
-                    } else {
-                        // If binding not ready, try again after a delay
-                        setTimeout(() => {
-                            const oBindingRetry = oTable.getBinding("items");
-                            if (oBindingRetry) {
-                                oBindingRetry.attachEvent("dataReceived", this._onTableDataReceived.bind(this));
-                            }
-                        }, 500);
-                    }
-                }
-            });
         },
 
         /**
@@ -252,6 +236,10 @@ sap.ui.define([
                 }
             }
             
+            // Attach to table dataReceived event to populate tokenizers
+            // This is done here because the model and binding are ready at this point
+            this._attachTableDataReceivedEvent();
+            
             // Load available countries and company codes for filter dropdowns
             // (maps are already loaded in component, but we need the arrays for filters)
             this._loadAvailableCountriesForFilters();
@@ -269,6 +257,39 @@ sap.ui.define([
                 this._refreshTableTokenizers();
             }, 100);
         },
+
+        /**
+         * Attach dataReceived event to table binding
+         * This is called in _onReconciliationListMatched when model is ready
+         */
+        _attachTableDataReceivedEvent: function() {
+            const oTable = this.getView().byId("reconcilesTable");
+            if (!oTable) {
+                console.log("[_attachTableDataReceivedEvent] Table not found");
+                return;
+            }
+
+            const oBinding = oTable.getBinding("items");
+            if (oBinding) {
+                // Check if event is already attached to avoid duplicates
+                // Note: hasListeners might not be available in all UI5 versions
+                // So we'll use a flag to track if we've attached it
+                if (!this._bDataReceivedAttached) {
+                    oBinding.attachEvent("dataReceived", this._onTableDataReceived.bind(this));
+                    this._bDataReceivedAttached = true;
+                    console.log("[_attachTableDataReceivedEvent] dataReceived event attached to table binding");
+                } else {
+                    console.log("[_attachTableDataReceivedEvent] dataReceived event already attached");
+                }
+            } else {
+                console.log("[_attachTableDataReceivedEvent] Table binding not ready, will retry");
+                // Retry after a short delay
+                setTimeout(() => {
+                    this._attachTableDataReceivedEvent();
+                }, 200);
+            }
+        },
+
         /**
          * Refresh the view
          */

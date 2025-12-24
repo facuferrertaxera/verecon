@@ -18,7 +18,7 @@ sap.ui.define([
             // Pattern-based icon determination
             // Success statuses (start with S): S, SR, SV, ST, SX, SS
             if (sStatus.indexOf("S") === 0) {
-                return "sap-icon://accept";
+                return "sap-icon://sys-enter-2";
             }
             
             // Failed statuses (start with F): F, FR, FV, FT, FX, FS, FE

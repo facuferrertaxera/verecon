@@ -49,6 +49,9 @@ sap.ui.define([
             this._mCountryMap = {};
             this._mCompanyCodeMap = {};
             this._mStatusMap = {};
+            
+            // Promise that resolves when all maps are loaded (for async/await pattern)
+            this._oMapsReadyPromise = null;
 
             // Set controller reference in formatter for token formatting
             formatter.setController(this);
@@ -83,145 +86,168 @@ sap.ui.define([
         },
 
         /**
-         * Load available countries from Country entity set
+         * Helper to wrap OData model.read() in a Promise
+         * @param {sap.ui.model.odata.v2.ODataModel} oModel - OData model
+         * @param {string} sPath - Entity path
+         * @param {object} mParameters - Read parameters (urlParameters, sorters, etc.)
+         * @returns {Promise} Promise that resolves with response or rejects with error
          */
-        _loadAvailableCountries: function() {
+        _readOData: function(oModel, sPath, mParameters) {
+            return new Promise((resolve, reject) => {
+                const mReadParams = {
+                    success: resolve,
+                    error: reject
+                };
+                
+                // Copy parameters (urlParameters, sorters, etc.) to read params
+                if (mParameters) {
+                    Object.keys(mParameters).forEach((sKey) => {
+                        if (sKey !== "success" && sKey !== "error") {
+                            mReadParams[sKey] = mParameters[sKey];
+                        }
+                    });
+                }
+                
+                oModel.read(sPath, mReadParams);
+            });
+        },
+
+        /**
+         * Load available countries from Country entity set
+         * @returns {Promise} Promise that resolves when countries are loaded
+         */
+        _loadAvailableCountries: async function() {
             const oModel = this.getModel();
             if (!oModel) {
                 return;
             }
 
-            // Read countries from Country entity set
-            // For OData v2, response is in oResponse.results
-            oModel.read("/Country", {
-                urlParameters: {
-                    "$select": "Country,Country_Text,CountryName"
-                },
-                sorters: [
-                    new Sorter("Country", false)
-                ],
-                success: (oResponse) => {
-                    // OData v2 uses results array
-                    const aResults = oResponse.results || [];
-                    const aCountries = aResults.map((oCountry) => {
-                        return {
-                            code: oCountry.Country,
-                            name: oCountry.Country_Text || oCountry.CountryName || oCountry.Country,
-                            selected: false
-                        };
-                    });
+            try {
+                // Read countries from Country entity set
+                // For OData v2, response is in oResponse.results
+                const oResponse = await this._readOData(oModel, "/Country", {
+                    urlParameters: {
+                        "$select": "Country,Country_Text,CountryName"
+                    },
+                    sorters: [
+                        new Sorter("Country", false)
+                    ]
+                });
 
-                    // Create country code to name mapping for formatter
-                    this._mCountryMap = {};
-                    aResults.forEach((oCountry) => {
-                        this._mCountryMap[oCountry.Country] = oCountry.Country_Text || oCountry.CountryName || oCountry.Country;
-                    });
+                // OData v2 uses results array
+                const aResults = oResponse.results || [];
+                const aCountries = aResults.map((oCountry) => {
+                    return {
+                        code: oCountry.Country,
+                        name: oCountry.Country_Text || oCountry.CountryName || oCountry.Country,
+                        selected: false
+                    };
+                });
 
-                    console.log("[_loadAvailableCountries] Country map populated with", Object.keys(this._mCountryMap).length, "countries");
+                // Create country code to name mapping for formatter
+                this._mCountryMap = {};
+                aResults.forEach((oCountry) => {
+                    this._mCountryMap[oCountry.Country] = oCountry.Country_Text || oCountry.CountryName || oCountry.Country;
+                });
 
-                    // Update view model
-                    this.getView().getModel("view").setProperty("/filters/availableCountries", aCountries);
-                    
-                    // Refresh tokenizers in table if data is already loaded
-                    // This ensures country names are displayed correctly even if formatter ran before map was ready
-                    this._refreshTableTokenizers();
-                },
-                error: (oError) => {
-                    // If error loading, fall back to empty array or show error
-                    console.error("[_loadAvailableCountries] Error loading countries:", oError);
-                    this.getView().getModel("view").setProperty("/filters/availableCountries", []);
-                }
-            });
+                console.log("[_loadAvailableCountries] Country map populated with", Object.keys(this._mCountryMap).length, "countries");
+
+                // Update view model
+                this.getView().getModel("view").setProperty("/filters/availableCountries", aCountries);
+            } catch (oError) {
+                // If error loading, fall back to empty array or show error
+                console.error("[_loadAvailableCountries] Error loading countries:", oError);
+                this.getView().getModel("view").setProperty("/filters/availableCountries", []);
+            }
         },
 
         /**
          * Load available company codes from CompanyVH entity set
+         * @returns {Promise} Promise that resolves when company codes are loaded
          */
-        _loadAvailableCompanyCodes: function() {
+        _loadAvailableCompanyCodes: async function() {
             const oModel = this.getModel();
             if (!oModel) {
                 return;
             }
 
-            // Read company codes from CompanyVH entity set
-            // For OData v2, response is in oResponse.results
-            oModel.read("/CompanyVH", {
-                urlParameters: {
-                    "$select": "CompanyCode,Name,Country,CountryName"
-                },
-                sorters: [
-                    new Sorter("CompanyCode", false)
-                ],
-                success: (oResponse) => {
-                    // OData v2 uses results array
-                    const aResults = oResponse.results || [];
-                    const aCompanyCodes = aResults.map((oCompany) => {
-                        return {
-                            code: oCompany.CompanyCode,
-                            name: oCompany.Name || oCompany.CompanyCode,
-                            selected: false
-                        };
-                    });
+            try {
+                // Read company codes from CompanyVH entity set
+                // For OData v2, response is in oResponse.results
+                const oResponse = await this._readOData(oModel, "/CompanyVH", {
+                    urlParameters: {
+                        "$select": "CompanyCode,Name,Country,CountryName"
+                    },
+                    sorters: [
+                        new Sorter("CompanyCode", false)
+                    ]
+                });
 
-                    // Create company code to name mapping for formatter
-                    this._mCompanyCodeMap = {};
-                    aResults.forEach((oCompany) => {
-                        this._mCompanyCodeMap[oCompany.CompanyCode] = oCompany.Name || oCompany.CompanyCode;
-                    });
+                // OData v2 uses results array
+                const aResults = oResponse.results || [];
+                const aCompanyCodes = aResults.map((oCompany) => {
+                    return {
+                        code: oCompany.CompanyCode,
+                        name: oCompany.Name || oCompany.CompanyCode,
+                        selected: false
+                    };
+                });
 
-                    console.log("[_loadAvailableCompanyCodes] Company code map populated with", Object.keys(this._mCompanyCodeMap).length, "company codes");
+                // Create company code to name mapping for formatter
+                this._mCompanyCodeMap = {};
+                aResults.forEach((oCompany) => {
+                    this._mCompanyCodeMap[oCompany.CompanyCode] = oCompany.Name || oCompany.CompanyCode;
+                });
 
-                    // Update view model
-                    this.getView().getModel("view").setProperty("/filters/availableCompanyCodes", aCompanyCodes);
-                    
-                    // Refresh tokenizers in table if data is already loaded
-                    this._refreshTableTokenizers();
-                },
-                error: (oError) => {
-                    // If error loading, fall back to empty array or show error
-                    console.error("[_loadAvailableCompanyCodes] Error loading company codes:", oError);
-                    this.getView().getModel("view").setProperty("/filters/availableCompanyCodes", []);
-                }
-            });
+                console.log("[_loadAvailableCompanyCodes] Company code map populated with", Object.keys(this._mCompanyCodeMap).length, "company codes");
+
+                // Update view model
+                this.getView().getModel("view").setProperty("/filters/availableCompanyCodes", aCompanyCodes);
+            } catch (oError) {
+                // If error loading, fall back to empty array or show error
+                console.error("[_loadAvailableCompanyCodes] Error loading company codes:", oError);
+                this.getView().getModel("view").setProperty("/filters/availableCompanyCodes", []);
+            }
         },
 
         /**
          * Load available statuses from xTAXERAxI_SF_STATUS_VH entity set
+         * @returns {Promise} Promise that resolves when statuses are loaded
          */
-        _loadAvailableStatuses: function() {
+        _loadAvailableStatuses: async function() {
             const oModel = this.getModel();
             if (!oModel) {
                 return;
             }
 
-            // Read statuses from xTAXERAxI_SF_STATUS_VH entity set
-            oModel.read("/xTAXERAxI_SF_STATUS_VH", {
-                urlParameters: {
-                    "$select": "Status,Description,value_position"
-                },
-                sorters: [
-                    new Sorter("value_position", false)
-                ],
-                success: (oResponse) => {
-                    // OData v2 uses results array
-                    const aResults = oResponse.results || [];
-                    
-                    // Create status code to description mapping for formatter
-                    this._mStatusMap = {};
-                    aResults.forEach((oStatus) => {
-                        this._mStatusMap[oStatus.Status] = {
-                            description: oStatus.Description || oStatus.Status,
-                            status: oStatus.Status
-                        };
-                    });
+            try {
+                // Read statuses from xTAXERAxI_SF_STATUS_VH entity set
+                const oResponse = await this._readOData(oModel, "/xTAXERAxI_SF_STATUS_VH", {
+                    urlParameters: {
+                        "$select": "Status,Description,value_position"
+                    },
+                    sorters: [
+                        new Sorter("value_position", false)
+                    ]
+                });
 
-                    console.log("[_loadAvailableStatuses] Status map populated with", Object.keys(this._mStatusMap).length, "statuses");
-                },
-                error: (oError) => {
-                    console.error("[_loadAvailableStatuses] Error loading statuses:", oError);
-                    this._mStatusMap = {};
-                }
-            });
+                // OData v2 uses results array
+                const aResults = oResponse.results || [];
+                
+                // Create status code to description mapping for formatter
+                this._mStatusMap = {};
+                aResults.forEach((oStatus) => {
+                    this._mStatusMap[oStatus.Status] = {
+                        description: oStatus.Description || oStatus.Status,
+                        status: oStatus.Status
+                    };
+                });
+
+                console.log("[_loadAvailableStatuses] Status map populated with", Object.keys(this._mStatusMap).length, "statuses");
+            } catch (oError) {
+                console.error("[_loadAvailableStatuses] Error loading statuses:", oError);
+                this._mStatusMap = {};
+            }
         },
 
         /**
@@ -262,7 +288,7 @@ sap.ui.define([
         /**
          * Handler for the Reconciliation List route matched
          */
-        _onReconciliationListMatched: function() {
+        _onReconciliationListMatched: async function() {
             console.log("[_onReconciliationListMatched] Route matched");
             const oModel = this.getModel();
             if (oModel && oModel.hasPendingChanges && oModel.hasPendingChanges(true)) {
@@ -270,12 +296,27 @@ sap.ui.define([
                 oModel.resetChanges();
             }
             
-            // Load countries, company codes, and statuses from service
+            // Load countries, company codes, and statuses from service in parallel
             // This happens here because OData model metadata may not be ready in onInit
             console.log("[_onReconciliationListMatched] Loading countries, company codes, and statuses");
-            this._loadAvailableCountries();
-            this._loadAvailableCompanyCodes();
-            this._loadAvailableStatuses();
+            
+            // Create promise that resolves when all maps are loaded
+            this._oMapsReadyPromise = Promise.all([
+                this._loadAvailableCountries(),
+                this._loadAvailableCompanyCodes(),
+                this._loadAvailableStatuses()
+            ]).then(() => {
+                console.log("[_onReconciliationListMatched] All maps loaded successfully");
+                // Refresh tokenizers after all maps are ready
+                this._refreshTableTokenizers();
+            }).catch((oError) => {
+                console.error("[_onReconciliationListMatched] Error loading maps:", oError);
+                // Still try to refresh tokenizers even if some maps failed
+                this._refreshTableTokenizers();
+            });
+            
+            // Wait for maps to load before refreshing view
+            await this._oMapsReadyPromise;
             
             // Note: Filter controls visibility is handled in _onSmartFilterBarInitialized event
             // which fires after SmartFilterBar is fully initialized
@@ -713,6 +754,9 @@ sap.ui.define([
          * Refresh tokenizers in table rows with updated country/company code maps
          * This is called after country/company code maps are loaded to update
          * tokenizers that were populated before the maps were ready
+         * 
+         * This method also triggers tokenizer population if table data was received
+         * before maps were ready (handles the race condition)
          */
         _refreshTableTokenizers: function() {
             const oTable = this.getView().byId("reconcilesTable");
@@ -722,60 +766,49 @@ sap.ui.define([
 
             const aItems = oTable.getItems();
             if (!aItems || aItems.length === 0) {
+                // If no items yet, table data might arrive later
+                // The _onTableDataReceived handler will populate tokenizers when data arrives
                 return;
             }
 
-            aItems.forEach((oItem, iIndex) => {
-                const oContext = oItem.getBindingContext();
-                if (!oContext) {
-                    return;
-                }
-
-                const oData = oContext.getObject();
-                const aCells = oItem.getCells();
-                
-                // Update country list tokenizer (first cell)
-                if (aCells && aCells.length > 0) {
-                    const oCountryTokenizer = aCells[0];
-                    if (oCountryTokenizer && 
-                        oCountryTokenizer.isA && 
-                        oCountryTokenizer.isA("sap.m.Tokenizer") &&
-                        typeof oCountryTokenizer.removeAllTokens === "function") {
-                        oCountryTokenizer.removeAllTokens();
-                        const aCountryTokens = this.formatter.formatCountryListToTokens(oData.CountryList);
-                        aCountryTokens.forEach((oToken) => {
-                            if (oToken && typeof oCountryTokenizer.addToken === "function") {
-                                oCountryTokenizer.addToken(oToken);
-                            }
-                        });
-                    }
-                }
-
-                // Update company code list tokenizer (second cell)
-                if (aCells && aCells.length > 1) {
-                    const oCompanyCodeTokenizer = aCells[1];
-                    if (oCompanyCodeTokenizer && 
-                        oCompanyCodeTokenizer.isA && 
-                        oCompanyCodeTokenizer.isA("sap.m.Tokenizer") &&
-                        typeof oCompanyCodeTokenizer.removeAllTokens === "function") {
-                        oCompanyCodeTokenizer.removeAllTokens();
-                        const aCompanyCodeTokens = this.formatter.formatCompanyCodeListToTokens(oData.CompanyCodeList);
-                        aCompanyCodeTokens.forEach((oToken) => {
-                            if (oToken && typeof oCompanyCodeTokenizer.addToken === "function") {
-                                oCompanyCodeTokenizer.addToken(oToken);
-                            }
-                        });
-                    }
-                }
-            });
+            // Use the same implementation as _populateTableTokenizers
+            this._populateTableTokenizers();
         },
 
         /**
          * Handler for table data received - populate tokenizers
          * Note: setTokens() exists on ValueHelpDialog, but for Tokenizer controls
          * we must use removeAllTokens() and addToken() methods
+         * 
+         * This method waits for maps to be ready before populating tokenizers to avoid race conditions.
+         * If maps are not ready, it waits for them to load.
          */
-        _onTableDataReceived: function() {
+        _onTableDataReceived: async function() {
+            const oTable = this.getView().byId("reconcilesTable");
+            if (!oTable) {
+                return;
+            }
+
+            // Wait for maps to be ready if they're still loading
+            if (this._oMapsReadyPromise) {
+                try {
+                    await this._oMapsReadyPromise;
+                } catch (oError) {
+                    console.error("[_onTableDataReceived] Error waiting for maps:", oError);
+                    // Continue anyway - maps might be partially loaded
+                }
+            }
+
+            // Maps are ready (or promise resolved), populate tokenizers
+            this._populateTableTokenizers();
+        },
+
+        /**
+         * Populate tokenizers in table rows
+         * This is the actual implementation that populates tokenizers
+         * Separated from _onTableDataReceived to allow calling after maps are ready
+         */
+        _populateTableTokenizers: function() {
             const oTable = this.getView().byId("reconcilesTable");
             if (!oTable) {
                 return;

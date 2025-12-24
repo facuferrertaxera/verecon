@@ -1,116 +1,91 @@
 <core:FragmentDefinition xmlns:mvc="sap.ui.core.mvc"
     xmlns:html="http://www.w3.org/1999/xhtml"
     xmlns="sap.m"
-    xmlns:sform="sap.ui.comp.smartform"
     xmlns:form="sap.ui.layout.form"
-    xmlns:smartField="sap.ui.comp.smartfield"
     xmlns:core="sap.ui.core"
-    xmlns:vhd="sap.ui.comp.valuehelpdialog"
+    xmlns:sv="sap.ui.comp.smartvariants"
+    xmlns:sfb="sap.ui.comp.smartfilterbar"
     displayBlock="true">
-    <Dialog id="ReconciliationDialog" showHeader="true" resizable="false" contentHeight="auto" contentWidth="500px" busyIndicatorDelay="{view>/busyIndicatorDelay}">
-        <customHeader>
-            <Bar>
-                <contentLeft>
-                    <Title text="{i18n>reconciliationPopup.NewReconciliation}"/>
-                </contentLeft>
-                <contentRight>
-                    <VariantManagement 
-                        id="reconciliationVariantManagement"
-                        select="onReconciliationVariantSelect"
-                        save="onReconciliationVariantSave"
-                        manage="onReconciliationVariantManage"
-                        showFooter="true"
-                        items="{
-                            path: 'view>/reconciliationList/newReconciliation/variants',
-                            templateShareable: false
-                        }">
-                        <VariantItem 
-                            key="{view>key}" 
-                            title="{view>title}"
-                            author="{view>author}"
-                            favorite="{view>favorite}"
-                            executeOnSelect="true"
-                            rename="true"
-                            changeable="true"
-                            remove="true"
-                            sharing="{view>sharing}"/>
-                    </VariantManagement>
-                </contentRight>
-            </Bar>
-        </customHeader>
-        <form:Form editable="true" class="sapUiSmallMarginTop">
-            <form:layout>
-                <form:ColumnLayout columnsM="1" columnsL="1" columnsXL="1"/>
-            </form:layout>
-            <form:FormContainer>
-                <form:FormElement>
-                    <form:label>
-                        <Label text="{i18n>reconciliationList.CountryList}" required="true"/>
-                    </form:label>
-                    <MultiInput 
-                        id="reconciliationCountryListInput" 
-                        valueHelpOnly="true" 
-                        valueHelpRequest="onReconciliationCountryValueHelpRequest" 
-                        showValueHelp="true" 
-                        placeholder="{i18n>reconciliationList.SelectCountries}" 
-                        enableMultiLineMode="true"
-                        valueState="{view>/reconciliationList/newReconciliation/CountryListValueState}"
-                        valueStateText="{view>/reconciliationList/newReconciliation/CountryListValueStateText}"/>
-                </form:FormElement>
-                <form:FormElement>
-                    <form:label>
-                        <Label text="{i18n>reconciliationList.CompanyCodeList}" required="true"/>
-                    </form:label>
-                    <MultiInput 
-                        id="reconciliationCompanyCodeListInput" 
-                        valueHelpOnly="true" 
-                        valueHelpRequest="onReconciliationCompanyCodeValueHelpRequest" 
-                        showValueHelp="true" 
-                        placeholder="{i18n>reconciliationList.SelectCompanyCodes}" 
-                        enableMultiLineMode="true"
-                        valueState="{view>/reconciliationList/newReconciliation/CompanyCodeListValueState}"
-                        valueStateText="{view>/reconciliationList/newReconciliation/CompanyCodeListValueStateText}"/>
-                </form:FormElement>
-                <form:FormElement>
-                    <form:label>
-                        <Label text="{i18n>reconciliationPopup.DateRange}" required="true"/>
-                    </form:label>
-                    <DateRangeSelection 
-                        id="reconciliationDateRangeInput"
-                        value="{parts: [{path: 'FromDate'}, {path: 'ToDate'}], type: 'sap.ui.model.type.DateInterval', formatOptions: { UTC: true}}" 
-                        displayFormat="short" 
-                        change="onReconciliationDateRangeChange"
-                        valueState="{view>/reconciliationList/newReconciliation/dateRangeValueState}"
-                        valueStateText="{view>/reconciliationList/newReconciliation/dateRangeValueStateText}"/>
-                </form:FormElement>
-            </form:FormContainer>
-        </form:Form>
-
+    <Dialog 
+        id="ReconciliationDialog" 
+        title="{i18n>reconciliationPopup.NewReconciliation}"
+        showHeader="true" 
+        resizable="false" 
+        contentHeight="auto" 
+        contentWidth="500px" 
+        busyIndicatorDelay="{view>/busyIndicatorDelay}">
+        <content>
+            <VBox width="96%" class="sapUiTinyMarginTop sapUiTinyMarginBegin sapUiTinyMarginEnd">
+                <sv:SmartVariantManagement 
+                    class="sapUiSmallMarginBegin" 
+                    id="reconciliationSmartVariantManagement" 
+                    persistencyKey="tech.taxera.taxreporting.verecon.reconciliation.vm" 
+                    showShare="true" 
+                    showExecuteOnSelection="true" 
+                    entitySet="NewRecParameter"/>
+                   
+                <sfb:SmartFilterBar 
+                    search="onReconciliationSearch" 
+                    class="SFDialogContent" 
+                    id="reconciliationSmartFilterBar" 
+                    showClearOnFB="false" 
+                    showGoOnFB="false" 
+                    showFilterConfiguration="false" 
+                    liveMode="false" 
+                    smartVariant="reconciliationSmartVariantManagement" 
+                    useToolbar="false" 
+                    entitySet="NewRecParameter" 
+                    persistencyKey="tech.taxera.taxreporting.verecon.reconciliation.vm" 
+                    assignedFiltersChanged="onReconciliationAssignedFiltersChanged" 
+                    enableBasicSearch="false">
+                    <sfb:controlConfiguration>
+                        <sfb:ControlConfiguration 
+                            key="country" 
+                            mandatory="mandatory" 
+                            index="1" 
+                            visibleInAdvancedArea="true">
+                        </sfb:ControlConfiguration>
+                        <sfb:ControlConfiguration 
+                            key="companycode" 
+                            mandatory="mandatory" 
+                            index="2" 
+                            visibleInAdvancedArea="true">
+                        </sfb:ControlConfiguration>
+                        <sfb:ControlConfiguration 
+                            key="reporting_date" 
+                            mandatory="mandatory" 
+                            index="3" 
+                            visibleInAdvancedArea="true" 
+                            conditionType="{
+                                module: 'sap.ui.comp.config.condition.DateRangeType',
+                                ignoreTime: true,
+                                utc: true
+                            }">
+                        </sfb:ControlConfiguration>
+                        <sfb:ControlConfiguration 
+                            key="variant" 
+                            mandatory="notMandatory" 
+                            index="4" 
+                            visibleInAdvancedArea="true">
+                        </sfb:ControlConfiguration>
+                    </sfb:controlConfiguration>
+                    <sfb:customData>
+                        <core:CustomData key="dateFormatSettings" value='\{"UTC":true\}' />
+                    </sfb:customData>
+                    <sfb:layoutData>
+                        <FlexItemData shrinkFactor="0"/>
+                    </sfb:layoutData>
+                </sfb:SmartFilterBar>
+            </VBox>
+        </content>
         <buttons>
-            <Button text="{i18n>reconciliationPopup.Proceed}" type="Accept" press="onNewReconciliationProceed"></Button>
-            <Button text="{i18n>reconciliationPopup.Cancel}" type="Reject" press="onNewReconciliationCancel"></Button>
+            <Button 
+                text="{i18n>reconciliationPopup.Proceed}" 
+                type="Emphasized" 
+                press="onNewReconciliationProceed"/>
+            <Button 
+                text="{i18n>reconciliationPopup.Cancel}" 
+                press="onNewReconciliationCancel"/>
         </buttons>
-        <dependents>
-            <!-- Value Help Dialog for Countries -->
-            <vhd:ValueHelpDialog id="reconciliationCountryValueHelpDialog" 
-                title="{i18n>reconciliationList.SelectCountries}"
-                ok="onReconciliationCountryValueHelpOk"
-                cancel="onReconciliationCountryValueHelpCancel"
-                afterClose="onReconciliationCountryValueHelpAfterClose"
-                key="Country"
-                descriptionKey="Country_Text"
-                supportMultiselect="true"/>
-            
-            <!-- Value Help Dialog for Company Codes -->
-            <vhd:ValueHelpDialog id="reconciliationCompanyCodeValueHelpDialog" 
-                title="{i18n>reconciliationList.SelectCompanyCodes}"
-                ok="onReconciliationCompanyCodeValueHelpOk"
-                cancel="onReconciliationCompanyCodeValueHelpCancel"
-                afterClose="onReconciliationCompanyCodeValueHelpAfterClose"
-                key="CompanyCode"
-                descriptionKey="Name"
-                supportMultiselect="true"/>
-            
-        </dependents>
     </Dialog>
 </core:FragmentDefinition>

@@ -141,6 +141,37 @@ sap.ui.define([
                 sMessage = JSON.parse(oError.response.body).error.message.value;
             }
             MessageBox.error(sMessage);
+        },
+
+        /**
+         * Promise-based read helper for OData model
+         * @param {string} sPath - Entity path
+         * @param {object} mParameters - Read parameters (filters, urlParameters, etc.)
+         * @returns {Promise} Promise that resolves with response or rejects with error
+         */
+        promRead: function(sPath, mParameters) {
+            const oModel = this.getModel();
+            return new Promise((resolve, reject) => {
+                const mReadParams = {
+                    success: function(oData) {
+                        resolve(oData);
+                    },
+                    error: function(oError) {
+                        reject(oError);
+                    }
+                };
+                
+                // Copy parameters (filters, urlParameters, etc.) to read params
+                if (mParameters) {
+                    Object.keys(mParameters).forEach((sKey) => {
+                        if (sKey !== "success" && sKey !== "error") {
+                            mReadParams[sKey] = mParameters[sKey];
+                        }
+                    });
+                }
+                
+                oModel.read(sPath, mReadParams);
+            });
         }
     });
 

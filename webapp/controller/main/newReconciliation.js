@@ -27,35 +27,11 @@ sap.ui.define([
                 MessageToast.show("Dialog not found. Please refresh the page.");
                 return;
             }
-            this.getModel().resetChanges();
-            
-            const oNewContext = this.getModel().createEntry("/Reconciliation", {
-                properties: {
-                    Status: "C",
-                    StatusText: this.i18n("reconciliationPopup.ReconciliationCreated"),
-                    FromDate: null,
-                    ToDate: null,
-                    CountryList: "",
-                    CompanyCodeList: ""
-                }
-            });
 
-            // Clear inputs
-            oView.byId("reconciliationCountryListInput").setTokens([]);
-            oView.byId("reconciliationCompanyCodeListInput").setTokens([]);
-
-            // Reset validation states
-            this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CountryListValueState", library.ValueState.None);
-            this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CountryListValueStateText", "");
-            this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CompanyCodeListValueState", library.ValueState.None);
-            this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CompanyCodeListValueStateText", "");
-            this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/dateRangeValueState", library.ValueState.None);
-            this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/dateRangeValueStateText", "");
-
-            oReconciliationDialog.setBindingContext(oNewContext);
-            
-            // Load variants from localStorage
-            this._loadReconciliationVariants();
+            const oViewModel = oView.getModel("view");
+            if (!oViewModel) {
+                oView.setModel(new sap.ui.model.json.JSONModel(), "view");
+            }
             
             oReconciliationDialog.open();
         },
@@ -65,70 +41,130 @@ sap.ui.define([
          * Handler for cancel button
          */
         onNewReconciliationCancel: function () {
-            this.getView().byId("ReconciliationDialog").close();
-            this.getModel().resetChanges();
+            const oView = this.getView();
+            const oSmartFilterBar = oView.byId("reconciliationSmartFilterBar");
+            if (oSmartFilterBar) {
+                oSmartFilterBar.fireClear();
+            }
+            oView.byId("ReconciliationDialog").close();
         },
 
         /**
-         * Handler for proceed button - validates and creates reconciliation
+         * Handler for search event - prevent default behavior
+         */
+        onReconciliationSearch: function(oEvent) {
+            // Prevent the standard call
+            oEvent.preventDefault();
+        },
+
+        /**
+         * Handler for assigned filters changed
+         */
+        onReconciliationAssignedFiltersChanged: function() {
+            // Can be used to react to filter changes if needed
+        },
+
+        /**
+         * Handler for proceed button - validates and creates reconciliation via NewRecParameter read
          */
         onNewReconciliationProceed: async function () {
             const oView = this.getView();
             const oReconciliationDialog = oView.byId("ReconciliationDialog");
-            const oNewContext = oReconciliationDialog.getBindingContext();
-            const oNewReconciliation = oNewContext.getObject();
-            let bValid = true;
-
-            // Get selected countries and company codes from MultiInput tokens
-            const oCountryInput = oView.byId("reconciliationCountryListInput");
-            const oCompanyCodeInput = oView.byId("reconciliationCompanyCodeListInput");
-            const aCountryTokens = oCountryInput.getTokens();
-            const aCompanyCodeTokens = oCompanyCodeInput.getTokens();
-
-            // Build comma-separated lists
-            const sCountryList = aCountryTokens.map(oToken => oToken.getKey()).join(",");
-            const sCompanyCodeList = aCompanyCodeTokens.map(oToken => oToken.getKey()).join(",");
-
-            // Validation Checks
-            if (!sCountryList || aCountryTokens.length === 0) {
-                bValid = false;
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CountryListValueState", library.ValueState.Error);
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CountryListValueStateText", this.i18n("reconciliationPopup.CountryListMandatory"));
-            } else {
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CountryListValueState", library.ValueState.None);
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CountryListValueStateText", "");
-            }
-
-            if (!sCompanyCodeList || aCompanyCodeTokens.length === 0) {
-                bValid = false;
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CompanyCodeListValueState", library.ValueState.Error);
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CompanyCodeListValueStateText", this.i18n("reconciliationPopup.CompanyCodeListMandatory"));
-            } else {
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CompanyCodeListValueState", library.ValueState.None);
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CompanyCodeListValueStateText", "");
-            }
-
-            if (!oNewReconciliation.FromDate || !oNewReconciliation.ToDate) {
-                bValid = false;
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/dateRangeValueState", library.ValueState.Error);
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/dateRangeValueStateText", this.i18n("reconciliationPopup.DateRangeMandatory"));
-            } else {
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/dateRangeValueState", library.ValueState.None);
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/dateRangeValueStateText", "");
-            }
-
-            if (!bValid) {
+            const oSmartFilterBar = oView.byId("reconciliationSmartFilterBar");
+            
+            if (!oSmartFilterBar) {
+                MessageToast.show("SmartFilterBar not found.");
                 return;
             }
 
-            // Set the country and company code lists
-            oNewReconciliation.CountryList = sCountryList;
-            oNewReconciliation.CompanyCodeList = sCompanyCodeList;
+            // Validate mandatory fields
+            if (!oSmartFilterBar.validateMandatoryFields()) {
+                MessageToast.show(this.i18n("reconciliationPopup.PleaseFillAllMandatoryFields"));
+                return;
+            }
+
+            // Get filters from SmartFilterBar
+            let aFilters = oSmartFilterBar.getFilters();
+            
+            // Extract values from filters for validation and processing
+            const mFilterValues = this._extractFilterValues(aFilters);
+            
+            if (!mFilterValues.companycodes || mFilterValues.companycodes.length === 0) {
+                MessageToast.show(this.i18n("reconciliationPopup.CompanyCodeListMandatory"));
+                return;
+            }
+            
+            if (!mFilterValues.countries || mFilterValues.countries.length === 0) {
+                MessageToast.show(this.i18n("reconciliationPopup.CountryListMandatory"));
+                return;
+            }
+            
+            if (!mFilterValues.reporting_date) {
+                MessageToast.show(this.i18n("reconciliationPopup.DateRangeMandatory"));
+                return;
+            }
+
+            // Fix UTC for date filters
+            this._fixUTC("reporting_date", aFilters);
 
             try {
                 oReconciliationDialog.setBusy(true);
-                await this.getModel().submitChanges();
+                
+                // Read NewRecParameter for each companycode+country combination
+                const aReadPromises = [];
+                const aReconIds = [];
+                const aCompanyCodes = mFilterValues.companycodes;
+                const aCountries = mFilterValues.countries;
+                const oReportingDate = mFilterValues.reporting_date;
+                const sVariant = mFilterValues.variant || "";
+
+                // Create read operations for each combination
+                for (let i = 0; i < aCompanyCodes.length; i++) {
+                    const sCompanyCode = aCompanyCodes[i];
+                    
+                    for (let j = 0; j < aCountries.length; j++) {
+                        const sCountry = aCountries[j];
+                        
+                        // Build filters for this combination (required filters for composite key + reporting_date)
+                        const aCombinationFilters = [
+                            new Filter("companycode", FilterOperator.EQ, sCompanyCode),
+                            new Filter("country", FilterOperator.EQ, sCountry),
+                            new Filter("reporting_date", FilterOperator.EQ, oReportingDate)
+                        ];
+                        
+                        // Add variant filter if provided
+                        if (sVariant) {
+                            aCombinationFilters.push(new Filter("variant", FilterOperator.EQ, sVariant));
+                        }
+
+                        // Use promRead helper (from BaseController)
+                        const oReadPromise = this.promRead("/NewRecParameter", {
+                            filters: aCombinationFilters,
+                            urlParameters: {
+                                "$select": "companycode,country,reporting_date,recon_id"
+                            }
+                        }).then(function(oData) {
+                            // Handle single result or array
+                            const oResult = Array.isArray(oData.results) ? oData.results[0] : oData;
+                            if (oResult && oResult.recon_id) {
+                                aReconIds.push({
+                                    companycode: sCompanyCode,
+                                    country: sCountry,
+                                    recon_id: oResult.recon_id
+                                });
+                            }
+                            return oResult;
+                        });
+                        
+                        aReadPromises.push(oReadPromise);
+                    }
+                }
+
+                // Wait for all reads to complete
+                await Promise.all(aReadPromises);
+                
                 oReconciliationDialog.close();
+                oSmartFilterBar.fireClear();
                 this._refreshView();
                 MessageToast.show(this.i18n("reconciliationList.CreateReconciliationConfirmation"));
             } catch (oError) {
@@ -139,27 +175,122 @@ sap.ui.define([
         },
 
         /**
-         * Handler for date range change
+         * Fix UTC for date filters
+         * @private
          */
-        onReconciliationDateRangeChange: function (oEvent) {
-            const oView = this.getView();
-            const oReconciliationDialog = oView.byId("ReconciliationDialog");
-            const sPath = oReconciliationDialog.getBindingContext().getPath();
-            const bValid = oEvent.getParameter("valid");
-            const oDateFrom = oEvent.getParameter("from");
-            const oDateTo = oEvent.getParameter("to");
-
-            oReconciliationDialog.getModel().setProperty(sPath + "/FromDate", oDateFrom);
-            oReconciliationDialog.getModel().setProperty(sPath + "/ToDate", oDateTo);
-
-            if (!bValid) {
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/dateRangeValueState", library.ValueState.Error);
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/dateRangeValueStateText", this.i18n("reconciliationPopup.InvalidDate"));
-            } else {
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/dateRangeValueState", library.ValueState.None);
-                this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/dateRangeValueStateText", "");
+        _fixUTC: function(sDateProperty, aFilters) {
+            if (!aFilters || aFilters.length === 0 || !aFilters[0].aFilters) {
+                return;
+            }
+            
+            let oDateFilter = aFilters[0].aFilters.find(function(oFilter) {
+                return oFilter.aFilters && oFilter.aFilters[0] && oFilter.aFilters[0].sPath === sDateProperty;
+            });
+            
+            if (!oDateFilter || !oDateFilter.aFilters || !oDateFilter.aFilters[0]) {
+                return;
+            }
+            
+            const oInnerFilter = oDateFilter.aFilters[0];
+            
+            // Convert local date to UTC (ignoring timezone)
+            if (oInnerFilter.oValue1) {
+                const oDate1 = new Date(oInnerFilter.oValue1);
+                oInnerFilter.oValue1 = new Date(Date.UTC(
+                    oDate1.getFullYear(),
+                    oDate1.getMonth(),
+                    oDate1.getDate(),
+                    0, 0, 0, 0
+                )).toISOString();
+            }
+            
+            if (oInnerFilter.oValue2) {
+                const oDate2 = new Date(oInnerFilter.oValue2);
+                oInnerFilter.oValue2 = new Date(Date.UTC(
+                    oDate2.getFullYear(),
+                    oDate2.getMonth(),
+                    oDate2.getDate(),
+                    23, 59, 59, 999
+                )).toISOString();
             }
         },
+
+        /**
+         * Extract filter values from SmartFilterBar filters
+         * @private
+         */
+        _extractFilterValues: function(aFilters) {
+            const mValues = {
+                companycodes: [],
+                countries: [],
+                reporting_date: null,
+                variant: null
+            };
+
+            if (!aFilters || aFilters.length === 0) {
+                return mValues;
+            }
+
+            // SmartFilterBar filters are typically nested
+            const oFilterGroup = aFilters[0];
+            if (oFilterGroup && oFilterGroup.aFilters) {
+                oFilterGroup.aFilters.forEach(function(oFilter) {
+                    if (oFilter.aFilters) {
+                        oFilter.aFilters.forEach(function(oInnerFilter) {
+                            const sPath = oInnerFilter.sPath || oInnerFilter.getPath();
+                            const sOperator = oInnerFilter.sOperator || oInnerFilter.getOperator();
+                            
+                            if (sPath === "companycode") {
+                                if (sOperator === "EQ") {
+                                    const sValue = oInnerFilter.oValue1 || oInnerFilter.getValue1();
+                                    if (sValue && mValues.companycodes.indexOf(sValue) === -1) {
+                                        mValues.companycodes.push(sValue);
+                                    }
+                                } else if (sOperator === "IN") {
+                                    const aValues = oInnerFilter.aValues || oInnerFilter.getValues();
+                                    if (aValues) {
+                                        aValues.forEach(function(sValue) {
+                                            if (mValues.companycodes.indexOf(sValue) === -1) {
+                                                mValues.companycodes.push(sValue);
+                                            }
+                                        });
+                                    }
+                                }
+                            } else if (sPath === "country") {
+                                if (sOperator === "EQ") {
+                                    const sValue = oInnerFilter.oValue1 || oInnerFilter.getValue1();
+                                    if (sValue && mValues.countries.indexOf(sValue) === -1) {
+                                        mValues.countries.push(sValue);
+                                    }
+                                } else if (sOperator === "IN") {
+                                    const aValues = oInnerFilter.aValues || oInnerFilter.getValues();
+                                    if (aValues) {
+                                        aValues.forEach(function(sValue) {
+                                            if (mValues.countries.indexOf(sValue) === -1) {
+                                                mValues.countries.push(sValue);
+                                            }
+                                        });
+                                    }
+                                }
+                            } else if (sPath === "reporting_date") {
+                                // Date range filter - get the "to" date as reporting_date
+                                if (sOperator === "BT") {
+                                    mValues.reporting_date = oInnerFilter.oValue2 || oInnerFilter.getValue2();
+                                } else if (sOperator === "EQ") {
+                                    mValues.reporting_date = oInnerFilter.oValue1 || oInnerFilter.getValue1();
+                                }
+                            } else if (sPath === "variant") {
+                                mValues.variant = oInnerFilter.oValue1 || oInnerFilter.getValue1();
+                            }
+                        });
+                    }
+                });
+            }
+
+            return mValues;
+        },
+
+
 
         /**
          * Handler for reconciliation creation error

@@ -1,1 +1,27 @@
 /* Enter your custom styles here */
+
+/* Force SmartFilterBar to display in single column with 3 rows */
+.reconciliationSingleColumnFilterBar .sapUiRespGrid.sapUiRespGridHSpace1 > div {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.reconciliationSingleColumnFilterBar .sapUiRespGrid > div {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.reconciliationSingleColumnFilterBar .sapUiRespGridBreak {
+    clear: both !important;
+}
+
+/* Ensure each filter field takes full width and appears on its own row */
+.reconciliationSingleColumnFilterBar .sapUiRespGridMedia-Std-Phone > div,
+.reconciliationSingleColumnFilterBar .sapUiRespGridMedia-Std-Tablet > div,
+.reconciliationSingleColumnFilterBar .sapUiRespGridMedia-Std-Desktop > div {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}

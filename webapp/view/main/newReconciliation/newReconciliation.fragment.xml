@@ -26,7 +26,7 @@
                    
                 <sfb:SmartFilterBar 
                     search="onReconciliationSearch" 
-                    class="SFDialogContent" 
+                    class="SFDialogContent reconciliationSingleColumnFilterBar" 
                     id="reconciliationSmartFilterBar" 
                     showClearOnFB="false" 
                     showGoOnFB="false" 
@@ -37,7 +37,8 @@
                     entitySet="NewRecParameter" 
                     persistencyKey="tech.taxera.taxreporting.verecon.reconciliation.vm" 
                     assignedFiltersChanged="onReconciliationAssignedFiltersChanged" 
-                    enableBasicSearch="false">
+                    enableBasicSearch="false"
+                    considerSelectionVariants="false">
                     <sfb:controlConfiguration>
                         <sfb:ControlConfiguration 
                             key="country" 

@@ -307,12 +307,8 @@ sap.ui.define([
                 this._loadAvailableStatuses()
             ]).then(() => {
                 console.log("[_onReconciliationListMatched] All maps loaded successfully");
-                // Refresh tokenizers after all maps are ready
-                this._refreshTableTokenizers();
             }).catch((oError) => {
                 console.error("[_onReconciliationListMatched] Error loading maps:", oError);
-                // Still try to refresh tokenizers even if some maps failed
-                this._refreshTableTokenizers();
             });
             
             // Wait for maps to load before refreshing view
@@ -323,6 +319,12 @@ sap.ui.define([
             
             console.log("[_onReconciliationListMatched] Refreshing view");
             this._refreshView();
+            
+            // After refreshing, wait a bit for table data to load, then refresh tokenizers
+            // This handles the case where table data arrives after maps are ready
+            setTimeout(() => {
+                this._refreshTableTokenizers();
+            }, 100);
         },
         /**
          * Refresh the view
@@ -331,6 +333,11 @@ sap.ui.define([
             const oTable = this.getView().byId("reconcilesTable");
             if (oTable && oTable.getBinding("items")) {
                 oTable.getBinding("items").refresh();
+                // Also try to populate tokenizers after refresh
+                // Use a longer delay to ensure data is loaded
+                setTimeout(() => {
+                    this._populateTableTokenizers();
+                }, 500);
             }
         },
 
@@ -784,22 +791,29 @@ sap.ui.define([
          * If maps are not ready, it waits for them to load.
          */
         _onTableDataReceived: async function() {
+            console.log("[_onTableDataReceived] Table data received");
             const oTable = this.getView().byId("reconcilesTable");
             if (!oTable) {
+                console.log("[_onTableDataReceived] Table not found");
                 return;
             }
 
             // Wait for maps to be ready if they're still loading
             if (this._oMapsReadyPromise) {
                 try {
+                    console.log("[_onTableDataReceived] Waiting for maps to be ready...");
                     await this._oMapsReadyPromise;
+                    console.log("[_onTableDataReceived] Maps are ready");
                 } catch (oError) {
                     console.error("[_onTableDataReceived] Error waiting for maps:", oError);
                     // Continue anyway - maps might be partially loaded
                 }
+            } else {
+                console.log("[_onTableDataReceived] No maps promise found, proceeding anyway");
             }
 
             // Maps are ready (or promise resolved), populate tokenizers
+            console.log("[_onTableDataReceived] Populating tokenizers");
             this._populateTableTokenizers();
         },
 
@@ -811,10 +825,19 @@ sap.ui.define([
         _populateTableTokenizers: function() {
             const oTable = this.getView().byId("reconcilesTable");
             if (!oTable) {
+                console.log("[_populateTableTokenizers] Table not found");
                 return;
             }
 
             const aItems = oTable.getItems();
+            console.log("[_populateTableTokenizers] Found", aItems ? aItems.length : 0, "table items");
+            
+            if (!aItems || aItems.length === 0) {
+                console.log("[_populateTableTokenizers] No items to populate");
+                return;
+            }
+            
+            let iTokenizersPopulated = 0;
             aItems.forEach((oItem) => {
                 const oContext = oItem.getBindingContext();
                 if (!oContext) {
@@ -833,9 +856,11 @@ sap.ui.define([
                         typeof oCountryTokenizer.removeAllTokens === "function") {
                         oCountryTokenizer.removeAllTokens();
                         const aCountryTokens = this.formatter.formatCountryListToTokens(oData.CountryList);
+                        console.log("[_populateTableTokenizers] Country tokens for row:", aCountryTokens.length, "tokens from", oData.CountryList);
                         aCountryTokens.forEach((oToken) => {
                             if (oToken && typeof oCountryTokenizer.addToken === "function") {
                                 oCountryTokenizer.addToken(oToken);
+                                iTokenizersPopulated++;
                             }
                         });
                     }
@@ -850,14 +875,18 @@ sap.ui.define([
                         typeof oCompanyCodeTokenizer.removeAllTokens === "function") {
                         oCompanyCodeTokenizer.removeAllTokens();
                         const aCompanyCodeTokens = this.formatter.formatCompanyCodeListToTokens(oData.CompanyCodeList);
+                        console.log("[_populateTableTokenizers] Company code tokens for row:", aCompanyCodeTokens.length, "tokens from", oData.CompanyCodeList);
                         aCompanyCodeTokens.forEach((oToken) => {
                             if (oToken && typeof oCompanyCodeTokenizer.addToken === "function") {
                                 oCompanyCodeTokenizer.addToken(oToken);
+                                iTokenizersPopulated++;
                             }
                         });
                     }
                 }
             });
+            
+            console.log("[_populateTableTokenizers] Populated", iTokenizersPopulated, "tokens across", aItems.length, "rows");
         }
     }, newReconciliation));
 

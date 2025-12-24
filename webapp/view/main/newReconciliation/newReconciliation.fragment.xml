@@ -8,7 +8,34 @@
     xmlns:vhd="sap.ui.comp.valuehelpdialog"
     displayBlock="true">
     <Dialog id="ReconciliationDialog" showHeader="false" resizable="false" contentHeight="auto" contentWidth="500px" busyIndicatorDelay="{view>/busyIndicatorDelay}">
-        <form:Form editable="true" title="{i18n>reconciliationPopup.NewReconciliation}">
+        <headerToolbar>
+            <Toolbar>
+                <Title text="{i18n>reconciliationPopup.NewReconciliation}"/>
+                <ToolbarSpacer/>
+                <Label text="{i18n>reconciliationPopup.Variant}" labelFor="reconciliationVariantSelect" class="sapUiTinyMarginEnd"/>
+                <Select 
+                    id="reconciliationVariantSelect" 
+                    width="200px"
+                    change="onReconciliationVariantChange"
+                    items="{
+                        path: 'view>/reconciliationList/newReconciliation/variants',
+                        templateShareable: false
+                    }">
+                    <core:Item key="{view>key}" text="{view>text}"/>
+                </Select>
+                <Button 
+                    icon="sap-icon://save" 
+                    tooltip="{i18n>reconciliationPopup.SaveVariant}" 
+                    press="onSaveReconciliationVariant"
+                    type="Transparent"/>
+                <Button 
+                    icon="sap-icon://action-settings" 
+                    tooltip="{i18n>reconciliationPopup.ManageVariants}" 
+                    press="onManageReconciliationVariants"
+                    type="Transparent"/>
+            </Toolbar>
+        </headerToolbar>
+        <form:Form editable="true">
             <form:layout>
                 <form:ColumnLayout columnsM="1" columnsL="1" columnsXL="1"/>
             </form:layout>
@@ -53,6 +80,7 @@
                         <Label text="{i18n>reconciliationPopup.DateRange}" required="true"/>
                     </form:label>
                     <DateRangeSelection 
+                        id="reconciliationDateRangeInput"
                         value="{parts: [{path: 'FromDate'}, {path: 'ToDate'}], type: 'sap.ui.model.type.DateInterval', formatOptions: { UTC: true}}" 
                         displayFormat="short" 
                         change="onReconciliationDateRangeChange"
@@ -85,6 +113,30 @@
                 key="CompanyCode"
                 descriptionKey="Name"
                 supportMultiselect="true"/>
+            
+            <!-- Manage Variants Dialog -->
+            <Dialog id="reconciliationManageVariantsDialog" 
+                title="{i18n>reconciliationPopup.ManageVariants}"
+                contentWidth="400px">
+                <content>
+                    <List 
+                        id="reconciliationVariantsList"
+                        mode="Delete"
+                        delete="onDeleteReconciliationVariant"
+                        items="{
+                            path: 'view>/reconciliationList/newReconciliation/manageVariants',
+                            templateShareable: false
+                        }">
+                        <StandardListItem 
+                            title="{view>text}"
+                            type="Active"
+                            press="onSelectReconciliationVariantFromManage"/>
+                    </List>
+                </content>
+                <buttons>
+                    <Button text="{i18n>common.OK}" press="onCloseManageVariantsDialog"/>
+                </buttons>
+            </Dialog>
         </dependents>
     </Dialog>
 </core:FragmentDefinition>

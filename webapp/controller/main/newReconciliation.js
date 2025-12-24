@@ -51,6 +51,10 @@ sap.ui.define([
             this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/dateRangeValueStateText", "");
 
             oReconciliationDialog.setBindingContext(oNewContext);
+            
+            // Load variants from localStorage
+            this._loadReconciliationVariants();
+            
             oReconciliationDialog.open();
         },
 
@@ -397,6 +401,385 @@ sap.ui.define([
          */
         onReconciliationCompanyCodeValueHelpAfterClose: function () {
             // Cleanup if needed
+        },
+
+        /**
+         * Load reconciliation variants from localStorage
+         * @private
+         */
+        _loadReconciliationVariants: function () {
+            const sStorageKey = "reconciliationVariants";
+            const oView = this.getView();
+            const oViewModel = oView.getModel("view");
+            
+            try {
+                const sStoredVariants = localStorage.getItem(sStorageKey);
+                let aVariants = [];
+                
+                if (sStoredVariants) {
+                    aVariants = JSON.parse(sStoredVariants);
+                }
+                
+                // Add empty option
+                aVariants.unshift({
+                    key: "",
+                    text: this.i18n("reconciliationPopup.NoVariant")
+                });
+                
+                oViewModel.setProperty("/reconciliationList/newReconciliation/variants", aVariants);
+            } catch (oError) {
+                console.error("Error loading variants:", oError);
+                oViewModel.setProperty("/reconciliationList/newReconciliation/variants", [{
+                    key: "",
+                    text: this.i18n("reconciliationPopup.NoVariant")
+                }]);
+            }
+        },
+
+        /**
+         * Save reconciliation variants to localStorage
+         * @private
+         */
+        _saveReconciliationVariants: function (aVariants) {
+            const sStorageKey = "reconciliationVariants";
+            
+            try {
+                // Filter out the empty option before saving
+                const aVariantsToSave = aVariants.filter(function(oVariant) {
+                    return oVariant.key !== "";
+                });
+                localStorage.setItem(sStorageKey, JSON.stringify(aVariantsToSave));
+            } catch (oError) {
+                console.error("Error saving variants:", oError);
+                MessageToast.show(this.i18n("reconciliationPopup.ErrorSavingVariant"));
+            }
+        },
+
+        /**
+         * Handler for variant selection change
+         */
+        onReconciliationVariantChange: function (oEvent) {
+            const oSelectedItem = oEvent.getParameter("selectedItem");
+            if (!oSelectedItem) {
+                return;
+            }
+            
+            const sSelectedKey = oSelectedItem.getKey();
+            
+            if (!sSelectedKey) {
+                // Empty variant selected - clear form
+                return;
+            }
+            
+            const sStorageKey = "reconciliationVariants";
+            
+            try {
+                const sStoredVariants = localStorage.getItem(sStorageKey);
+                if (!sStoredVariants) {
+                    return;
+                }
+                
+                const aVariants = JSON.parse(sStoredVariants);
+                const oSelectedVariant = aVariants.find(function(oVariant) {
+                    return oVariant.key === sSelectedKey;
+                });
+                
+                if (oSelectedVariant && oSelectedVariant.data) {
+                    this._applyReconciliationVariant(oSelectedVariant.data);
+                }
+            } catch (oError) {
+                console.error("Error loading variant:", oError);
+                MessageToast.show(this.i18n("reconciliationPopup.ErrorLoadingVariant"));
+            }
+        },
+
+        /**
+         * Apply variant data to form fields
+         * @private
+         */
+        _applyReconciliationVariant: function (oVariantData) {
+            const oView = this.getView();
+            const oReconciliationDialog = oView.byId("ReconciliationDialog");
+            const oContext = oReconciliationDialog.getBindingContext();
+            const sPath = oContext.getPath();
+            const oModel = oReconciliationDialog.getModel();
+            
+            // Apply date range
+            if (oVariantData.FromDate && oVariantData.ToDate) {
+                oModel.setProperty(sPath + "/FromDate", oVariantData.FromDate);
+                oModel.setProperty(sPath + "/ToDate", oVariantData.ToDate);
+            }
+            
+            // Apply country tokens
+            if (oVariantData.CountryList && Array.isArray(oVariantData.CountryList)) {
+                const aCountryTokens = oVariantData.CountryList.map(function(oCountry) {
+                    return new Token({
+                        key: oCountry.key,
+                        text: oCountry.text
+                    });
+                });
+                oView.byId("reconciliationCountryListInput").setTokens(aCountryTokens);
+            }
+            
+            // Apply company code tokens
+            if (oVariantData.CompanyCodeList && Array.isArray(oVariantData.CompanyCodeList)) {
+                const aCompanyCodeTokens = oVariantData.CompanyCodeList.map(function(oCompanyCode) {
+                    return new Token({
+                        key: oCompanyCode.key,
+                        text: oCompanyCode.text
+                    });
+                });
+                oView.byId("reconciliationCompanyCodeListInput").setTokens(aCompanyCodeTokens);
+            }
+        },
+
+        /**
+         * Handler for save variant button
+         */
+        onSaveReconciliationVariant: function () {
+            const oView = this.getView();
+            const oReconciliationDialog = oView.byId("ReconciliationDialog");
+            const oContext = oReconciliationDialog.getBindingContext();
+            const oReconciliation = oContext.getObject();
+            
+            // Get current form values
+            const oCountryInput = oView.byId("reconciliationCountryListInput");
+            const oCompanyCodeInput = oView.byId("reconciliationCompanyCodeListInput");
+            const aCountryTokens = oCountryInput.getTokens();
+            const aCompanyCodeTokens = oCompanyCodeInput.getTokens();
+            
+            // Check if form has values
+            if (aCountryTokens.length === 0 && aCompanyCodeTokens.length === 0 && !oReconciliation.FromDate && !oReconciliation.ToDate) {
+                MessageToast.show(this.i18n("reconciliationPopup.NoDataToSave"));
+                return;
+            }
+            
+            // Prompt for variant name
+            MessageBox.prompt(this.i18n("reconciliationPopup.EnterVariantName"), {
+                title: this.i18n("reconciliationPopup.SaveVariant"),
+                defaultValue: "",
+                actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+                onClose: function (sAction, sVariantName) {
+                    if (sAction === MessageBox.Action.OK && sVariantName) {
+                        this._saveReconciliationVariant(sVariantName.trim());
+                    }
+                }.bind(this)
+            });
+        },
+
+        /**
+         * Save current form state as a variant
+         * @private
+         */
+        _saveReconciliationVariant: function (sVariantName) {
+            const oView = this.getView();
+            const oReconciliationDialog = oView.byId("ReconciliationDialog");
+            const oContext = oReconciliationDialog.getBindingContext();
+            const oReconciliation = oContext.getObject();
+            
+            // Get current form values
+            const oCountryInput = oView.byId("reconciliationCountryListInput");
+            const oCompanyCodeInput = oView.byId("reconciliationCompanyCodeListInput");
+            const aCountryTokens = oCountryInput.getTokens();
+            const aCompanyCodeTokens = oCompanyCodeInput.getTokens();
+            
+            // Build variant data
+            const oVariantData = {
+                FromDate: oReconciliation.FromDate,
+                ToDate: oReconciliation.ToDate,
+                CountryList: aCountryTokens.map(function(oToken) {
+                    return {
+                        key: oToken.getKey(),
+                        text: oToken.getText()
+                    };
+                }),
+                CompanyCodeList: aCompanyCodeTokens.map(function(oToken) {
+                    return {
+                        key: oToken.getKey(),
+                        text: oToken.getText()
+                    };
+                })
+            };
+            
+            // Generate unique key
+            const sVariantKey = "variant_" + Date.now();
+            
+            // Get existing variants
+            const sStorageKey = "reconciliationVariants";
+            let aVariants = [];
+            
+            try {
+                const sStoredVariants = localStorage.getItem(sStorageKey);
+                if (sStoredVariants) {
+                    aVariants = JSON.parse(sStoredVariants);
+                }
+            } catch (oError) {
+                console.error("Error loading variants:", oError);
+            }
+            
+            // Check if variant name already exists
+            const bVariantExists = aVariants.some(function(oVariant) {
+                return oVariant.text === sVariantName;
+            });
+            
+            if (bVariantExists) {
+                MessageBox.warning(this.i18n("reconciliationPopup.VariantNameExists"));
+                return;
+            }
+            
+            // Add new variant
+            aVariants.push({
+                key: sVariantKey,
+                text: sVariantName,
+                data: oVariantData
+            });
+            
+            // Save to localStorage
+            this._saveReconciliationVariants(aVariants);
+            
+            // Reload variants in UI
+            this._loadReconciliationVariants();
+            
+            // Select the newly saved variant
+            const oVariantSelect = oView.byId("reconciliationVariantSelect");
+            oVariantSelect.setSelectedKey(sVariantKey);
+            
+            MessageToast.show(this.i18n("reconciliationPopup.VariantSaved"));
+        },
+
+        /**
+         * Handler for manage variants button
+         */
+        onManageReconciliationVariants: function () {
+            const oView = this.getView();
+            const oManageDialog = oView.byId("reconciliationManageVariantsDialog");
+            const oViewModel = oView.getModel("view");
+            
+            // Load variants excluding the empty option for the manage dialog
+            const sStorageKey = "reconciliationVariants";
+            try {
+                const sStoredVariants = localStorage.getItem(sStorageKey);
+                let aVariants = [];
+                
+                if (sStoredVariants) {
+                    aVariants = JSON.parse(sStoredVariants);
+                }
+                
+                oViewModel.setProperty("/reconciliationList/newReconciliation/manageVariants", aVariants);
+            } catch (oError) {
+                console.error("Error loading variants:", oError);
+                oViewModel.setProperty("/reconciliationList/newReconciliation/manageVariants", []);
+            }
+            
+            if (oManageDialog) {
+                oManageDialog.open();
+            }
+        },
+
+        /**
+         * Handler for selecting variant from manage dialog
+         */
+        onSelectReconciliationVariantFromManage: function (oEvent) {
+            const oItem = oEvent.getSource();
+            const sVariantKey = oItem.getBindingContext("view").getProperty("key");
+            
+            if (sVariantKey) {
+                const oVariantSelect = this.getView().byId("reconciliationVariantSelect");
+                oVariantSelect.setSelectedKey(sVariantKey);
+                
+                // Trigger variant change manually
+                const oSelectedItem = oVariantSelect.getSelectedItem();
+                if (oSelectedItem) {
+                    const sStorageKey = "reconciliationVariants";
+                    try {
+                        const sStoredVariants = localStorage.getItem(sStorageKey);
+                        if (sStoredVariants) {
+                            const aVariants = JSON.parse(sStoredVariants);
+                            const oSelectedVariant = aVariants.find(function(oVariant) {
+                                return oVariant.key === sVariantKey;
+                            });
+                            
+                            if (oSelectedVariant && oSelectedVariant.data) {
+                                this._applyReconciliationVariant(oSelectedVariant.data);
+                            }
+                        }
+                    } catch (oError) {
+                        console.error("Error loading variant:", oError);
+                        MessageToast.show(this.i18n("reconciliationPopup.ErrorLoadingVariant"));
+                    }
+                }
+            }
+            
+            this.getView().byId("reconciliationManageVariantsDialog").close();
+        },
+
+        /**
+         * Handler for deleting variant
+         */
+        onDeleteReconciliationVariant: function (oEvent) {
+            const oItem = oEvent.getParameter("listItem");
+            const oBindingContext = oItem.getBindingContext("view");
+            const sVariantKey = oBindingContext.getProperty("key");
+            
+            if (!sVariantKey) {
+                return;
+            }
+            
+            MessageBox.confirm(this.i18n("reconciliationPopup.ConfirmDeleteVariant"), {
+                title: this.i18n("reconciliationPopup.DeleteVariant"),
+                actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.OK) {
+                        this._deleteReconciliationVariant(sVariantKey);
+                    }
+                }.bind(this)
+            });
+        },
+
+        /**
+         * Delete a variant
+         * @private
+         */
+        _deleteReconciliationVariant: function (sVariantKey) {
+            const oView = this.getView();
+            const oViewModel = oView.getModel("view");
+            const sStorageKey = "reconciliationVariants";
+            
+            try {
+                const sStoredVariants = localStorage.getItem(sStorageKey);
+                if (!sStoredVariants) {
+                    return;
+                }
+                
+                let aVariants = JSON.parse(sStoredVariants);
+                aVariants = aVariants.filter(function(oVariant) {
+                    return oVariant.key !== sVariantKey;
+                });
+                
+                this._saveReconciliationVariants(aVariants);
+                this._loadReconciliationVariants();
+                
+                // Update manage dialog list if it's open
+                oViewModel.setProperty("/reconciliationList/newReconciliation/manageVariants", aVariants);
+                
+                // Clear selection if deleted variant was selected
+                const oVariantSelect = oView.byId("reconciliationVariantSelect");
+                if (oVariantSelect.getSelectedKey() === sVariantKey) {
+                    oVariantSelect.setSelectedKey("");
+                }
+                
+                MessageToast.show(this.i18n("reconciliationPopup.VariantDeleted"));
+            } catch (oError) {
+                console.error("Error deleting variant:", oError);
+                MessageToast.show(this.i18n("reconciliationPopup.ErrorDeletingVariant"));
+            }
+        },
+
+        /**
+         * Handler for closing manage variants dialog
+         */
+        onCloseManageVariantsDialog: function () {
+            this.getView().byId("reconciliationManageVariantsDialog").close();
         }
     };
 });

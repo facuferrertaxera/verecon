@@ -125,6 +125,25 @@ sap.ui.define([
         },
 
         /**
+         * Get country map from controller or component
+         * @returns {object} Country map
+         */
+        _getCountryMap: function() {
+            // First try controller (for backward compatibility)
+            if (this._oController && this._oController._mCountryMap) {
+                return this._oController._mCountryMap;
+            }
+            // Then try component
+            if (this._oController) {
+                const oComponent = this._oController.getOwnerComponent();
+                if (oComponent && oComponent._mCountryMap) {
+                    return oComponent._mCountryMap;
+                }
+            }
+            return {};
+        },
+
+        /**
          * Format country list to tokens array
          * @param {string} sCountryList - Comma-separated country codes
          * @returns {Array} Array of Token objects
@@ -135,7 +154,7 @@ sap.ui.define([
             }
             
             const aCountryCodes = sCountryList.split(",").map(s => s.trim()).filter(s => s);
-            const mCountryMap = (this._oController && this._oController._mCountryMap) ? this._oController._mCountryMap : {};
+            const mCountryMap = this._getCountryMap();
             
             return aCountryCodes.map((sCode) => {
                 // Get country name from map, fallback to code if not found

@@ -45,13 +45,19 @@ sap.ui.define([
             });
             this.getView().setModel(oViewModel, "view");
 
-            // Initialize country, company code, and status maps
-            this._mCountryMap = {};
-            this._mCompanyCodeMap = {};
-            this._mStatusMap = {};
-            
-            // Promise that resolves when all maps are loaded (for async/await pattern)
-            this._oMapsReadyPromise = null;
+            // Get maps from component (they should already be loading or loaded)
+            const oComponent = this.getOwnerComponent();
+            if (oComponent) {
+                // Reference component maps for backward compatibility
+                this._mCountryMap = oComponent._mCountryMap || {};
+                this._mCompanyCodeMap = oComponent._mCompanyCodeMap || {};
+                this._mStatusMap = oComponent._mStatusMap || {};
+            } else {
+                // Fallback if component not available
+                this._mCountryMap = {};
+                this._mCompanyCodeMap = {};
+                this._mStatusMap = {};
+            }
 
             // Set controller reference in formatter for token formatting
             formatter.setController(this);
@@ -113,10 +119,11 @@ sap.ui.define([
         },
 
         /**
-         * Load available countries from Country entity set
+         * Load available countries for filter dropdown
+         * Note: Maps are loaded in Component.js, this only loads the array for filters
          * @returns {Promise} Promise that resolves when countries are loaded
          */
-        _loadAvailableCountries: async function() {
+        _loadAvailableCountriesForFilters: async function() {
             const oModel = this.getModel();
             if (!oModel) {
                 return;
@@ -144,28 +151,23 @@ sap.ui.define([
                     };
                 });
 
-                // Create country code to name mapping for formatter
-                this._mCountryMap = {};
-                aResults.forEach((oCountry) => {
-                    this._mCountryMap[oCountry.Country] = oCountry.Country_Text || oCountry.CountryName || oCountry.Country;
-                });
-
-                console.log("[_loadAvailableCountries] Country map populated with", Object.keys(this._mCountryMap).length, "countries");
+                console.log("[_loadAvailableCountriesForFilters] Loaded", aCountries.length, "countries for filters");
 
                 // Update view model
                 this.getView().getModel("view").setProperty("/filters/availableCountries", aCountries);
             } catch (oError) {
                 // If error loading, fall back to empty array or show error
-                console.error("[_loadAvailableCountries] Error loading countries:", oError);
+                console.error("[_loadAvailableCountriesForFilters] Error loading countries:", oError);
                 this.getView().getModel("view").setProperty("/filters/availableCountries", []);
             }
         },
 
         /**
-         * Load available company codes from CompanyVH entity set
+         * Load available company codes for filter dropdown
+         * Note: Maps are loaded in Component.js, this only loads the array for filters
          * @returns {Promise} Promise that resolves when company codes are loaded
          */
-        _loadAvailableCompanyCodes: async function() {
+        _loadAvailableCompanyCodesForFilters: async function() {
             const oModel = this.getModel();
             if (!oModel) {
                 return;
@@ -193,62 +195,17 @@ sap.ui.define([
                     };
                 });
 
-                // Create company code to name mapping for formatter
-                this._mCompanyCodeMap = {};
-                aResults.forEach((oCompany) => {
-                    this._mCompanyCodeMap[oCompany.CompanyCode] = oCompany.Name || oCompany.CompanyCode;
-                });
-
-                console.log("[_loadAvailableCompanyCodes] Company code map populated with", Object.keys(this._mCompanyCodeMap).length, "company codes");
+                console.log("[_loadAvailableCompanyCodesForFilters] Loaded", aCompanyCodes.length, "company codes for filters");
 
                 // Update view model
                 this.getView().getModel("view").setProperty("/filters/availableCompanyCodes", aCompanyCodes);
             } catch (oError) {
                 // If error loading, fall back to empty array or show error
-                console.error("[_loadAvailableCompanyCodes] Error loading company codes:", oError);
+                console.error("[_loadAvailableCompanyCodesForFilters] Error loading company codes:", oError);
                 this.getView().getModel("view").setProperty("/filters/availableCompanyCodes", []);
             }
         },
 
-        /**
-         * Load available statuses from xTAXERAxI_SF_STATUS_VH entity set
-         * @returns {Promise} Promise that resolves when statuses are loaded
-         */
-        _loadAvailableStatuses: async function() {
-            const oModel = this.getModel();
-            if (!oModel) {
-                return;
-            }
-
-            try {
-                // Read statuses from xTAXERAxI_SF_STATUS_VH entity set
-                const oResponse = await this._readOData(oModel, "/xTAXERAxI_SF_STATUS_VH", {
-                    urlParameters: {
-                        "$select": "Status,Description,value_position"
-                    },
-                    sorters: [
-                        new Sorter("value_position", false)
-                    ]
-                });
-
-                // OData v2 uses results array
-                const aResults = oResponse.results || [];
-                
-                // Create status code to description mapping for formatter
-                this._mStatusMap = {};
-                aResults.forEach((oStatus) => {
-                    this._mStatusMap[oStatus.Status] = {
-                        description: oStatus.Description || oStatus.Status,
-                        status: oStatus.Status
-                    };
-                });
-
-                console.log("[_loadAvailableStatuses] Status map populated with", Object.keys(this._mStatusMap).length, "statuses");
-            } catch (oError) {
-                console.error("[_loadAvailableStatuses] Error loading statuses:", oError);
-                this._mStatusMap = {};
-            }
-        },
 
         /**
          * Get the router instance
@@ -296,23 +253,26 @@ sap.ui.define([
                 oModel.resetChanges();
             }
             
-            // Load countries, company codes, and statuses from service in parallel
-            // This happens here because OData model metadata may not be ready in onInit
-            console.log("[_onReconciliationListMatched] Loading countries, company codes, and statuses");
+            // Wait for component maps to be ready (they're loaded in Component.js)
+            const oComponent = this.getOwnerComponent();
+            if (oComponent && oComponent.getMapsReadyPromise) {
+                console.log("[_onReconciliationListMatched] Waiting for component maps to be ready...");
+                try {
+                    await oComponent.getMapsReadyPromise();
+                    // Update local references to component maps
+                    this._mCountryMap = oComponent._mCountryMap || {};
+                    this._mCompanyCodeMap = oComponent._mCompanyCodeMap || {};
+                    this._mStatusMap = oComponent._mStatusMap || {};
+                    console.log("[_onReconciliationListMatched] Component maps ready");
+                } catch (oError) {
+                    console.error("[_onReconciliationListMatched] Error waiting for maps:", oError);
+                }
+            }
             
-            // Create promise that resolves when all maps are loaded
-            this._oMapsReadyPromise = Promise.all([
-                this._loadAvailableCountries(),
-                this._loadAvailableCompanyCodes(),
-                this._loadAvailableStatuses()
-            ]).then(() => {
-                console.log("[_onReconciliationListMatched] All maps loaded successfully");
-            }).catch((oError) => {
-                console.error("[_onReconciliationListMatched] Error loading maps:", oError);
-            });
-            
-            // Wait for maps to load before refreshing view
-            await this._oMapsReadyPromise;
+            // Load available countries and company codes for filter dropdowns
+            // (maps are already loaded in component, but we need the arrays for filters)
+            this._loadAvailableCountriesForFilters();
+            this._loadAvailableCompanyCodesForFilters();
             
             // Note: Filter controls visibility is handled in _onSmartFilterBarInitialized event
             // which fires after SmartFilterBar is fully initialized
@@ -787,8 +747,7 @@ sap.ui.define([
          * Note: setTokens() exists on ValueHelpDialog, but for Tokenizer controls
          * we must use removeAllTokens() and addToken() methods
          * 
-         * This method waits for maps to be ready before populating tokenizers to avoid race conditions.
-         * If maps are not ready, it waits for them to load.
+         * This method waits for component maps to be ready before populating tokenizers.
          */
         _onTableDataReceived: async function() {
             console.log("[_onTableDataReceived] Table data received");
@@ -798,18 +757,23 @@ sap.ui.define([
                 return;
             }
 
-            // Wait for maps to be ready if they're still loading
-            if (this._oMapsReadyPromise) {
+            // Wait for component maps to be ready
+            const oComponent = this.getOwnerComponent();
+            if (oComponent && oComponent.getMapsReadyPromise) {
                 try {
-                    console.log("[_onTableDataReceived] Waiting for maps to be ready...");
-                    await this._oMapsReadyPromise;
-                    console.log("[_onTableDataReceived] Maps are ready");
+                    console.log("[_onTableDataReceived] Waiting for component maps to be ready...");
+                    await oComponent.getMapsReadyPromise();
+                    // Update local references to component maps
+                    this._mCountryMap = oComponent._mCountryMap || {};
+                    this._mCompanyCodeMap = oComponent._mCompanyCodeMap || {};
+                    this._mStatusMap = oComponent._mStatusMap || {};
+                    console.log("[_onTableDataReceived] Component maps ready");
                 } catch (oError) {
                     console.error("[_onTableDataReceived] Error waiting for maps:", oError);
                     // Continue anyway - maps might be partially loaded
                 }
             } else {
-                console.log("[_onTableDataReceived] No maps promise found, proceeding anyway");
+                console.log("[_onTableDataReceived] No component maps promise found, proceeding anyway");
             }
 
             // Maps are ready (or promise resolved), populate tokenizers

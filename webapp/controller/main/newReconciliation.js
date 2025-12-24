@@ -87,23 +87,20 @@ sap.ui.define([
             let aFilters = oSmartFilterBar.getFilters();
 
             // Get variant name from SmartVariantManagement
-            // SmartVariantManagement manages variants for SmartFilterBar
-            // We need to get the current variant through the SmartFilterBar's variant management
             let sVariant = "";
             try {
                 const oVariantMgmt = oView.byId("reconciliationSmartVariantManagement");
-                if (oVariantMgmt && oSmartFilterBar) {
-                    // Try getContentVariant method (returns the current variant for the SmartFilterBar)
-                    const oContentVariant = oVariantMgmt.getContentVariant(oSmartFilterBar);
-                    if (oContentVariant) {
-                        // Get variant name - could be getText(), getName(), or a property
-                        sVariant = oContentVariant.getText ? oContentVariant.getText() : 
-                                  (oContentVariant.getName ? oContentVariant.getName() : 
-                                  (oContentVariant.name || oContentVariant.title || ""));
+                if (oVariantMgmt) {
+                    const sCurrentVariantKey = oVariantMgmt.getCurrentVariantKey();
+                    if (sCurrentVariantKey) {
+                        const oVariantItem = oVariantMgmt.getItemByKey(sCurrentVariantKey);
+                        if (oVariantItem) {
+                            sVariant = oVariantItem.getProperty("title") || "";
+                        }
                     }
                 }
             } catch (oError) {
-                // If getContentVariant doesn't work, variant will remain empty
+                // If variant retrieval fails, variant will remain empty
                 console.warn("Could not get variant name from SmartVariantManagement:", oError);
             }
 

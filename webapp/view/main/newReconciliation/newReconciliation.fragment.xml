@@ -71,13 +71,7 @@
                         valueState="{view>/reconciliationList/newReconciliation/CompanyCodeListValueState}"
                         valueStateText="{view>/reconciliationList/newReconciliation/CompanyCodeListValueStateText}"/>
                 </form:FormElement>
-            </form:FormContainer>
-        </form:Form>
-        <form:Form editable="true" class="sapUiSmallMargin">
-            <form:layout>
-                <form:ColumnLayout columnsM="1" columnsL="1" columnsXL="1"/>
-            </form:layout>
-            <form:FormContainer>
+                <form:FormContainer>
                 <form:FormElement>
                     <form:label>
                         <Label text="{i18n>reconciliationPopup.DateRange}" required="true"/>
@@ -91,7 +85,9 @@
                         valueStateText="{view>/reconciliationList/newReconciliation/dateRangeValueStateText}"/>
                 </form:FormElement>
             </form:FormContainer>
+            </form:FormContainer>
         </form:Form>
+
         <buttons>
             <Button text="{i18n>reconciliationPopup.Proceed}" type="Accept" press="onNewReconciliationProceed"></Button>
             <Button text="{i18n>reconciliationPopup.Cancel}" type="Reject" press="onNewReconciliationCancel"></Button>

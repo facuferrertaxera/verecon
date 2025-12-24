@@ -19,8 +19,12 @@ sap.ui.define([
          * Opens the Reconciliation dialog
          */
         openNewReconciliation: async function () {
-            const oRootControl = this.getOwnerComponent().getRootControl();
-            const oReconciliationDialog = await this._getNewReconciliationDialog();
+            const oView = this.getView();
+            const oReconciliationDialog = this.getView().byId("ReconciliationDialog");
+            if (!oReconciliationDialog) {
+                MessageToast.show("Dialog not found. Please refresh the page.");
+                return;
+            }
             this.getModel().resetChanges();
             
             const oNewContext = this.getModel().createEntry("/Reconciliation", {
@@ -35,8 +39,8 @@ sap.ui.define([
             });
 
             // Clear inputs
-            oRootControl.byId("reconciliationCountryListInput").setTokens([]);
-            oRootControl.byId("reconciliationCompanyCodeListInput").setTokens([]);
+            oView.byId("reconciliationCountryListInput").setTokens([]);
+            oView.byId("reconciliationCompanyCodeListInput").setTokens([]);
 
             // Reset validation states
             this.getView().getModel("view").setProperty("/reconciliationList/newReconciliation/CountryListValueState", library.ValueState.None);
@@ -50,33 +54,12 @@ sap.ui.define([
             oReconciliationDialog.open();
         },
 
-        /**
-         * Gets a reference to the Reconciliation Dialog
-         * If not yet loaded, it will load the dialog first
-         */
-        _getNewReconciliationDialog: function () {
-            const oRootControl = this.getOwnerComponent().getRootControl();
-            const oReconciliationDialog = oRootControl.byId("ReconciliationDialog");
-            if (!oReconciliationDialog) {
-                return Fragment.load({
-                    id: oRootControl.getId(),
-                    name: "tech.taxera.taxreporting.verecon.view.main.newReconciliation.newReconciliation",
-                    controller: this
-                }).then(function (oDialog) {
-                    oRootControl.addDependent(oDialog);
-                    return oDialog;
-                }.bind(this));
-            } else {
-                return Promise.resolve(oReconciliationDialog);
-            }
-        },
 
         /**
          * Handler for cancel button
          */
         onNewReconciliationCancel: function () {
-            const oRootControl = this.getOwnerComponent().getRootControl();
-            oRootControl.byId("ReconciliationDialog").close();
+            this.getView().byId("ReconciliationDialog").close();
             this.getModel().resetChanges();
         },
 
@@ -84,15 +67,15 @@ sap.ui.define([
          * Handler for proceed button - validates and creates reconciliation
          */
         onNewReconciliationProceed: async function () {
-            const oRootControl = this.getOwnerComponent().getRootControl();
-            const oReconciliationDialog = oRootControl.byId("ReconciliationDialog");
+            const oView = this.getView();
+            const oReconciliationDialog = oView.byId("ReconciliationDialog");
             const oNewContext = oReconciliationDialog.getBindingContext();
             const oNewReconciliation = oNewContext.getObject();
             let bValid = true;
 
             // Get selected countries and company codes from MultiInput tokens
-            const oCountryInput = oRootControl.byId("reconciliationCountryListInput");
-            const oCompanyCodeInput = oRootControl.byId("reconciliationCompanyCodeListInput");
+            const oCountryInput = oView.byId("reconciliationCountryListInput");
+            const oCompanyCodeInput = oView.byId("reconciliationCompanyCodeListInput");
             const aCountryTokens = oCountryInput.getTokens();
             const aCompanyCodeTokens = oCompanyCodeInput.getTokens();
 
@@ -153,8 +136,8 @@ sap.ui.define([
          * Handler for date range change
          */
         onReconciliationDateRangeChange: function (oEvent) {
-            const oRootControl = this.getOwnerComponent().getRootControl();
-            const oReconciliationDialog = oRootControl.byId("ReconciliationDialog");
+            const oView = this.getView();
+            const oReconciliationDialog = oView.byId("ReconciliationDialog");
             const sPath = oReconciliationDialog.getBindingContext().getPath();
             const bValid = oEvent.getParameter("valid");
             const oDateFrom = oEvent.getParameter("from");
@@ -192,8 +175,9 @@ sap.ui.define([
          * Handler for country value help request in reconciliation dialog
          */
         onReconciliationCountryValueHelpRequest: function (oEvent) {
-            const oVHD = this.getOwnerComponent().getRootControl().byId("reconciliationCountryValueHelpDialog");
-            const oMultiInput = this.getOwnerComponent().getRootControl().byId("reconciliationCountryListInput");
+            const oView = this.getView();
+            const oVHD = oView.byId("reconciliationCountryValueHelpDialog");
+            const oMultiInput = oView.byId("reconciliationCountryListInput");
             const oModel = this.getModel();
             
             if (!oVHD || !oModel) {
@@ -273,9 +257,10 @@ sap.ui.define([
          * Handler for country value help OK in reconciliation dialog
          */
         onReconciliationCountryValueHelpOk: function (oEvent) {
+            const oView = this.getView();
             const aTokens = oEvent.getParameter("tokens");
-            const oMultiInput = this.getOwnerComponent().getRootControl().byId("reconciliationCountryListInput");
-            const oVHD = this.getOwnerComponent().getRootControl().byId("reconciliationCountryValueHelpDialog");
+            const oMultiInput = oView.byId("reconciliationCountryListInput");
+            const oVHD = oView.byId("reconciliationCountryValueHelpDialog");
             
             oMultiInput.setTokens(aTokens);
             
@@ -288,7 +273,8 @@ sap.ui.define([
          * Handler for country value help cancel in reconciliation dialog
          */
         onReconciliationCountryValueHelpCancel: function () {
-            const oVHD = this.getOwnerComponent().getRootControl().byId("reconciliationCountryValueHelpDialog");
+            const oView = this.getView();
+            const oVHD = oView.byId("reconciliationCountryValueHelpDialog");
             oVHD.close();
         },
 
@@ -303,8 +289,9 @@ sap.ui.define([
          * Handler for company code value help request in reconciliation dialog
          */
         onReconciliationCompanyCodeValueHelpRequest: function (oEvent) {
-            const oVHD = this.getOwnerComponent().getRootControl().byId("reconciliationCompanyCodeValueHelpDialog");
-            const oMultiInput = this.getOwnerComponent().getRootControl().byId("reconciliationCompanyCodeListInput");
+            const oView = this.getView();
+            const oVHD = oView.byId("reconciliationCompanyCodeValueHelpDialog");
+            const oMultiInput = oView.byId("reconciliationCompanyCodeListInput");
             const oModel = this.getModel();
             
             if (!oVHD || !oModel) {
@@ -384,9 +371,10 @@ sap.ui.define([
          * Handler for company code value help OK in reconciliation dialog
          */
         onReconciliationCompanyCodeValueHelpOk: function (oEvent) {
+            const oView = this.getView();
             const aTokens = oEvent.getParameter("tokens");
-            const oMultiInput = this.getOwnerComponent().getRootControl().byId("reconciliationCompanyCodeListInput");
-            const oVHD = this.getOwnerComponent().getRootControl().byId("reconciliationCompanyCodeValueHelpDialog");
+            const oMultiInput = oView.byId("reconciliationCompanyCodeListInput");
+            const oVHD = oView.byId("reconciliationCompanyCodeValueHelpDialog");
             
             oMultiInput.setTokens(aTokens);
             
@@ -399,7 +387,8 @@ sap.ui.define([
          * Handler for company code value help cancel in reconciliation dialog
          */
         onReconciliationCompanyCodeValueHelpCancel: function () {
-            const oVHD = this.getOwnerComponent().getRootControl().byId("reconciliationCompanyCodeValueHelpDialog");
+            const oView = this.getView();
+            const oVHD = oView.byId("reconciliationCompanyCodeValueHelpDialog");
             oVHD.close();
         },
 
@@ -411,6 +400,7 @@ sap.ui.define([
         }
     };
 });
+
 
 
 

@@ -167,5 +167,8 @@
                 </Table>
             </st:SmartTable>
         </f:content>
+        <f:dependents>
+            <core:Fragment fragmentName="tech.taxera.taxreporting.verecon.view.main.newReconciliation.newReconciliation" type="XML"/>
+        </f:dependents>
     </f:DynamicPage>
 </mvc:View>

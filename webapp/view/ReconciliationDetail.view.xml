@@ -182,7 +182,7 @@
                         </table:template>
                     </table:Column>
                     <!-- VATR Column Group - spans 3 columns -->
-                    <table:Column width="8rem" sortProperty="VatrBaseAmount" filterProperty="VatrBaseAmount" headerSpan="3,2">
+                    <table:Column width="8rem" sortProperty="VatrBaseAmount" filterProperty="VatrBaseAmount" headerSpan="3,2" visible="false">
                         <table:multiLabels>
                             <m:Label text="{i18n>reconciliationDetail.VATR}" textAlign="Center" width="100%"/>
                             <m:Label text="{i18n>reconciliationDetail.BaseAmount}" textAlign="Center" width="100%"/>
@@ -210,7 +210,7 @@
                         </table:template>
                     </table:Column>
                     <!-- ECSL Column Group - spans 3 columns -->
-                    <table:Column width="8rem" sortProperty="EcslBaseAmount" filterProperty="EcslBaseAmount" headerSpan="3,2">
+                    <table:Column width="8rem" sortProperty="EcslBaseAmount" filterProperty="EcslBaseAmount" headerSpan="3,2" visible="false">
                         <table:multiLabels>
                             <m:Label text="{i18n>reconciliationDetail.ECSL}" textAlign="Center" width="100%"/>
                             <m:Label text="{i18n>reconciliationDetail.BaseAmount}" textAlign="Center" width="100%"/>
@@ -238,7 +238,7 @@
                         </table:template>
                     </table:Column>
                     <!-- Differences Column Group - spans 3 columns -->
-                    <table:Column width="8rem" sortProperty="DiffBaseAmount" filterProperty="DiffBaseAmount" headerSpan="3,2">
+                    <table:Column width="8rem" sortProperty="DiffBaseAmount" filterProperty="DiffBaseAmount" headerSpan="3,2" visible="false">
                         <table:multiLabels>
                             <m:Label text="{i18n>reconciliationDetail.Differences}" textAlign="Center" width="100%"/>
                             <m:Label text="{i18n>reconciliationDetail.BaseAmount}" textAlign="Center" width="100%"/>

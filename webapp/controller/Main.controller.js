@@ -45,21 +45,8 @@ sap.ui.define([
             });
             this.getView().setModel(oViewModel, "view");
 
-            // Get maps from component (they should already be loading or loaded)
-            const oComponent = this.getOwnerComponent();
-            if (oComponent) {
-                // Reference component maps for backward compatibility
-                this._mCountryMap = oComponent._mCountryMap || {};
-                this._mCompanyCodeMap = oComponent._mCompanyCodeMap || {};
-                this._mStatusMap = oComponent._mStatusMap || {};
-            } else {
-                // Fallback if component not available
-                this._mCountryMap = {};
-                this._mCompanyCodeMap = {};
-                this._mStatusMap = {};
-            }
-
             // Set controller reference in formatter for token formatting
+            // Maps are stored on component, not controller
             formatter.setController(this);
 
             // Attach route matched handler if routing is available
@@ -259,10 +246,6 @@ sap.ui.define([
                 console.log("[_onReconciliationListMatched] Waiting for component maps to be ready...");
                 try {
                     await oComponent.getMapsReadyPromise();
-                    // Update local references to component maps
-                    this._mCountryMap = oComponent._mCountryMap || {};
-                    this._mCompanyCodeMap = oComponent._mCompanyCodeMap || {};
-                    this._mStatusMap = oComponent._mStatusMap || {};
                     console.log("[_onReconciliationListMatched] Component maps ready");
                 } catch (oError) {
                     console.error("[_onReconciliationListMatched] Error waiting for maps:", oError);
@@ -763,10 +746,6 @@ sap.ui.define([
                 try {
                     console.log("[_onTableDataReceived] Waiting for component maps to be ready...");
                     await oComponent.getMapsReadyPromise();
-                    // Update local references to component maps
-                    this._mCountryMap = oComponent._mCountryMap || {};
-                    this._mCompanyCodeMap = oComponent._mCompanyCodeMap || {};
-                    this._mStatusMap = oComponent._mStatusMap || {};
                     console.log("[_onTableDataReceived] Component maps ready");
                 } catch (oError) {
                     console.error("[_onTableDataReceived] Error waiting for maps:", oError);

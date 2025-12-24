@@ -15,9 +15,6 @@ sap.ui.define([
                 return "";
             }
             
-            // Get status map from controller if available
-            const mStatusMap = (this._oController && this._oController._mStatusMap) ? this._oController._mStatusMap : {};
-            
             // Pattern-based icon determination
             // Success statuses (start with S): S, SR, SV, ST, SX, SS
             if (sStatus.indexOf("S") === 0) {
@@ -68,9 +65,6 @@ sap.ui.define([
             if (!sStatus) {
                 return "None";
             }
-            
-            // Get status map from controller if available
-            const mStatusMap = (this._oController && this._oController._mStatusMap) ? this._oController._mStatusMap : {};
             
             // Pattern-based color determination
             // Success statuses (start with S): S, SR, SV, ST, SX, SS
@@ -125,18 +119,13 @@ sap.ui.define([
         },
 
         /**
-         * Get country map from controller or component
+         * Get country map from component
          * @returns {object} Country map
          */
         _getCountryMap: function() {
-            // First try controller (for backward compatibility)
-            if (this._oController && this._oController._mCountryMap) {
-                return this._oController._mCountryMap;
-            }
-            // Then try component
             if (this._oController) {
                 const oComponent = this._oController.getOwnerComponent();
-                if (oComponent && oComponent._mCountryMap) {
+                if (oComponent && oComponent._mCountryMap && Object.keys(oComponent._mCountryMap).length > 0) {
                     return oComponent._mCountryMap;
                 }
             }

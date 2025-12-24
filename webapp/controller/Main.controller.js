@@ -1,5 +1,5 @@
 sap.ui.define([
-    "sap/ui/core/mvc/Controller",
+    "tech/taxera/taxreporting/verecon/controller/BaseController",
     "sap/ui/model/Sorter",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
@@ -17,11 +17,11 @@ sap.ui.define([
     "tech/taxera/taxreporting/verecon/utils/types",
     "tech/taxera/taxreporting/verecon/utils/formatter",
     "tech/taxera/taxreporting/verecon/controller/main/newReconciliation"
-], (Controller, Sorter, MessageToast, MessageBox, Filter, FilterOperator, JSONModel, ValueHelpDialog, UITableColumn, MColumn, Text, Label, ColumnListItem, SearchField, Token, types, formatter, newReconciliation) => {
+], (BaseController, Sorter, MessageToast, MessageBox, Filter, FilterOperator, JSONModel, ValueHelpDialog, UITableColumn, MColumn, Text, Label, ColumnListItem, SearchField, Token, types, formatter, newReconciliation) => {
     "use strict";
 
     // Mix in newReconciliation methods
-    const MainController = Controller.extend("tech.taxera.taxreporting.verecon.controller.Main", Object.assign({
+    const MainController = BaseController.extend("tech.taxera.taxreporting.verecon.controller.Main", Object.assign({
         // Add types and formatter to controller instance
         types: types,
         formatter: formatter,

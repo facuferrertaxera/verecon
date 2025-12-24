@@ -71,7 +71,6 @@
                         valueState="{view>/reconciliationList/newReconciliation/CompanyCodeListValueState}"
                         valueStateText="{view>/reconciliationList/newReconciliation/CompanyCodeListValueStateText}"/>
                 </form:FormElement>
-                <form:FormContainer>
                 <form:FormElement>
                     <form:label>
                         <Label text="{i18n>reconciliationPopup.DateRange}" required="true"/>
@@ -84,7 +83,6 @@
                         valueState="{view>/reconciliationList/newReconciliation/dateRangeValueState}"
                         valueStateText="{view>/reconciliationList/newReconciliation/dateRangeValueStateText}"/>
                 </form:FormElement>
-            </form:FormContainer>
             </form:FormContainer>
         </form:Form>
 

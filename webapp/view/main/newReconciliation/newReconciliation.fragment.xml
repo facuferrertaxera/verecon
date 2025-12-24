@@ -12,7 +12,7 @@
         showHeader="true" 
         resizable="false" 
         contentHeight="auto" 
-        contentWidth="500px" 
+        contentWidth="420px" 
         busyIndicatorDelay="{view>/busyIndicatorDelay}">
         <content>
             <VBox width="96%" class="sapUiTinyMarginTop sapUiTinyMarginBegin sapUiTinyMarginEnd">

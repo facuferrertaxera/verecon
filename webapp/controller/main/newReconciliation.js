@@ -104,6 +104,22 @@ sap.ui.define([
                 return;
             }
 
+            // Get variant name from SmartVariantManagement
+            const oVariantMgmt = oView.byId("reconciliationSmartVariantManagement");
+            let sVariant = "";
+            if (oVariantMgmt) {
+                const sSelectedKey = oVariantMgmt.getSelectedKey();
+                const oVariantItems = oVariantMgmt.getVariantItems();
+                if (oVariantItems && sSelectedKey) {
+                    const oSelectedVariant = oVariantItems.find(function(item) {
+                        return item.getKey && item.getKey() === sSelectedKey;
+                    });
+                    if (oSelectedVariant) {
+                        sVariant = oSelectedVariant.getText() || "";
+                    }
+                }
+            }
+
             // Fix UTC for date filters
             this._fixUTC("reporting_date", aFilters);
 
@@ -116,7 +132,6 @@ sap.ui.define([
                 const aCompanyCodes = mFilterValues.companycodes;
                 const aCountries = mFilterValues.countries;
                 const oReportingDate = mFilterValues.reporting_date;
-                const sVariant = mFilterValues.variant || "";
 
                 // Create read operations for each combination
                 for (let i = 0; i < aCompanyCodes.length; i++) {
@@ -132,7 +147,7 @@ sap.ui.define([
                             new Filter("reporting_date", FilterOperator.EQ, oReportingDate)
                         ];
                         
-                        // Add variant filter if provided
+                        // Add variant filter if provided (variant name from SmartVariantManagement)
                         if (sVariant) {
                             aCombinationFilters.push(new Filter("variant", FilterOperator.EQ, sVariant));
                         }
@@ -223,8 +238,7 @@ sap.ui.define([
             const mValues = {
                 companycodes: [],
                 countries: [],
-                reporting_date: null,
-                variant: null
+                reporting_date: null
             };
 
             if (!aFilters || aFilters.length === 0) {
@@ -279,8 +293,6 @@ sap.ui.define([
                                 } else if (sOperator === "EQ") {
                                     mValues.reporting_date = oInnerFilter.oValue1 || oInnerFilter.getValue1();
                                 }
-                            } else if (sPath === "variant") {
-                                mValues.variant = oInnerFilter.oValue1 || oInnerFilter.getValue1();
                             }
                         });
                     }

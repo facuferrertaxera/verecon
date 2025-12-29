@@ -70,7 +70,8 @@
                                     uiConfig="{applicationSet:'fiori'}"
                                     height="100%" 
                                     width="100%" 
-                                    vizType="treemap">
+                                    vizType="treemap"
+                                    legendVisible="false">
                                     <viz:dataset>
                                         <viz.data:FlattenedDataset data="{view>/reconciliationDetail/treemapData/companyCodes}">
                                             <viz.data:dimensions>
@@ -104,7 +105,8 @@
                                     uiConfig="{applicationSet:'fiori'}"
                                     height="100%" 
                                     width="100%" 
-                                    vizType="treemap">
+                                    vizType="treemap"
+                                    legendVisible="false">
                                     <viz:dataset>
                                         <viz.data:FlattenedDataset data="{view>/reconciliationDetail/treemapData/taxCodes}">
                                             <viz.data:dimensions>

@@ -135,13 +135,16 @@
                                 <cssgrid:GridItemLayoutData gridColumn="span 2" />
                             </f:layoutData>
                             <f:content>
-                                <VBox justifyContent="Center" alignItems="End" width="100%" height="100%" class="sapUiSmallMargin">
-                                    <NumericContent 
-                                        value="{path: 'view>/reconciliationDetail/totalDifference/value', formatter: '.formatter.formatNumberWithScale'}" 
-                                        scale=""
-                                        valueColor="Error"
-                                        class="totalDifferenceNumericContent" />
-                                    <Text text="{view>/reconciliationDetail/totalDifference/text}" class="sapUiTinyMarginTop" />
+                                <VBox width="100%" height="100%" class="sapUiSmallMargin">
+                                    <Title text="{i18n>reconciliationDetail.TotalDifference}" titleStyle="H6" class="sapUiTinyMarginBottom" />
+                                    <VBox justifyContent="Center" alignItems="Start" width="100%" class="sapUiTinyMarginTop">
+                                        <NumericContent 
+                                            value="{path: 'view>/reconciliationDetail/totalDifference/value', formatter: '.formatter.formatNumberWithScale'}" 
+                                            scale="EUR"
+                                            valueColor="Error"
+                                            class="totalDifferenceNumericContent" />
+                                        <Text text="{view>/reconciliationDetail/totalDifference/text}" class="sapUiTinyMarginTop" />
+                                    </VBox>
                                 </VBox>
                             </f:content>
                         </f:Card>

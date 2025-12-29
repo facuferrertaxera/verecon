@@ -3,7 +3,7 @@
 /* Make Total Difference NumericContent 30% larger */
 .totalDifferenceNumericContent {
     transform: scale(1.4);
-    transform-origin: right center;
+    transform-origin: left center;
 }
 
 /* Force SmartFilterBar to display in single column with 3 rows */

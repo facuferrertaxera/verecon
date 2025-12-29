@@ -196,39 +196,36 @@ sap.ui.define([
         },
 
         /**
-         * Format number with scale (K, M, etc.) and EUR currency
+         * Format number with scale (K, M, etc.) without currency
          * @param {number} fValue - Numeric value
-         * @returns {string} Formatted value with scale and EUR
+         * @returns {string} Formatted value with scale
          */
         formatNumberWithScale: function(fValue) {
             if (fValue === null || fValue === undefined || isNaN(fValue)) {
-                return "0 EUR";
+                return "0";
             }
             
             const fAbsValue = Math.abs(fValue);
-            let sFormatted;
             
             // Billions
             if (fAbsValue >= 1000000000) {
                 const fFormatted = (fValue / 1000000000).toFixed(1);
-                sFormatted = (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "B";
+                return (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "B";
             }
             // Millions
             else if (fAbsValue >= 1000000) {
                 const fFormatted = (fValue / 1000000).toFixed(1);
-                sFormatted = (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "M";
+                return (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "M";
             }
             // Thousands
             else if (fAbsValue >= 1000) {
                 const fFormatted = (fValue / 1000).toFixed(1);
-                sFormatted = (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "K";
+                return (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "K";
             }
             // Less than 1000
             else {
-                sFormatted = fValue.toString();
+                return fValue.toString();
             }
-            
-            return sFormatted + " EUR";
         }
     };
 });

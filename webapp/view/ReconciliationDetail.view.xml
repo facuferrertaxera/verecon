@@ -135,7 +135,7 @@
                                 <cssgrid:GridItemLayoutData gridColumn="span 2" />
                             </f:layoutData>
                             <f:content>
-                                <VBox justifyContent="Center" alignItems="End" width="100%" height="100%" class="sapUiSmallMargin">
+                                <VBox justifyContent="Center" alignItems="Center" width="100%" height="100%" class="sapUiSmallMargin">
                                     <NumericContent 
                                         value="{path: 'view>/reconciliationDetail/totalDifference/value', formatter: '.formatter.formatNumberWithScale'}" 
                                         scale=""

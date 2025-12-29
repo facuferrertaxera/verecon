@@ -193,6 +193,40 @@ sap.ui.define([
             
             // If there's a difference, show as error (mismatch)
             return "Error";
+        },
+
+        /**
+         * Format number with scale (K, M, etc.)
+         * @param {number} fValue - Numeric value
+         * @returns {string} Formatted value with scale
+         */
+        formatNumberWithScale: function(fValue) {
+            if (fValue === null || fValue === undefined || isNaN(fValue)) {
+                return "0";
+            }
+            
+            const fAbsValue = Math.abs(fValue);
+            
+            // Billions
+            if (fAbsValue >= 1000000000) {
+                const fFormatted = (fValue / 1000000000).toFixed(1);
+                return (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "B";
+            }
+            
+            // Millions
+            if (fAbsValue >= 1000000) {
+                const fFormatted = (fValue / 1000000).toFixed(1);
+                return (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "M";
+            }
+            
+            // Thousands
+            if (fAbsValue >= 1000) {
+                const fFormatted = (fValue / 1000).toFixed(1);
+                return (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "K";
+            }
+            
+            // Less than 1000, return as is
+            return fValue.toString();
         }
     };
 });

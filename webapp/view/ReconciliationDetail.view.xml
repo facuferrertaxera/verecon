@@ -137,8 +137,8 @@
                             <f:content>
                                 <VBox justifyContent="Center" alignItems="End" width="100%" height="100%" class="sapUiSmallMargin">
                                     <NumericContent 
-                                        value="{view>/reconciliationDetail/totalDifference/value}" 
-                                        scale="{view>/reconciliationDetail/totalDifference/scale}" 
+                                        value="{path: 'view>/reconciliationDetail/totalDifference/value', formatter: '.formatter.formatNumberWithScale'}" 
+                                        scale=""
                                         valueColor="Error"
                                         class="totalDifferenceNumericContent" />
                                     <Text text="{view>/reconciliationDetail/totalDifference/text}" class="sapUiTinyMarginTop" />

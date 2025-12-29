@@ -1,5 +1,11 @@
 /* Enter your custom styles here */
 
+/* Make Total Difference NumericContent 30% larger */
+.totalDifferenceNumericContent {
+    transform: scale(1.3);
+    transform-origin: right center;
+}
+
 /* Force SmartFilterBar to display in single column with 3 rows */
 .reconciliationSingleColumnFilterBar .sapUiRespGrid.sapUiRespGridHSpace1 > div {
     width: 100% !important;

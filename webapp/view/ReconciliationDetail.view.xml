@@ -139,7 +139,8 @@
                                     <NumericContent 
                                         value="{view>/reconciliationDetail/totalDifference/value}" 
                                         scale="{view>/reconciliationDetail/totalDifference/scale}" 
-                                        valueColor="Error" />
+                                        valueColor="Error"
+                                        class="totalDifferenceNumericContent" />
                                     <Text text="{view>/reconciliationDetail/totalDifference/text}" class="sapUiTinyMarginTop" />
                                 </VBox>
                             </f:content>

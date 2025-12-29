@@ -140,7 +140,7 @@
                                     <VBox justifyContent="Center" alignItems="Start" width="100%" class="sapUiTinyMarginTop">
                                         <NumericContent 
                                             value="{path: 'view>/reconciliationDetail/totalDifference/value', formatter: '.formatter.formatNumberWithScale'}" 
-                                            scale="EUR"
+                                            scale=""
                                             valueColor="Error"
                                             class="totalDifferenceNumericContent" />
                                         <Text text="{view>/reconciliationDetail/totalDifference/text}" class="sapUiTinyMarginTop" />

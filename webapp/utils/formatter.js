@@ -196,37 +196,39 @@ sap.ui.define([
         },
 
         /**
-         * Format number with scale (K, M, etc.)
+         * Format number with scale (K, M, etc.) and EUR currency
          * @param {number} fValue - Numeric value
-         * @returns {string} Formatted value with scale
+         * @returns {string} Formatted value with scale and EUR
          */
         formatNumberWithScale: function(fValue) {
             if (fValue === null || fValue === undefined || isNaN(fValue)) {
-                return "0";
+                return "0 EUR";
             }
             
             const fAbsValue = Math.abs(fValue);
+            let sFormatted;
             
             // Billions
             if (fAbsValue >= 1000000000) {
                 const fFormatted = (fValue / 1000000000).toFixed(1);
-                return (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "B";
+                sFormatted = (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "B";
             }
-            
             // Millions
-            if (fAbsValue >= 1000000) {
+            else if (fAbsValue >= 1000000) {
                 const fFormatted = (fValue / 1000000).toFixed(1);
-                return (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "M";
+                sFormatted = (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "M";
             }
-            
             // Thousands
-            if (fAbsValue >= 1000) {
+            else if (fAbsValue >= 1000) {
                 const fFormatted = (fValue / 1000).toFixed(1);
-                return (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "K";
+                sFormatted = (parseFloat(fFormatted) % 1 === 0 ? parseInt(fFormatted) : fFormatted) + "K";
+            }
+            // Less than 1000
+            else {
+                sFormatted = fValue.toString();
             }
             
-            // Less than 1000, return as is
-            return fValue.toString();
+            return sFormatted + " EUR";
         }
     };
 });

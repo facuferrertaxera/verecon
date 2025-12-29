@@ -1,11 +1,9 @@
 /* Enter your custom styles here */
 
-/* Style for Total Difference value - large red text */
-.totalDifferenceValue {
-    font-size: 3rem !important;
-    font-weight: bold !important;
-    color: #e60000 !important;
-    line-height: 1.2;
+/* Make Total Difference NumericContent 30% larger */
+.totalDifferenceNumericContent {
+    transform: scale(1.4);
+    transform-origin: right center;
 }
 
 /* Force SmartFilterBar to display in single column with 3 rows */

@@ -62,7 +62,7 @@
                         <!-- Company Code Differences Treemap Card -->
                         <f:Card class="sapUiNoContentPadding" height="220px">
                             <f:layoutData>
-                                <cssgrid:GridItemLayoutData gridColumn="span 4" />
+                                <cssgrid:GridItemLayoutData gridColumn="span 3" />
                             </f:layoutData>
                             <f:content>
                                 <viz:VizFrame 
@@ -96,7 +96,7 @@
                         <!-- Tax Code Differences Treemap Card -->
                         <f:Card class="sapUiNoContentPadding" height="220px">
                             <f:layoutData>
-                                <cssgrid:GridItemLayoutData gridColumn="span 5" />
+                                <cssgrid:GridItemLayoutData gridColumn="span 3" />
                             </f:layoutData>
                             <f:content>
                                 <viz:VizFrame 
@@ -124,6 +124,23 @@
                                         <viz:Popover id="taxCodeTreemapPopover"></viz:Popover>
                                     </viz:dependents>
                                 </viz:VizFrame>
+                            </f:content>
+                        </f:Card>
+                        
+                        <!-- Total Difference Card -->
+                        <f:Card class="sapUiNoContentPadding" height="220px" press="onTotalDifferenceCardPress">
+                            <f:layoutData>
+                                <cssgrid:GridItemLayoutData gridColumn="span 1" />
+                            </f:layoutData>
+                            <f:content>
+                                <VBox justifyContent="Center" alignItems="End" width="100%" height="100%" class="sapUiSmallMargin">
+                                    <NumericContent 
+                                        value="{view>/reconciliationDetail/totalDifference/value}" 
+                                        scale="{view>/reconciliationDetail/totalDifference/scale}" 
+                                        valueColor="Error" 
+                                        width="100%" />
+                                    <Text text="{view>/reconciliationDetail/totalDifference/text}" class="sapUiTinyMarginTop" />
+                                </VBox>
                             </f:content>
                         </f:Card>
                         

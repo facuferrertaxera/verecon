@@ -37,7 +37,13 @@ sap.ui.define([
                     treemapData: {
                         companyCodes: [],
                         taxCodes: []
-                    }
+                    },
+                    totalDifference: {
+                        value: 0,
+                        scale: "EUR",
+                        text: "Total Difference"
+                    },
+                    showOnlyDifferences: false
                 }
             });
             this.getView().setModel(oViewModel, "view");
@@ -207,6 +213,7 @@ sap.ui.define([
             const aContexts = oBinding.getContexts();
             const mCompanyCodeAggregation = {};
             const mTaxCodeAggregation = {};
+            let fTotalDifference = 0;
 
             // Aggregate by CompanyCode and TaxCode
             aContexts.forEach((oContext) => {
@@ -219,6 +226,9 @@ sap.ui.define([
                     const sCompanyCode = oDocument.CompanyCode || "Unknown";
                     const sTaxCode = oDocument.TaxCode || "Unknown";
                     const fDiffAmount = Math.abs(oDocument.DiffGrossAmount || 0);
+                    
+                    // Sum total difference (use absolute value for total)
+                    fTotalDifference += fDiffAmount;
 
                     // Aggregate by CompanyCode
                     if (!mCompanyCodeAggregation[sCompanyCode]) {
@@ -256,6 +266,9 @@ sap.ui.define([
             if (oViewModel) {
                 oViewModel.setProperty("/reconciliationDetail/treemapData/companyCodes", aCompanyCodes);
                 oViewModel.setProperty("/reconciliationDetail/treemapData/taxCodes", aTaxCodes);
+                
+                // Update total difference
+                oViewModel.setProperty("/reconciliationDetail/totalDifference/value", fTotalDifference);
             }
         },
 
@@ -290,10 +303,14 @@ sap.ui.define([
                 { TaxCode: "N14", DiffGrossAmount: 5100, Currency: "EUR" }
             ];
 
+            // Calculate total difference from company codes (sum of all differences)
+            const fTotalDifference = aCompanyCodes.reduce((fSum, oItem) => fSum + (oItem.DiffGrossAmount || 0), 0);
+
             const oViewModel = this.getView().getModel("view");
             if (oViewModel) {
                 oViewModel.setProperty("/reconciliationDetail/treemapData/companyCodes", aCompanyCodes);
                 oViewModel.setProperty("/reconciliationDetail/treemapData/taxCodes", aTaxCodes);
+                oViewModel.setProperty("/reconciliationDetail/totalDifference/value", fTotalDifference);
             }
         },
 
@@ -446,6 +463,58 @@ sap.ui.define([
                     oCompanyCodeTokenizer.addToken(oToken);
                 });
             }
+        },
+
+        /**
+         * Handler for total difference card press - toggles filter to show only records with differences
+         */
+        onTotalDifferenceCardPress: function() {
+            const oViewModel = this.getView().getModel("view");
+            const oTable = this.byId("documentsTable");
+            
+            if (!oTable) {
+                return;
+            }
+
+            const oBinding = oTable.getBinding("rows");
+            if (!oBinding) {
+                return;
+            }
+
+            // Toggle the filter state
+            const bShowOnlyDifferences = !oViewModel.getProperty("/reconciliationDetail/showOnlyDifferences");
+            oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", bShowOnlyDifferences);
+
+            // Get existing filters
+            let aFilters = oBinding.getFilters() || [];
+            
+            // Remove any existing DiffGrossAmount filter
+            aFilters = aFilters.filter(function(oFilter) {
+                // Check if this is a DiffGrossAmount filter
+                if (oFilter.sPath === "DiffGrossAmount") {
+                    return false;
+                }
+                // Check if it's a composite filter containing DiffGrossAmount
+                if (oFilter.aFilters && Array.isArray(oFilter.aFilters)) {
+                    const bContainsDiffFilter = oFilter.aFilters.some(function(oSubFilter) {
+                        return oSubFilter.sPath === "DiffGrossAmount";
+                    });
+                    if (bContainsDiffFilter && oFilter.aFilters.length === 1) {
+                        return false; // Remove if it's a single-filter composite
+                    }
+                }
+                return true;
+            });
+
+            // Add filter to show only records with differences if toggled on
+            if (bShowOnlyDifferences) {
+                // Filter to show only records where DiffGrossAmount is not zero
+                const oDiffFilter = new Filter("DiffGrossAmount", FilterOperator.NE, 0);
+                aFilters.push(oDiffFilter);
+            }
+
+            // Apply filters
+            oBinding.filter(aFilters);
         }
     });
 

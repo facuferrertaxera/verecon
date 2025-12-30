@@ -12,6 +12,25 @@
     min-height: 0;
 }
 
+/* Make SmartTable fill available height in DynamicPage content */
+#documentsSmartTable {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#documentsSmartTable .sapUiCompSmartTableInner {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+}
+
+/* Ensure DynamicPage content area fills available space */
+.sapFDynamicPageContent {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
 /* Force SmartFilterBar to display in single column with 3 rows */
 .reconciliationSingleColumnFilterBar .sapUiRespGrid.sapUiRespGridHSpace1 > div {
     width: 100% !important;

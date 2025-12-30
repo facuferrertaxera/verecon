@@ -169,7 +169,7 @@
                 showTablePersonalisation="true"
                 initialise="true"
                 beforeRebindTable="onBeforeRebindDocumentsTable"
-                class="sapUiNoContentPadding sapUiMediumMargin"
+                class="sapUiNoContentPadding"
                 height="100%">
                     <st:customToolbar>
                         <OverflowToolbar design="Transparent">

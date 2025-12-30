@@ -156,22 +156,21 @@
             </f:DynamicPageHeader>
         </f:header>
         <f:content>
-            <VBox class="sapUiMediumMargin" height="100%">
-                <st:SmartTable
-                    id="documentsSmartTable"
-                    entitySet="Document"
-                    tableBindingPath="to_Document"
-                    tableType="Table"
-                    useExportToExcel="true"
-                    useVariantManagement="false"
-                    enableAutoBinding="false"
-                    useTablePersonalisation="true"
-                    showRowCount="true"
-                    showTablePersonalisation="true"
-                    initialise="true"
-                    beforeRebindTable="onBeforeRebindDocumentsTable"
-                    class="sapUiNoContentPadding"
-                    height="100%">
+            <st:SmartTable
+                id="documentsSmartTable"
+                entitySet="Document"
+                tableBindingPath="to_Document"
+                tableType="Table"
+                useExportToExcel="true"
+                useVariantManagement="false"
+                enableAutoBinding="false"
+                useTablePersonalisation="true"
+                showRowCount="true"
+                showTablePersonalisation="true"
+                initialise="true"
+                beforeRebindTable="onBeforeRebindDocumentsTable"
+                class="sapUiNoContentPadding sapUiMediumMargin"
+                height="100%">
                     <st:customToolbar>
                         <OverflowToolbar design="Transparent">
                             <Title text="{i18n>reconciliationDetail.Documents}" titleStyle="H3"/>
@@ -434,7 +433,6 @@
                 </table:columns>
                     </table:Table>
                 </st:SmartTable>
-            </VBox>
         </f:content>
     </f:DynamicPage>
 </mvc:View>

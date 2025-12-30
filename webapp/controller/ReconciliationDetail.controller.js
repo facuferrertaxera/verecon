@@ -177,7 +177,7 @@ sap.ui.define([
 
         /**
          * Handler for SmartTable beforeRebindTable event
-         * Sets up the binding path to the navigation property
+         * Sets up the binding path to the navigation property and applies filters
          */
         onBeforeRebindDocumentsTable: function(oEvent) {
             const oBindingParams = oEvent.getParameter("bindingParams");
@@ -186,6 +186,41 @@ sap.ui.define([
                 // Set the binding path to the navigation property
                 oBindingParams.path = `${this._sReconciliationPath}/to_Document`;
             }
+            
+            // Get existing filters or initialize empty array
+            let aFilters = oBindingParams.filters || [];
+            
+            // Check if we should filter to show only records with differences
+            const oViewModel = this.getView().getModel("view");
+            const bShowOnlyDifferences = oViewModel ? oViewModel.getProperty("/reconciliationDetail/showOnlyDifferences") : false;
+            
+            // Remove any existing DiffGrossAmount filter
+            aFilters = aFilters.filter(function(oFilter) {
+                // Check if this is a DiffGrossAmount filter
+                if (oFilter.sPath === "DiffGrossAmount") {
+                    return false;
+                }
+                // Check if it's a composite filter containing DiffGrossAmount
+                if (oFilter.aFilters && Array.isArray(oFilter.aFilters)) {
+                    const bContainsDiffFilter = oFilter.aFilters.some(function(oSubFilter) {
+                        return oSubFilter.sPath === "DiffGrossAmount";
+                    });
+                    if (bContainsDiffFilter && oFilter.aFilters.length === 1) {
+                        return false; // Remove if it's a single-filter composite
+                    }
+                }
+                return true;
+            });
+            
+            // Add filter to show only records with differences if flag is set
+            if (bShowOnlyDifferences) {
+                // Filter to show only records where DiffGrossAmount is not zero
+                const oDiffFilter = new Filter("DiffGrossAmount", FilterOperator.NE, 0);
+                aFilters.push(oDiffFilter);
+            }
+            
+            // Set the filters
+            oBindingParams.filters = aFilters;
             
             // Add event handlers
             oBindingParams.events = {
@@ -490,14 +525,9 @@ sap.ui.define([
          */
         onTotalDifferenceCardPress: function() {
             const oViewModel = this.getView().getModel("view");
-            const oTable = this.byId("documentsTable");
+            const oSmartTable = this.byId("documentsSmartTable");
             
-            if (!oTable) {
-                return;
-            }
-
-            const oBinding = oTable.getBinding("rows");
-            if (!oBinding) {
+            if (!oSmartTable || !oViewModel) {
                 return;
             }
 
@@ -505,36 +535,9 @@ sap.ui.define([
             const bShowOnlyDifferences = !oViewModel.getProperty("/reconciliationDetail/showOnlyDifferences");
             oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", bShowOnlyDifferences);
 
-            // Get existing filters
-            let aFilters = oBinding.getFilters() || [];
-            
-            // Remove any existing DiffGrossAmount filter
-            aFilters = aFilters.filter(function(oFilter) {
-                // Check if this is a DiffGrossAmount filter
-                if (oFilter.sPath === "DiffGrossAmount") {
-                    return false;
-                }
-                // Check if it's a composite filter containing DiffGrossAmount
-                if (oFilter.aFilters && Array.isArray(oFilter.aFilters)) {
-                    const bContainsDiffFilter = oFilter.aFilters.some(function(oSubFilter) {
-                        return oSubFilter.sPath === "DiffGrossAmount";
-                    });
-                    if (bContainsDiffFilter && oFilter.aFilters.length === 1) {
-                        return false; // Remove if it's a single-filter composite
-                    }
-                }
-                return true;
-            });
-
-            // Add filter to show only records with differences if toggled on
-            if (bShowOnlyDifferences) {
-                // Filter to show only records where DiffGrossAmount is not zero
-                const oDiffFilter = new Filter("DiffGrossAmount", FilterOperator.NE, 0);
-                aFilters.push(oDiffFilter);
-            }
-
-            // Apply filters
-            oBinding.filter(aFilters);
+            // Trigger rebind on SmartTable - this will call onBeforeRebindDocumentsTable
+            // which will apply the filter based on the showOnlyDifferences flag
+            oSmartTable.rebindTable();
         }
     });
 

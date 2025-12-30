@@ -165,8 +165,11 @@ sap.ui.define([
                         // Populate tokenizers with reconciliation data
                         this._populateReconciliationDetails();
                         
-                        // After reconciliation is loaded, bind the SmartTable
+                        // After reconciliation is loaded, bind the SmartTable and load treemap data
                         this._bindDocumentsTable(sReconciliationPath);
+                        
+                        // Load treemap data once from the full unfiltered dataset
+                        this._loadTreemapDataOnce(sReconciliationPath);
                     },
                     change: (oEvent) => {
                         // Handle binding errors
@@ -272,8 +275,7 @@ sap.ui.define([
                 },
                 dataReceived: (oEvent) => {
                     this.getView().setBusy(false);
-                    // Aggregate documents for treemap visualizations
-                    this._populateTreemapData();
+                    // Don't recalculate treemap data here - it should only be loaded once on route matched
                 }
             };
         },
@@ -289,6 +291,94 @@ sap.ui.define([
             const oSmartTable = this.byId("documentsSmartTable");
             if (oSmartTable) {
                 oSmartTable.rebindTable();
+            }
+        },
+
+        /**
+         * Load treemap data once from the full unfiltered dataset
+         * This should only be called once when route is matched
+         */
+        _loadTreemapDataOnce: async function(sReconciliationPath) {
+            try {
+                // Read all documents without any filters to populate treemaps
+                const oResponse = await this.promRead(`${sReconciliationPath}/to_Document`, {
+                    urlParameters: {
+                        "$select": "CompanyCode,TaxCode,DiffGrossAmount"
+                    }
+                });
+                
+                if (oResponse && oResponse.results) {
+                    this._populateTreemapDataFromResults(oResponse.results);
+                } else {
+                    // Fallback to mock data
+                    this._setMockTreemapData();
+                }
+            } catch (oError) {
+                console.error("Error loading treemap data:", oError);
+                // Fallback to mock data
+                this._setMockTreemapData();
+            }
+        },
+
+        /**
+         * Populate treemap data from results array (used for initial load)
+         */
+        _populateTreemapDataFromResults: function(aResults) {
+            const mCompanyCodeAggregation = {};
+            const mTaxCodeAggregation = {};
+            let fTotalDifference = 0;
+
+            // Aggregate by CompanyCode and TaxCode
+            aResults.forEach((oDocument) => {
+                if (!oDocument) {
+                    return;
+                }
+
+                const sCompanyCode = oDocument.CompanyCode || "Unknown";
+                const sTaxCode = oDocument.TaxCode || "Unknown";
+                const fDiffAmount = Math.abs(oDocument.DiffGrossAmount || 0);
+                
+                // Sum total difference (use absolute value for total)
+                fTotalDifference += fDiffAmount;
+
+                // Aggregate by CompanyCode
+                if (!mCompanyCodeAggregation[sCompanyCode]) {
+                    mCompanyCodeAggregation[sCompanyCode] = {
+                        CompanyCode: sCompanyCode,
+                        DiffGrossAmount: 0,
+                        Currency: "EUR"
+                    };
+                }
+                mCompanyCodeAggregation[sCompanyCode].DiffGrossAmount += fDiffAmount;
+
+                // Aggregate by TaxCode
+                if (!mTaxCodeAggregation[sTaxCode]) {
+                    mTaxCodeAggregation[sTaxCode] = {
+                        TaxCode: sTaxCode,
+                        DiffGrossAmount: 0,
+                        Currency: "EUR"
+                    };
+                }
+                mTaxCodeAggregation[sTaxCode].DiffGrossAmount += fDiffAmount;
+            });
+
+            // Convert to arrays and update view model
+            const aCompanyCodes = Object.values(mCompanyCodeAggregation);
+            const aTaxCodes = Object.values(mTaxCodeAggregation);
+
+            // If no data, use mock data for demonstration
+            if (aCompanyCodes.length === 0 && aTaxCodes.length === 0) {
+                this._setMockTreemapData();
+                return;
+            }
+
+            const oViewModel = this.getView().getModel("view");
+            if (oViewModel) {
+                oViewModel.setProperty("/reconciliationDetail/treemapData/companyCodes", aCompanyCodes);
+                oViewModel.setProperty("/reconciliationDetail/treemapData/taxCodes", aTaxCodes);
+                
+                // Update total difference
+                oViewModel.setProperty("/reconciliationDetail/totalDifference/value", fTotalDifference);
             }
         },
 

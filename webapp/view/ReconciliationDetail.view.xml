@@ -169,6 +169,7 @@
                 showTablePersonalisation="true"
                 initialise="true"
                 beforeRebindTable="onBeforeRebindDocumentsTable"
+                requestAtLeastFields="CompanyCode,DocumentNo,PostingDate,TaxCode,Currencycode,VatrGrossAmount,EcslGrossAmount,DiffGrossAmount,Status,StatusText"
                 class="sapUiNoContentPadding"
                 height="100%">
                     <st:customToolbar>
@@ -425,7 +426,7 @@
                         </table:multiLabels>
                         <table:template>
                             <m:ObjectStatus 
-                                text="{path: 'Status', formatter: '.formatter.formatStatusText'}" 
+                                text="{StatusText}" 
                                 state="{path: 'Status', formatter: '.formatter.formatStatusColor'}"
                                 icon="{path: 'Status', formatter: '.formatter.formatStatusIcon'}"/>
                         </table:template>

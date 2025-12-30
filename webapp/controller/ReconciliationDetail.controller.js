@@ -44,8 +44,8 @@ sap.ui.define([
                         text: "Total Difference"
                     },
                     showOnlyDifferences: false,
-                    selectedCompanyCode: null,
-                    selectedTaxCode: null
+                    selectedCompanyCodes: [],
+                    selectedTaxCodes: []
                 }
             });
             this.getView().setModel(oViewModel, "view");
@@ -104,7 +104,7 @@ sap.ui.define([
                 });
                 
                 // Add click handler for company code treemap
-                oCompanyCodeTreemap.attachVizDataSelect(this.onCompanyCodeTreemapSelect.bind(this));
+                oCompanyCodeTreemap.attachSelectData(this.onCompanyCodeTreemapSelect.bind(this));
             }
 
             if (oTaxCodeTreemap) {
@@ -126,7 +126,7 @@ sap.ui.define([
                 });
                 
                 // Add click handler for tax code treemap
-                oTaxCodeTreemap.attachVizDataSelect(this.onTaxCodeTreemapSelect.bind(this));
+                oTaxCodeTreemap.attachSelectData(this.onTaxCodeTreemapSelect.bind(this));
             }
         },
 
@@ -201,8 +201,8 @@ sap.ui.define([
             // Get filter flags from view model
             const oViewModel = this.getView().getModel("view");
             const bShowOnlyDifferences = oViewModel ? oViewModel.getProperty("/reconciliationDetail/showOnlyDifferences") : false;
-            const sSelectedCompanyCode = oViewModel ? oViewModel.getProperty("/reconciliationDetail/selectedCompanyCode") : null;
-            const sSelectedTaxCode = oViewModel ? oViewModel.getProperty("/reconciliationDetail/selectedTaxCode") : null;
+            const aSelectedCompanyCodes = oViewModel ? (oViewModel.getProperty("/reconciliationDetail/selectedCompanyCodes") || []) : [];
+            const aSelectedTaxCodes = oViewModel ? (oViewModel.getProperty("/reconciliationDetail/selectedTaxCodes") || []) : [];
             
             // Remove any existing custom filters (DiffGrossAmount, CompanyCode, TaxCode)
             aFilters = aFilters.filter(function(oFilter) {
@@ -230,16 +230,36 @@ sap.ui.define([
                 aFilters.push(oDiffFilter);
             }
             
-            // Add CompanyCode filter if selected
-            if (sSelectedCompanyCode) {
-                const oCompanyCodeFilter = new Filter("CompanyCode", FilterOperator.EQ, sSelectedCompanyCode);
-                aFilters.push(oCompanyCodeFilter);
+            // Add CompanyCode filter if any are selected (IN filter for multiple values)
+            if (aSelectedCompanyCodes.length > 0) {
+                const aCompanyCodeFilters = aSelectedCompanyCodes.map(function(sCompanyCode) {
+                    return new Filter("CompanyCode", FilterOperator.EQ, sCompanyCode);
+                });
+                if (aCompanyCodeFilters.length === 1) {
+                    aFilters.push(aCompanyCodeFilters[0]);
+                } else if (aCompanyCodeFilters.length > 1) {
+                    // Multiple company codes - use OR filter
+                    aFilters.push(new Filter({
+                        filters: aCompanyCodeFilters,
+                        and: false
+                    }));
+                }
             }
             
-            // Add TaxCode filter if selected
-            if (sSelectedTaxCode) {
-                const oTaxCodeFilter = new Filter("TaxCode", FilterOperator.EQ, sSelectedTaxCode);
-                aFilters.push(oTaxCodeFilter);
+            // Add TaxCode filter if any are selected (IN filter for multiple values)
+            if (aSelectedTaxCodes.length > 0) {
+                const aTaxCodeFilters = aSelectedTaxCodes.map(function(sTaxCode) {
+                    return new Filter("TaxCode", FilterOperator.EQ, sTaxCode);
+                });
+                if (aTaxCodeFilters.length === 1) {
+                    aFilters.push(aTaxCodeFilters[0]);
+                } else if (aTaxCodeFilters.length > 1) {
+                    // Multiple tax codes - use OR filter
+                    aFilters.push(new Filter({
+                        filters: aTaxCodeFilters,
+                        and: false
+                    }));
+                }
             }
             
             // Set the filters
@@ -574,26 +594,49 @@ sap.ui.define([
                 return;
             }
 
-            // Get selected data from treemap
-            const aData = oEvent.getParameter("data");
-            if (aData && aData.length > 0) {
-                const oSelectedData = aData[0];
-                const sCompanyCode = oSelectedData.data && oSelectedData.data[0] ? oSelectedData.data[0].CompanyCode : null;
-                
-                // Toggle: if same company code is selected, clear filter; otherwise set it
-                const sCurrentCompanyCode = oViewModel.getProperty("/reconciliationDetail/selectedCompanyCode");
-                const sNewCompanyCode = (sCompanyCode === sCurrentCompanyCode) ? null : sCompanyCode;
-                
-                oViewModel.setProperty("/reconciliationDetail/selectedCompanyCode", sNewCompanyCode);
-                
-                // Clear tax code filter when company code is selected (mutually exclusive)
-                if (sNewCompanyCode) {
-                    oViewModel.setProperty("/reconciliationDetail/selectedTaxCode", null);
+            // Get selected and deselected data from treemap
+            // selectData event provides both selected and deselected arrays
+            const aSelectedData = oEvent.getParameter("data") || [];
+            const aDeselectedData = oEvent.getParameter("deselectedData") || [];
+            
+            // Get currently selected company codes from view model
+            const aCurrentCompanyCodes = oViewModel.getProperty("/reconciliationDetail/selectedCompanyCodes") || [];
+            let aNewCompanyCodes = [...aCurrentCompanyCodes];
+            
+            // Process selected items - extract CompanyCode from each data point
+            aSelectedData.forEach(function(oDataPoint) {
+                if (oDataPoint && oDataPoint.data) {
+                    // For treemap, the dimension value (CompanyCode) is in the data
+                    const sCompanyCode = oDataPoint.data.CompanyCode || oDataPoint.data[0]?.CompanyCode;
+                    if (sCompanyCode && aNewCompanyCodes.indexOf(sCompanyCode) === -1) {
+                        aNewCompanyCodes.push(sCompanyCode);
+                    }
                 }
-                
-                // Trigger rebind
-                oSmartTable.rebindTable();
+            });
+            
+            // Process deselected items - remove from selection
+            aDeselectedData.forEach(function(oDataPoint) {
+                if (oDataPoint && oDataPoint.data) {
+                    const sCompanyCode = oDataPoint.data.CompanyCode || oDataPoint.data[0]?.CompanyCode;
+                    if (sCompanyCode) {
+                        const iIndex = aNewCompanyCodes.indexOf(sCompanyCode);
+                        if (iIndex > -1) {
+                            aNewCompanyCodes.splice(iIndex, 1);
+                        }
+                    }
+                }
+            });
+            
+            // Update view model - store as array for multiple selections
+            oViewModel.setProperty("/reconciliationDetail/selectedCompanyCodes", aNewCompanyCodes);
+            
+            // Clear tax code filter when company code is selected (mutually exclusive)
+            if (aNewCompanyCodes.length > 0) {
+                oViewModel.setProperty("/reconciliationDetail/selectedTaxCodes", []);
             }
+            
+            // Trigger rebind
+            oSmartTable.rebindTable();
         },
 
         /**
@@ -607,26 +650,49 @@ sap.ui.define([
                 return;
             }
 
-            // Get selected data from treemap
-            const aData = oEvent.getParameter("data");
-            if (aData && aData.length > 0) {
-                const oSelectedData = aData[0];
-                const sTaxCode = oSelectedData.data && oSelectedData.data[0] ? oSelectedData.data[0].TaxCode : null;
-                
-                // Toggle: if same tax code is selected, clear filter; otherwise set it
-                const sCurrentTaxCode = oViewModel.getProperty("/reconciliationDetail/selectedTaxCode");
-                const sNewTaxCode = (sTaxCode === sCurrentTaxCode) ? null : sTaxCode;
-                
-                oViewModel.setProperty("/reconciliationDetail/selectedTaxCode", sNewTaxCode);
-                
-                // Clear company code filter when tax code is selected (mutually exclusive)
-                if (sNewTaxCode) {
-                    oViewModel.setProperty("/reconciliationDetail/selectedCompanyCode", null);
+            // Get selected and deselected data from treemap
+            // selectData event provides both selected and deselected arrays
+            const aSelectedData = oEvent.getParameter("data") || [];
+            const aDeselectedData = oEvent.getParameter("deselectedData") || [];
+            
+            // Get currently selected tax codes from view model
+            const aCurrentTaxCodes = oViewModel.getProperty("/reconciliationDetail/selectedTaxCodes") || [];
+            let aNewTaxCodes = [...aCurrentTaxCodes];
+            
+            // Process selected items - extract TaxCode from each data point
+            aSelectedData.forEach(function(oDataPoint) {
+                if (oDataPoint && oDataPoint.data) {
+                    // For treemap, the dimension value (TaxCode) is in the data
+                    const sTaxCode = oDataPoint.data.TaxCode || oDataPoint.data[0]?.TaxCode;
+                    if (sTaxCode && aNewTaxCodes.indexOf(sTaxCode) === -1) {
+                        aNewTaxCodes.push(sTaxCode);
+                    }
                 }
-                
-                // Trigger rebind
-                oSmartTable.rebindTable();
+            });
+            
+            // Process deselected items - remove from selection
+            aDeselectedData.forEach(function(oDataPoint) {
+                if (oDataPoint && oDataPoint.data) {
+                    const sTaxCode = oDataPoint.data.TaxCode || oDataPoint.data[0]?.TaxCode;
+                    if (sTaxCode) {
+                        const iIndex = aNewTaxCodes.indexOf(sTaxCode);
+                        if (iIndex > -1) {
+                            aNewTaxCodes.splice(iIndex, 1);
+                        }
+                    }
+                }
+            });
+            
+            // Update view model - store as array for multiple selections
+            oViewModel.setProperty("/reconciliationDetail/selectedTaxCodes", aNewTaxCodes);
+            
+            // Clear company code filter when tax code is selected (mutually exclusive)
+            if (aNewTaxCodes.length > 0) {
+                oViewModel.setProperty("/reconciliationDetail/selectedCompanyCodes", []);
             }
+            
+            // Trigger rebind
+            oSmartTable.rebindTable();
         }
     });
 

@@ -313,7 +313,7 @@
                         </table:multiLabels>
                         <table:template>
                             <m:ObjectStatus 
-                                text="{Status}" 
+                                text="{path: 'Status', formatter: '.formatter.formatStatusText'}" 
                                 state="{path: 'Status', formatter: '.formatter.formatStatusColor'}"
                                 icon="{path: 'Status', formatter: '.formatter.formatStatusIcon'}"/>
                         </table:template>

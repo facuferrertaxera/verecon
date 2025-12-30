@@ -107,6 +107,55 @@ sap.ui.define([
         },
 
         /**
+         * Format status text based on status code
+         * @param {string} sStatus - Status code
+         * @returns {string} Descriptive status text
+         */
+        formatStatusText: function(sStatus) {
+            if (!sStatus) {
+                return "";
+            }
+            
+            // Success statuses (start with S): S, SR, SV, ST, SX, SS
+            if (sStatus.indexOf("S") === 0) {
+                return "Success";
+            }
+            
+            // Failed statuses (start with F): F, FR, FV, FT, FX, FS, FE
+            if (sStatus.indexOf("F") === 0) {
+                return "Error";
+            }
+            
+            // Extracted
+            if (sStatus === "E") {
+                return "Error";
+            }
+            
+            // In Progress statuses (end with P): P, RP, VP, XP
+            if (sStatus.lastIndexOf("P") === sStatus.length - 1) {
+                return "In Progress";
+            }
+            
+            // Created
+            if (sStatus === "C") {
+                return "Created";
+            }
+            
+            // Pending Archiving
+            if (sStatus === "PA") {
+                return "Pending Archiving";
+            }
+            
+            // Tax Authority Review
+            if (sStatus === "TR") {
+                return "Tax Authority Review";
+            }
+            
+            // Default fallback - return the status code itself
+            return sStatus;
+        },
+
+        /**
          * Store controller reference for formatters
          */
         _oController: null,

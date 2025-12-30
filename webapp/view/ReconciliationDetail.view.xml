@@ -20,7 +20,7 @@
     xmlns:viz="sap.viz.ui5.controls"
     xmlns:viz.data="sap.viz.ui5.data"
     xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds">
-    <f:DynamicPage headerExpanded="{view>/reconciliationDetail/headerExpanded}" toggleHeaderOnTitleClick="{view>/reconciliationDetail/titleClickable}" class="sapUiNoContentPadding">
+    <f:DynamicPage headerExpanded="{view>/reconciliationDetail/headerExpanded}" toggleHeaderOnTitleClick="{view>/reconciliationDetail/titleClickable}" class="sapUiNoContentPadding" height="100%">
         <!-- DynamicPage Header -->
         <f:header>
             <f:DynamicPageHeader pinnable="true">

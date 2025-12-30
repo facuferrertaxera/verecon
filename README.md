@@ -9,7 +9,7 @@
 |**Service Type**<br>SAP System (ABAP Cloud)|
 |**Service URL**<br>N/A|
 |**Module Name**<br>verecon|
-|**Application Title**<br>Reconcilition - VAT Returns EC Sales List |
+|**Application Title**<br>Reconciliation - VAT Returns EC Sales List |
 |**Namespace**<br>tech.taxera.taxreporting|
 |**UI5 Theme**<br>sap_horizon|
 |**UI5 Version**<br>1.143.2|

@@ -154,13 +154,16 @@
             </f:DynamicPageHeader>
         </f:header>
         <f:content>
-            <VBox class="sapUiMediumMargin">
+            <VBox class="sapUiMediumMargin" height="100%">
                 <table:Table
                     id="documentsTable"
                     enableColumnFreeze="true"
                     visibleRowCountMode="Auto"
                     selectionMode="None"
                     class="sapUiNoContentPadding">
+                    <table:layoutData>
+                        <layout:FlexItemData growFactor="1" baseSize="0%"/>
+                    </table:layoutData>
                     <table:extension>
                         <OverflowToolbar style="Clear" class="sapUiMediumMarginBottom">
                             <Title text="{i18n>reconciliationDetail.Documents}" titleStyle="H3"/>

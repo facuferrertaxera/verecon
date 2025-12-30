@@ -103,8 +103,9 @@ sap.ui.define([
                     }
                 });
                 
-                // Add click handler for company code treemap
+                // Add click handlers for company code treemap (both select and deselect)
                 oCompanyCodeTreemap.attachSelectData(this.onCompanyCodeTreemapSelect.bind(this));
+                oCompanyCodeTreemap.attachDeselectData(this.onCompanyCodeTreemapDeselect.bind(this));
             }
 
             if (oTaxCodeTreemap) {
@@ -125,8 +126,9 @@ sap.ui.define([
                     }
                 });
                 
-                // Add click handler for tax code treemap
+                // Add click handlers for tax code treemap (both select and deselect)
                 oTaxCodeTreemap.attachSelectData(this.onTaxCodeTreemapSelect.bind(this));
+                oTaxCodeTreemap.attachDeselectData(this.onTaxCodeTreemapDeselect.bind(this));
             }
         },
 
@@ -684,10 +686,8 @@ sap.ui.define([
                 return;
             }
 
-            // Get selected and deselected data from treemap
-            // selectData event provides both selected and deselected arrays
+            // Get selected data from treemap
             const aSelectedData = oEvent.getParameter("data") || [];
-            const aDeselectedData = oEvent.getParameter("deselectedData") || [];
             
             // Get currently selected company codes from view model
             const aCurrentCompanyCodes = oViewModel.getProperty("/reconciliationDetail/selectedCompanyCodes") || [];
@@ -700,19 +700,6 @@ sap.ui.define([
                     const sCompanyCode = oDataPoint.data.CompanyCode || oDataPoint.data[0]?.CompanyCode;
                     if (sCompanyCode && aNewCompanyCodes.indexOf(sCompanyCode) === -1) {
                         aNewCompanyCodes.push(sCompanyCode);
-                    }
-                }
-            });
-            
-            // Process deselected items - remove from selection
-            aDeselectedData.forEach(function(oDataPoint) {
-                if (oDataPoint && oDataPoint.data) {
-                    const sCompanyCode = oDataPoint.data.CompanyCode || oDataPoint.data[0]?.CompanyCode;
-                    if (sCompanyCode) {
-                        const iIndex = aNewCompanyCodes.indexOf(sCompanyCode);
-                        if (iIndex > -1) {
-                            aNewCompanyCodes.splice(iIndex, 1);
-                        }
                     }
                 }
             });
@@ -730,6 +717,44 @@ sap.ui.define([
         },
 
         /**
+         * Handler for company code treemap deselection - removes filter from table
+         */
+        onCompanyCodeTreemapDeselect: function(oEvent) {
+            const oViewModel = this.getView().getModel("view");
+            const oSmartTable = this.byId("documentsSmartTable");
+            
+            if (!oSmartTable || !oViewModel) {
+                return;
+            }
+
+            // Get deselected data from treemap
+            const aDeselectedData = oEvent.getParameter("data") || [];
+            
+            // Get currently selected company codes from view model
+            const aCurrentCompanyCodes = oViewModel.getProperty("/reconciliationDetail/selectedCompanyCodes") || [];
+            let aNewCompanyCodes = [...aCurrentCompanyCodes];
+            
+            // Process deselected items - remove from selection
+            aDeselectedData.forEach(function(oDataPoint) {
+                if (oDataPoint && oDataPoint.data) {
+                    const sCompanyCode = oDataPoint.data.CompanyCode || oDataPoint.data[0]?.CompanyCode;
+                    if (sCompanyCode) {
+                        const iIndex = aNewCompanyCodes.indexOf(sCompanyCode);
+                        if (iIndex > -1) {
+                            aNewCompanyCodes.splice(iIndex, 1);
+                        }
+                    }
+                }
+            });
+            
+            // Update view model
+            oViewModel.setProperty("/reconciliationDetail/selectedCompanyCodes", aNewCompanyCodes);
+            
+            // Trigger rebind
+            oSmartTable.rebindTable();
+        },
+
+        /**
          * Handler for tax code treemap selection - filters table by tax code
          */
         onTaxCodeTreemapSelect: function(oEvent) {
@@ -740,10 +765,8 @@ sap.ui.define([
                 return;
             }
 
-            // Get selected and deselected data from treemap
-            // selectData event provides both selected and deselected arrays
+            // Get selected data from treemap
             const aSelectedData = oEvent.getParameter("data") || [];
-            const aDeselectedData = oEvent.getParameter("deselectedData") || [];
             
             // Get currently selected tax codes from view model
             const aCurrentTaxCodes = oViewModel.getProperty("/reconciliationDetail/selectedTaxCodes") || [];
@@ -760,6 +783,36 @@ sap.ui.define([
                 }
             });
             
+            // Update view model - store as array for multiple selections
+            oViewModel.setProperty("/reconciliationDetail/selectedTaxCodes", aNewTaxCodes);
+            
+            // Clear company code filter when tax code is selected (mutually exclusive)
+            if (aNewTaxCodes.length > 0) {
+                oViewModel.setProperty("/reconciliationDetail/selectedCompanyCodes", []);
+            }
+            
+            // Trigger rebind
+            oSmartTable.rebindTable();
+        },
+
+        /**
+         * Handler for tax code treemap deselection - removes filter from table
+         */
+        onTaxCodeTreemapDeselect: function(oEvent) {
+            const oViewModel = this.getView().getModel("view");
+            const oSmartTable = this.byId("documentsSmartTable");
+            
+            if (!oSmartTable || !oViewModel) {
+                return;
+            }
+
+            // Get deselected data from treemap
+            const aDeselectedData = oEvent.getParameter("data") || [];
+            
+            // Get currently selected tax codes from view model
+            const aCurrentTaxCodes = oViewModel.getProperty("/reconciliationDetail/selectedTaxCodes") || [];
+            let aNewTaxCodes = [...aCurrentTaxCodes];
+            
             // Process deselected items - remove from selection
             aDeselectedData.forEach(function(oDataPoint) {
                 if (oDataPoint && oDataPoint.data) {
@@ -773,13 +826,8 @@ sap.ui.define([
                 }
             });
             
-            // Update view model - store as array for multiple selections
+            // Update view model
             oViewModel.setProperty("/reconciliationDetail/selectedTaxCodes", aNewTaxCodes);
-            
-            // Clear company code filter when tax code is selected (mutually exclusive)
-            if (aNewTaxCodes.length > 0) {
-                oViewModel.setProperty("/reconciliationDetail/selectedCompanyCodes", []);
-            }
             
             // Trigger rebind
             oSmartTable.rebindTable();

@@ -171,26 +171,46 @@ sap.ui.define([
         },
 
         /**
-         * Bind the documents table to the navigation property
+         * Store reconciliation path for SmartTable binding
+         */
+        _sReconciliationPath: null,
+
+        /**
+         * Handler for SmartTable beforeRebindTable event
+         * Sets up the binding path to the navigation property
+         */
+        onBeforeRebindDocumentsTable: function(oEvent) {
+            const oBindingParams = oEvent.getParameter("bindingParams");
+            
+            if (this._sReconciliationPath) {
+                // Set the binding path to the navigation property
+                oBindingParams.path = `${this._sReconciliationPath}/to_Document`;
+            }
+            
+            // Add event handlers
+            oBindingParams.events = {
+                dataRequested: () => {
+                    this.getView().setBusy(true);
+                },
+                dataReceived: (oEvent) => {
+                    this.getView().setBusy(false);
+                    // Aggregate documents for treemap visualizations
+                    this._populateTreemapData();
+                }
+            };
+        },
+
+        /**
+         * Bind the documents SmartTable to the navigation property
          */
         _bindDocumentsTable: function(sReconciliationPath) {
-            const oTable = this.byId("documentsTable");
+            // Store the path for use in onBeforeRebindDocumentsTable
+            this._sReconciliationPath = sReconciliationPath;
             
-            if (oTable) {
-                // Bind rows aggregation to the navigation property (to_Document is singular)
-                oTable.bindRows({
-                    path: `${sReconciliationPath}/to_Document`,
-                    events: {
-                        dataRequested: () => {
-                            this.getView().setBusy(true);
-                        },
-                        dataReceived: (oEvent) => {
-                            this.getView().setBusy(false);
-                            // Aggregate documents for treemap visualizations
-                            this._populateTreemapData();
-                        }
-                    }
-                });
+            // Trigger rebind on the SmartTable
+            const oSmartTable = this.byId("documentsSmartTable");
+            if (oSmartTable) {
+                oSmartTable.rebindTable();
             }
         },
 

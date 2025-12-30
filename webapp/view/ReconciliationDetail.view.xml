@@ -9,6 +9,8 @@
     xmlns:layout="sap.ui.layout"
     xmlns:cssgrid="sap.ui.layout.cssgrid"
     xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:st="sap.ui.comp.smarttable"
+    xmlns:sv="sap.ui.comp.smartvariants"
     xmlns:smartFilterBar="sap.ui.comp.smartfilterbar" 
     xmlns:table="sap.ui.table"
     xmlns:m="sap.m"
@@ -155,18 +157,31 @@
         </f:header>
         <f:content>
             <VBox class="sapUiMediumMargin" height="100%">
-                <table:Table
-                    id="documentsTable"
-                    enableColumnFreeze="true"
-                    visibleRowCountMode="Auto"
-                    selectionMode="None"
+                <st:SmartTable
+                    id="documentsSmartTable"
+                    entitySet="Document"
+                    tableBindingPath="to_Document"
+                    tableType="Table"
+                    useExportToExcel="true"
+                    useVariantManagement="false"
+                    enableAutoBinding="false"
+                    useTablePersonalisation="true"
+                    showRowCount="true"
+                    showTablePersonalisation="true"
+                    beforeRebindTable="onBeforeRebindDocumentsTable"
                     class="sapUiNoContentPadding"
                     height="100%">
-                    <table:extension>
-                        <OverflowToolbar style="Clear" class="sapUiMediumMarginBottom">
+                    <st:customToolbar>
+                        <OverflowToolbar design="Transparent">
                             <Title text="{i18n>reconciliationDetail.Documents}" titleStyle="H3"/>
+                            <ToolbarSpacer />
                         </OverflowToolbar>
-                    </table:extension>
+                    </st:customToolbar>
+                    <table:Table
+                        id="documentsTable"
+                        enableColumnFreeze="true"
+                        visibleRowCountMode="Auto"
+                        selectionMode="None">
                 <table:columns>
                     <table:Column width="8rem" sortProperty="CompanyCode" filterProperty="CompanyCode" hAlign="Left">
                         <table:multiLabels>
@@ -320,7 +335,8 @@
                         </table:template>
                     </table:Column>
                 </table:columns>
-            </table:Table>
+                    </table:Table>
+                </st:SmartTable>
             </VBox>
         </f:content>
     </f:DynamicPage>

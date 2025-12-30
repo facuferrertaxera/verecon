@@ -33,7 +33,7 @@ sap.ui.define([
             
             // Extracted
             if (sStatus === "E") {
-                return "sap-icon://complete";
+                return "sap-icon://error";
             }
             
             // Created
@@ -84,7 +84,7 @@ sap.ui.define([
             
             // Extracted
             if (sStatus === "E") {
-                return "Success";
+                return "Error";
             }
             
             // Created

@@ -167,53 +167,71 @@
                         </OverflowToolbar>
                     </table:extension>
                 <table:columns>
-                    <table:Column width="8rem" sortProperty="CompanyCode" filterProperty="CompanyCode">
-                        <m:Label text="{i18n>reconciliationDetail.CompanyCode}" textAlign="Center" width="100%"/>
+                    <table:Column width="8rem" sortProperty="CompanyCode" filterProperty="CompanyCode" hAlign="Left">
+                        <table:multiLabels>
+                            <m:Label visible="false"/>
+                            <m:Label text="{i18n>reconciliationDetail.CompanyCode}" textAlign="Left" width="100%"/>
+                        </table:multiLabels>
                         <table:template>
-                            <m:Text text="{CompanyCode}"/>
+                            <m:Text text="{CompanyCode}" textAlign="Left"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="10rem" sortProperty="DocumentNo" filterProperty="DocumentNo">
-                        <m:Label text="{i18n>reconciliationDetail.DocumentNo}" textAlign="Center" width="100%"/>
+                    <table:Column width="10rem" sortProperty="DocumentNo" filterProperty="DocumentNo" hAlign="Left">
+                        <table:multiLabels>
+                            <m:Label visible="false"/>
+                            <m:Label text="{i18n>reconciliationDetail.DocumentNo}" textAlign="Left" width="100%"/>
+                        </table:multiLabels>
                         <table:template>
-                            <m:Text text="{DocumentNo}"/>
+                            <m:Text text="{DocumentNo}" textAlign="Left"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="6rem" sortProperty="FiscalYear" filterProperty="FiscalYear">
-                        <m:Label text="{i18n>reconciliationDetail.FiscalYear}" textAlign="Center" width="100%"/>
+                    <table:Column width="6rem" sortProperty="FiscalYear" filterProperty="FiscalYear" visible="false">
+                        <table:multiLabels>
+                            <m:Label visible="false"/>
+                            <m:Label text="{i18n>reconciliationDetail.FiscalYear}" textAlign="Center" width="100%"/>
+                        </table:multiLabels>
                         <table:template>
                             <m:Text text="{FiscalYear}"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="10rem" sortProperty="PostingDate" filterProperty="PostingDate">
-                        <m:Label text="{i18n>reconciliationDetail.PostingDate}" textAlign="Center" width="100%"/>
+                    <table:Column width="10rem" sortProperty="PostingDate" filterProperty="PostingDate" hAlign="Left">
+                        <table:multiLabels>
+                            <m:Label visible="false"/>
+                            <m:Label text="{i18n>reconciliationDetail.PostingDate}" textAlign="Left" width="100%"/>
+                        </table:multiLabels>
                         <table:template>
-                            <m:Text text="{path: 'PostingDate', type: 'sap.ui.model.type.Date', formatOptions: {style: 'medium'}}"/>
+                            <m:Text text="{path: 'PostingDate', type: 'sap.ui.model.type.Date', formatOptions: {style: 'medium'}}" textAlign="Left"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="TaxCode" filterProperty="TaxCode">
-                        <m:Label text="{i18n>reconciliationDetail.TaxCode}" textAlign="Center" width="100%"/>
+                    <table:Column width="8rem" sortProperty="TaxCode" filterProperty="TaxCode" hAlign="Left">
+                        <table:multiLabels>
+                            <m:Label visible="false"/>
+                            <m:Label text="{i18n>reconciliationDetail.TaxCode}" textAlign="Left" width="100%"/>
+                        </table:multiLabels>
                         <table:template>
-                            <m:Text text="{TaxCode}"/>
+                            <m:Text text="{TaxCode}" textAlign="Left"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="6rem" sortProperty="Currencycode" filterProperty="Currencycode">
-                        <m:Label text="{i18n>reconciliationDetail.Currency}" textAlign="Center" width="100%"/>
+                    <table:Column width="6rem" sortProperty="Currencycode" filterProperty="Currencycode" visible="false">
+                        <table:multiLabels>
+                            <m:Label visible="false"/>
+                            <m:Label text="{i18n>reconciliationDetail.Currency}" textAlign="Center" width="100%"/>
+                        </table:multiLabels>
                         <table:template>
                             <m:Text text="{Currencycode}"/>
                         </table:template>
                     </table:Column>
                     <!-- VATR Column Group - spans 3 columns -->
-                    <table:Column width="8rem" sortProperty="VatrBaseAmount" filterProperty="VatrBaseAmount" headerSpan="3,2" visible="false">
+                    <table:Column width="8rem" sortProperty="VatrBaseAmount" filterProperty="VatrBaseAmount" headerSpan="3,2" visible="false" hAlign="End">
                         <table:multiLabels>
                             <m:Label text="{i18n>reconciliationDetail.VATR}" textAlign="Center" width="100%"/>
                             <m:Label text="{i18n>reconciliationDetail.BaseAmount}" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
-                            <m:ObjectNumber number="{VatrBaseAmount}" unit="{Currencycode}"/>
+                            <m:ObjectNumber number="{VatrBaseAmount}" unit="{Currencycode}" textAlign="End"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="VatrTaxAmount" filterProperty="VatrTaxAmount" headerSpan="2">
+                    <table:Column width="8rem" sortProperty="VatrTaxAmount" filterProperty="VatrTaxAmount" headerSpan="2" visible="false">
                         <table:multiLabels>
                             <m:Label text="{i18n>reconciliationDetail.VATR}"/>
                             <m:Label text="{i18n>reconciliationDetail.TaxAmount}" textAlign="Center" width="100%"/>
@@ -222,26 +240,26 @@
                             <m:ObjectNumber number="{VatrTaxAmount}" unit="{Currencycode}"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="VatrGrossAmount" filterProperty="VatrGrossAmount">
+                    <table:Column width="8rem" sortProperty="VatrGrossAmount" filterProperty="VatrGrossAmount" hAlign="End">
                         <table:multiLabels>
                             <m:Label text="{i18n>reconciliationDetail.VATR}"/>
                             <m:Label text="{i18n>reconciliationDetail.GrossAmount}" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
-                            <m:ObjectNumber number="{VatrGrossAmount}" unit="{Currencycode}"/>
+                            <m:ObjectNumber number="{VatrGrossAmount}" unit="{Currencycode}" textAlign="End"/>
                         </table:template>
                     </table:Column>
                     <!-- ECSL Column Group - spans 3 columns -->
-                    <table:Column width="8rem" sortProperty="EcslBaseAmount" filterProperty="EcslBaseAmount" headerSpan="3,2" visible="false">
+                    <table:Column width="8rem" sortProperty="EcslBaseAmount" filterProperty="EcslBaseAmount" headerSpan="3,2" visible="false" hAlign="End">
                         <table:multiLabels>
                             <m:Label text="{i18n>reconciliationDetail.ECSL}" textAlign="Center" width="100%"/>
                             <m:Label text="{i18n>reconciliationDetail.BaseAmount}" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
-                            <m:ObjectNumber number="{EcslBaseAmount}" unit="{Currencycode}"/>
+                            <m:ObjectNumber number="{EcslBaseAmount}" unit="{Currencycode}" textAlign="End"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="EcslTaxAmount" filterProperty="EcslTaxAmount" headerSpan="2">
+                    <table:Column width="8rem" sortProperty="EcslTaxAmount" filterProperty="EcslTaxAmount" headerSpan="2" visible="false">
                         <table:multiLabels>
                             <m:Label text="{i18n>reconciliationDetail.ECSL}"/>
                             <m:Label text="{i18n>reconciliationDetail.TaxAmount}" textAlign="Center" width="100%"/>
@@ -250,26 +268,26 @@
                             <m:ObjectNumber number="{EcslTaxAmount}" unit="{Currencycode}"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="EcslGrossAmount" filterProperty="EcslGrossAmount">
+                    <table:Column width="8rem" sortProperty="EcslGrossAmount" filterProperty="EcslGrossAmount" hAlign="End">
                         <table:multiLabels>
                             <m:Label text="{i18n>reconciliationDetail.ECSL}"/>
                             <m:Label text="{i18n>reconciliationDetail.GrossAmount}" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
-                            <m:ObjectNumber number="{EcslGrossAmount}" unit="{Currencycode}"/>
+                            <m:ObjectNumber number="{EcslGrossAmount}" unit="{Currencycode}" textAlign="End"/>
                         </table:template>
                     </table:Column>
                     <!-- Differences Column Group - spans 3 columns -->
-                    <table:Column width="8rem" sortProperty="DiffBaseAmount" filterProperty="DiffBaseAmount" headerSpan="3,2" visible="false">
+                    <table:Column width="8rem" sortProperty="DiffBaseAmount" filterProperty="DiffBaseAmount" headerSpan="3,2" visible="false" hAlign="End">
                         <table:multiLabels>
                             <m:Label text="{i18n>reconciliationDetail.Differences}" textAlign="Center" width="100%"/>
                             <m:Label text="{i18n>reconciliationDetail.BaseAmount}" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
-                            <m:ObjectNumber number="{DiffBaseAmount}" unit="{Currencycode}" state="{path: 'DiffBaseAmount', formatter: '.formatter.formatDiffAmountState'}"/>
+                            <m:ObjectNumber number="{DiffBaseAmount}" unit="{Currencycode}" state="{path: 'DiffBaseAmount', formatter: '.formatter.formatDiffAmountState'}" textAlign="End"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="DiffTaxAmount" filterProperty="DiffTaxAmount" headerSpan="2">
+                    <table:Column width="8rem" sortProperty="DiffTaxAmount" filterProperty="DiffTaxAmount" headerSpan="2" visible="false">
                         <table:multiLabels>
                             <m:Label text="{i18n>reconciliationDetail.Differences}"/>
                             <m:Label text="{i18n>reconciliationDetail.TaxAmount}" textAlign="Center" width="100%"/>
@@ -278,23 +296,26 @@
                             <m:ObjectNumber number="{DiffTaxAmount}" unit="{Currencycode}" state="{path: 'DiffTaxAmount', formatter: '.formatter.formatDiffAmountState'}"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="DiffGrossAmount" filterProperty="DiffGrossAmount">
+                    <table:Column width="8rem" sortProperty="DiffGrossAmount" filterProperty="DiffGrossAmount" hAlign="End">
                         <table:multiLabels>
                             <m:Label text="{i18n>reconciliationDetail.Differences}"/>
                             <m:Label text="{i18n>reconciliationDetail.GrossAmount}" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
-                            <m:ObjectNumber number="{DiffGrossAmount}" unit="{Currencycode}" state="{path: 'DiffGrossAmount', formatter: '.formatter.formatDiffAmountState'}"/>
+                            <m:ObjectNumber number="{DiffGrossAmount}" unit="{Currencycode}" state="{path: 'DiffGrossAmount', formatter: '.formatter.formatDiffAmountState'}" textAlign="End"/>
                         </table:template>
                     </table:Column>
                     <!-- Status Column -->
-                    <table:Column width="8rem" sortProperty="Status" filterProperty="Status">
+                    <table:Column width="8rem" sortProperty="Status" filterProperty="Status" hAlign="Left">
                         <table:multiLabels>
                             <m:Label visible="false"/>
-                            <m:Label text="{i18n>reconciliationDetail.Status}" textAlign="Center" width="100%"/>
+                            <m:Label text="{i18n>reconciliationDetail.Status}" textAlign="Left" width="100%" hAlign="Bottom"/>
                         </table:multiLabels>
                         <table:template>
-                            <m:ObjectStatus text="{Status}" state="{path: 'Status', formatter: '.formatter.formatStatusColor'}"/>
+                            <m:ObjectStatus 
+                                text="{Status}" 
+                                state="{path: 'Status', formatter: '.formatter.formatStatusColor'}"
+                                icon="{path: 'Status', formatter: '.formatter.formatStatusIcon'}"/>
                         </table:template>
                     </table:Column>
                 </table:columns>

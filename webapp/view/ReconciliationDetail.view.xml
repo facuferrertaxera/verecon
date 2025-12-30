@@ -160,10 +160,8 @@
                     enableColumnFreeze="true"
                     visibleRowCountMode="Auto"
                     selectionMode="None"
-                    class="sapUiNoContentPadding">
-                    <table:layoutData>
-                        <layout:FlexItemData growFactor="1" baseSize="0%"/>
-                    </table:layoutData>
+                    class="sapUiNoContentPadding"
+                    height="100%">
                     <table:extension>
                         <OverflowToolbar style="Clear" class="sapUiMediumMarginBottom">
                             <Title text="{i18n>reconciliationDetail.Documents}" titleStyle="H3"/>

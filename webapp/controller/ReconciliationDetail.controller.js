@@ -43,7 +43,9 @@ sap.ui.define([
                         scale: "EUR",
                         text: "Total Difference"
                     },
-                    showOnlyDifferences: false
+                    showOnlyDifferences: false,
+                    selectedCompanyCode: null,
+                    selectedTaxCode: null
                 }
             });
             this.getView().setModel(oViewModel, "view");
@@ -100,6 +102,9 @@ sap.ui.define([
                         }
                     }
                 });
+                
+                // Add click handler for company code treemap
+                oCompanyCodeTreemap.attachVizDataSelect(this.onCompanyCodeTreemapSelect.bind(this));
             }
 
             if (oTaxCodeTreemap) {
@@ -119,6 +124,9 @@ sap.ui.define([
                         }
                     }
                 });
+                
+                // Add click handler for tax code treemap
+                oTaxCodeTreemap.attachVizDataSelect(this.onTaxCodeTreemapSelect.bind(this));
             }
         },
 
@@ -190,22 +198,26 @@ sap.ui.define([
             // Get existing filters or initialize empty array
             let aFilters = oBindingParams.filters || [];
             
-            // Check if we should filter to show only records with differences
+            // Get filter flags from view model
             const oViewModel = this.getView().getModel("view");
             const bShowOnlyDifferences = oViewModel ? oViewModel.getProperty("/reconciliationDetail/showOnlyDifferences") : false;
+            const sSelectedCompanyCode = oViewModel ? oViewModel.getProperty("/reconciliationDetail/selectedCompanyCode") : null;
+            const sSelectedTaxCode = oViewModel ? oViewModel.getProperty("/reconciliationDetail/selectedTaxCode") : null;
             
-            // Remove any existing DiffGrossAmount filter
+            // Remove any existing custom filters (DiffGrossAmount, CompanyCode, TaxCode)
             aFilters = aFilters.filter(function(oFilter) {
-                // Check if this is a DiffGrossAmount filter
-                if (oFilter.sPath === "DiffGrossAmount") {
+                // Check if this is one of our custom filters
+                if (oFilter.sPath === "DiffGrossAmount" || oFilter.sPath === "CompanyCode" || oFilter.sPath === "TaxCode") {
                     return false;
                 }
-                // Check if it's a composite filter containing DiffGrossAmount
+                // Check if it's a composite filter containing our custom filters
                 if (oFilter.aFilters && Array.isArray(oFilter.aFilters)) {
-                    const bContainsDiffFilter = oFilter.aFilters.some(function(oSubFilter) {
-                        return oSubFilter.sPath === "DiffGrossAmount";
+                    const bContainsCustomFilter = oFilter.aFilters.some(function(oSubFilter) {
+                        return oSubFilter.sPath === "DiffGrossAmount" || 
+                               oSubFilter.sPath === "CompanyCode" || 
+                               oSubFilter.sPath === "TaxCode";
                     });
-                    if (bContainsDiffFilter && oFilter.aFilters.length === 1) {
+                    if (bContainsCustomFilter && oFilter.aFilters.length === 1) {
                         return false; // Remove if it's a single-filter composite
                     }
                 }
@@ -214,9 +226,20 @@ sap.ui.define([
             
             // Add filter to show only records with differences if flag is set
             if (bShowOnlyDifferences) {
-                // Filter to show only records where DiffGrossAmount is not zero
                 const oDiffFilter = new Filter("DiffGrossAmount", FilterOperator.NE, 0);
                 aFilters.push(oDiffFilter);
+            }
+            
+            // Add CompanyCode filter if selected
+            if (sSelectedCompanyCode) {
+                const oCompanyCodeFilter = new Filter("CompanyCode", FilterOperator.EQ, sSelectedCompanyCode);
+                aFilters.push(oCompanyCodeFilter);
+            }
+            
+            // Add TaxCode filter if selected
+            if (sSelectedTaxCode) {
+                const oTaxCodeFilter = new Filter("TaxCode", FilterOperator.EQ, sSelectedTaxCode);
+                aFilters.push(oTaxCodeFilter);
             }
             
             // Set the filters
@@ -538,6 +561,72 @@ sap.ui.define([
             // Trigger rebind on SmartTable - this will call onBeforeRebindDocumentsTable
             // which will apply the filter based on the showOnlyDifferences flag
             oSmartTable.rebindTable();
+        },
+
+        /**
+         * Handler for company code treemap selection - filters table by company code
+         */
+        onCompanyCodeTreemapSelect: function(oEvent) {
+            const oViewModel = this.getView().getModel("view");
+            const oSmartTable = this.byId("documentsSmartTable");
+            
+            if (!oSmartTable || !oViewModel) {
+                return;
+            }
+
+            // Get selected data from treemap
+            const aData = oEvent.getParameter("data");
+            if (aData && aData.length > 0) {
+                const oSelectedData = aData[0];
+                const sCompanyCode = oSelectedData.data && oSelectedData.data[0] ? oSelectedData.data[0].CompanyCode : null;
+                
+                // Toggle: if same company code is selected, clear filter; otherwise set it
+                const sCurrentCompanyCode = oViewModel.getProperty("/reconciliationDetail/selectedCompanyCode");
+                const sNewCompanyCode = (sCompanyCode === sCurrentCompanyCode) ? null : sCompanyCode;
+                
+                oViewModel.setProperty("/reconciliationDetail/selectedCompanyCode", sNewCompanyCode);
+                
+                // Clear tax code filter when company code is selected (mutually exclusive)
+                if (sNewCompanyCode) {
+                    oViewModel.setProperty("/reconciliationDetail/selectedTaxCode", null);
+                }
+                
+                // Trigger rebind
+                oSmartTable.rebindTable();
+            }
+        },
+
+        /**
+         * Handler for tax code treemap selection - filters table by tax code
+         */
+        onTaxCodeTreemapSelect: function(oEvent) {
+            const oViewModel = this.getView().getModel("view");
+            const oSmartTable = this.byId("documentsSmartTable");
+            
+            if (!oSmartTable || !oViewModel) {
+                return;
+            }
+
+            // Get selected data from treemap
+            const aData = oEvent.getParameter("data");
+            if (aData && aData.length > 0) {
+                const oSelectedData = aData[0];
+                const sTaxCode = oSelectedData.data && oSelectedData.data[0] ? oSelectedData.data[0].TaxCode : null;
+                
+                // Toggle: if same tax code is selected, clear filter; otherwise set it
+                const sCurrentTaxCode = oViewModel.getProperty("/reconciliationDetail/selectedTaxCode");
+                const sNewTaxCode = (sTaxCode === sCurrentTaxCode) ? null : sTaxCode;
+                
+                oViewModel.setProperty("/reconciliationDetail/selectedTaxCode", sNewTaxCode);
+                
+                // Clear company code filter when tax code is selected (mutually exclusive)
+                if (sNewTaxCode) {
+                    oViewModel.setProperty("/reconciliationDetail/selectedCompanyCode", null);
+                }
+                
+                // Trigger rebind
+                oSmartTable.rebindTable();
+            }
         }
     });
 

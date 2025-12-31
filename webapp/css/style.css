@@ -1,9 +1,12 @@
 /* Enter your custom styles here */
 
-/* Make Total Difference NumericContent 30% larger */
-.totalDifferenceNumericContent {
-    transform: scale(1.4);
-    transform-origin: center center;
+/* Total Difference Value - Large centered text */
+.totalDifferenceValue {
+    font-size: 3rem !important;
+    font-weight: bold !important;
+    color: #bb0000 !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
 }
 
 /* Total Difference Card - Active state (red background, white text) */
@@ -19,17 +22,7 @@
     color: #ffffff !important;
 }
 
-.totalDifferenceCardActive .totalDifferenceNumericContent .sapMNCValue,
-.totalDifferenceCardActive .totalDifferenceNumericContent .sapMNCIcon,
-.totalDifferenceCardActive .totalDifferenceNumericContent .sapMNCLargeFont .sapMNCValue,
-.totalDifferenceCardActive .totalDifferenceNumericContent.sapMNCValueStateError .sapMNCValue,
-.totalDifferenceCardActive .totalDifferenceNumericContent .sapMNCValueStateError .sapMNCValue {
-    color: #ffffff !important;
-    fill: #ffffff !important;
-}
-
-.totalDifferenceCardActive .totalDifferenceNumericContent.sapMNCValueStateError .sapMNCIndicator {
-    fill: #ffffff !important;
+.totalDifferenceCardActive .totalDifferenceValue {
     color: #ffffff !important;
 }
 

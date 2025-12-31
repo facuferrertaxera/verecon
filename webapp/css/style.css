@@ -3,7 +3,34 @@
 /* Make Total Difference NumericContent 30% larger */
 .totalDifferenceNumericContent {
     transform: scale(1.4);
-    transform-origin: right center;
+    transform-origin: center center;
+}
+
+/* Total Difference Card - Active state (red background, white text) */
+.totalDifferenceCardActive {
+    background-color: #e53935 !important;
+}
+
+.totalDifferenceCardActive .sapFCardContent {
+    background-color: #e53935 !important;
+}
+
+.totalDifferenceCardActive .sapMTitle {
+    color: #ffffff !important;
+}
+
+.totalDifferenceCardActive .totalDifferenceNumericContent .sapMNCValue,
+.totalDifferenceCardActive .totalDifferenceNumericContent .sapMNCIcon,
+.totalDifferenceCardActive .totalDifferenceNumericContent .sapMNCLargeFont .sapMNCValue,
+.totalDifferenceCardActive .totalDifferenceNumericContent.sapMNCValueStateError .sapMNCValue,
+.totalDifferenceCardActive .totalDifferenceNumericContent .sapMNCValueStateError .sapMNCValue {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+}
+
+.totalDifferenceCardActive .totalDifferenceNumericContent.sapMNCValueStateError .sapMNCIndicator {
+    fill: #ffffff !important;
+    color: #ffffff !important;
 }
 
 /* Make documents table fill available height */

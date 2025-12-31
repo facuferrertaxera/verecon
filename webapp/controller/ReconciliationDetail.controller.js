@@ -661,6 +661,7 @@ sap.ui.define([
         onTotalDifferenceCardPress: function() {
             const oViewModel = this.getView().getModel("view");
             const oSmartTable = this.byId("documentsSmartTable");
+            const oCard = this.byId("totalDifferenceCard");
             
             if (!oSmartTable || !oViewModel) {
                 return;
@@ -669,6 +670,15 @@ sap.ui.define([
             // Toggle the filter state
             const bShowOnlyDifferences = !oViewModel.getProperty("/reconciliationDetail/showOnlyDifferences");
             oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", bShowOnlyDifferences);
+
+            // Update card styling based on state
+            if (oCard) {
+                if (bShowOnlyDifferences) {
+                    oCard.addStyleClass("totalDifferenceCardActive");
+                } else {
+                    oCard.removeStyleClass("totalDifferenceCardActive");
+                }
+            }
 
             // Trigger rebind on SmartTable - this will call onBeforeRebindDocumentsTable
             // which will apply the filter based on the showOnlyDifferences flag

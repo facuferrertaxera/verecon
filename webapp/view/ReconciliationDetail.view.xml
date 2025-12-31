@@ -132,7 +132,7 @@
                         </f:Card>
                         
                         <!-- Total Difference Card -->
-                        <f:Card height="220px" press="onTotalDifferenceCardPress" semanticRole="ListItem" class="{= ${view>/reconciliationDetail/showOnlyDifferences} ? 'totalDifferenceCardActive' : ''}">
+                        <f:Card id="totalDifferenceCard" height="220px" press="onTotalDifferenceCardPress" semanticRole="ListItem">
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 2" />
                             </f:layoutData>

@@ -137,9 +137,9 @@
                                 <cssgrid:GridItemLayoutData gridColumn="span 2" />
                             </f:layoutData>
                             <f:content>
-                                <VBox width="100%" height="100%" class="sapUiSmallMargin">
+                                <VBox width="100%" height="100%" class="sapUiSmallMargin totalDifferenceCardContent">
                                     <Title text="{i18n>reconciliationDetail.TotalDifference}" titleStyle="H6" class="sapUiTinyMarginBottom" />
-                                    <VBox justifyContent="Center" alignItems="Center" width="100%" height="100%" class="sapUiTinyMarginTop">
+                                    <VBox justifyContent="Center" alignItems="Center" width="100%" class="totalDifferenceValueContainer">
                                         <Text 
                                             text="{path: 'view>/reconciliationDetail/totalDifference/value', formatter: '.formatter.formatNumberWithScale'}" 
                                             class="totalDifferenceValue" />

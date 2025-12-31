@@ -1,5 +1,20 @@
 /* Enter your custom styles here */
 
+/* Total Difference Card Content - Flex layout */
+.totalDifferenceCardContent {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Total Difference Value Container - Takes remaining space and centers content */
+.totalDifferenceValueContainer {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 0 !important;
+}
+
 /* Total Difference Value - Large centered text */
 .totalDifferenceValue {
     font-size: 3rem !important;
@@ -7,6 +22,7 @@
     color: #bb0000 !important;
     text-align: center !important;
     line-height: 1.2 !important;
+    width: 100% !important;
 }
 
 /* Total Difference Card - Active state (red background, white text) */

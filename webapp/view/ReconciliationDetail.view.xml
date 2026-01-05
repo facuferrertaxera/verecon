@@ -73,8 +73,7 @@
                                     height="100%" 
                                     width="100%" 
                                     vizType="treemap"
-                                    legendVisible="false" 
-                                    class="sapUiNoMargin">
+                                    legendVisible="false">
                                     <viz:dataset>
                                         <viz.data:FlattenedDataset data="{view>/reconciliationDetail/treemapData/companyCodes}">
                                             <viz.data:dimensions>
@@ -109,8 +108,7 @@
                                     height="100%" 
                                     width="100%" 
                                     vizType="treemap"
-                                    legendVisible="false"
-                                    class="sapUiNoMargin">
+                                    legendVisible="false">
                                     <viz:dataset>
                                         <viz.data:FlattenedDataset data="{view>/reconciliationDetail/treemapData/taxCodes}">
                                             <viz.data:dimensions>

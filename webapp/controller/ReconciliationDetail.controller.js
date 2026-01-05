@@ -87,15 +87,6 @@ sap.ui.define([
 
             if (oCompanyCodeTreemap) {
                 oCompanyCodeTreemap.setVizProperties({
-                    general: {
-                        layout: {
-                            isFixedPadding: false,
-                            paddingLeft: 0,
-                            paddingRight: 0,
-                            paddingTop: 0,
-                            paddingBottom: 0
-                        }
-                    },
                     plotArea: {
                         dataLabel: {
                             visible: true,
@@ -119,15 +110,6 @@ sap.ui.define([
 
             if (oTaxCodeTreemap) {
                 oTaxCodeTreemap.setVizProperties({
-                    general: {
-                        layout: {
-                            isFixedPadding: false,
-                            paddingLeft: 0,
-                            paddingRight: 0,
-                            paddingTop: 0,
-                            paddingBottom: 0
-                        }
-                    },
                     plotArea: {
                         dataLabel: {
                             visible: true,

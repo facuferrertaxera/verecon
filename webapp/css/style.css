@@ -10,8 +10,8 @@
 .totalDifferenceValueContainer {
     flex: 1 1 auto !important;
     display: flex !important;
-    justify-content: center !important;
     align-items: center !important;
+    justify-content: center !important;
     min-height: 0 !important;
 }
 

@@ -1,6 +1,5 @@
 sap.ui.define([
-    "sap/ui/core/Fragment",
-    "sap/ui/core/library",
+    "sap/ui/model/json/JSONModel",
     "sap/m/MessageBox",
     "sap/m/MessageToast",
     "sap/ui/model/Filter",
@@ -10,10 +9,8 @@ sap.ui.define([
     "sap/m/Text",
     "sap/m/Label",
     "sap/m/ColumnListItem",
-    "sap/m/Token",
-    "sap/m/VariantItem",
-    "sap/m/library"
-], function (Fragment, library, MessageBox, MessageToast, Filter, FilterOperator, UITableColumn, MColumn, Text, Label, ColumnListItem, Token, VariantItem, mLibrary) {
+    "sap/m/Token"
+], function (JSONModel, MessageBox, MessageToast, Filter, FilterOperator, UITableColumn, MColumn, Text, Label, ColumnListItem, Token) {
     "use strict";
 
     return {
@@ -30,7 +27,7 @@ sap.ui.define([
 
             const oViewModel = oView.getModel("view");
             if (!oViewModel) {
-                oView.setModel(new sap.ui.model.json.JSONModel(), "view");
+                oView.setModel(new JSONModel(), "view");
             }
             
             oReconciliationDialog.open();

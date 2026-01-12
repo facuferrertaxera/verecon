@@ -31,6 +31,8 @@
           "semanticObject": "vr_ecsl",
           "action": "reconcile",
           "title": "{{vr_ecsl-reconcile.flpTitle}}",
+          "info": "{{vr_ecsl-reconcile.flpInfo}}",
+          "icon": "sap-icon://compare-2",
           "signature": {
             "parameters": {},
             "additionalParameters": "allowed"

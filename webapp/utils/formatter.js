@@ -275,6 +275,22 @@ sap.ui.define([
             else {
                 return fValue.toString();
             }
+        },
+
+        /**
+         * Format currency value with EUR
+         * @param {number} fValue - Currency value
+         * @returns {string} Formatted currency string
+         */
+        formatCurrency: function(fValue) {
+            if (fValue === null || fValue === undefined || isNaN(fValue)) {
+                return "EUR 0.00";
+            }
+            
+            // Format with 2 decimal places
+            const fFormatted = Math.abs(fValue).toFixed(2);
+            const sSign = fValue < 0 ? "-" : "";
+            return "EUR " + sSign + fFormatted;
         }
     };
 });

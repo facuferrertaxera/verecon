@@ -16,10 +16,7 @@
     xmlns:m="sap.m"
     xmlns:smartVariant="sap.ui.comp.smartvariants.SmartVariantManagement"
     xmlns:mc="sap.suite.ui.microchart"
-    xmlns:customData="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
-    xmlns:viz="sap.viz.ui5.controls"
-    xmlns:viz.data="sap.viz.ui5.data"
-    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds">
+    xmlns:customData="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
     <f:DynamicPage headerExpanded="{view>/reconciliationDetail/headerExpanded}" toggleHeaderOnTitleClick="{view>/reconciliationDetail/titleClickable}" class="sapUiNoContentPadding" height="100%">
         <!-- DynamicPage Header -->
         <f:header>
@@ -61,73 +58,136 @@
                             </f:content>
                         </f:Card>
                         
-                        <!-- Company Code Differences Treemap Card -->
+                        <!-- Document Status Donut Chart Card -->
                         <f:Card class="sapUiNoContentPadding" height="220px">
                             <f:layoutData>
                                 <cssgrid:GridItemLayoutData gridColumn="span 3" />
                             </f:layoutData>
                             <f:content>
-                                <viz:VizFrame 
-                                    id="companyCodeTreemap"
-                                    uiConfig="{applicationSet:'fiori'}"
-                                    height="100%" 
-                                    width="100%" 
-                                    vizType="treemap"
-                                    legendVisible="false">
-                                    <viz:dataset>
-                                        <viz.data:FlattenedDataset data="{view>/reconciliationDetail/treemapData/companyCodes}">
-                                            <viz.data:dimensions>
-                                                <viz.data:DimensionDefinition name="CompanyCode" value="{CompanyCode}" />
-                                            </viz.data:dimensions>
-                                            <viz.data:measures>
-                                                <viz.data:MeasureDefinition name="Differences" value="{DiffGrossAmount}" />
-                                            </viz.data:measures>
-                                        </viz.data:FlattenedDataset>
-                                    </viz:dataset>
-                                    <viz:feeds>
-                                        <viz.feeds:FeedItem uid="color" type="Measure" values="Differences" />
-                                        <viz.feeds:FeedItem uid="weight" type="Measure" values="Differences" />
-                                        <viz.feeds:FeedItem uid="title" type="Dimension" values="CompanyCode" />
-                                    </viz:feeds>
-                                    <viz:dependents>
-                                        <viz:Popover id="companyCodeTreemapPopover"></viz:Popover>
-                                    </viz:dependents>
-                                </viz:VizFrame>
+                                <VBox class="sapUiMediumMargin" width="100%" height="100%">
+                                    <Title text="{i18n>reconciliationDetail.DocumentStatus}" titleStyle="H4" class="sapUiSmallMarginBottom" />
+                                    <HBox width="100%" height="100%" alignItems="Center" justifyContent="SpaceBetween">
+                                        <mc:InteractiveDonutChart 
+                                            id="documentStatusDonutChart"
+                                            press="onDonutChartPress"
+                                            showLabel="true"
+                                            displayedSegments="4"
+                                            size="Responsive"
+                                            segments="{view>/reconciliationDetail/donutChartData/segments}">
+                                            <mc:segments>
+                                                <mc:InteractiveDonutChartSegment 
+                                                    label="{view>label}" 
+                                                    value="{view>value}" 
+                                                    displayedValue="{view>displayedValue}" />
+                                            </mc:segments>
+                                        </mc:InteractiveDonutChart>
+                                        <VBox class="sapUiSmallMarginBegin" width="50%">
+                                            <VBox items="{view>/reconciliationDetail/donutChartData/segments}">
+                                                <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                                    <core:Icon src="sap-icon://circle-task" size="0.75rem" color="#0070F2" class="sapUiTinyMarginEnd" />
+                                                    <Label text="{view>label}" />
+                                                    <Text text="{view>value}" class="sapUiTinyMarginBegin" />
+                                                </HBox>
+                                            </VBox>
+                                        </VBox>
+                                    </HBox>
+                                </VBox>
                             </f:content>
                         </f:Card>
                         
-                        <!-- Tax Code Differences Treemap Card -->
-                        <f:Card class="sapUiNoContentPadding" height="220px">
+                        <!-- Documents not in EC Sales List Card -->
+                        <f:Card id="notInEcslCard" height="220px" press="onStatusCardPress" semanticRole="ListItem">
                             <f:layoutData>
-                                <cssgrid:GridItemLayoutData gridColumn="span 4" />
+                                <cssgrid:GridItemLayoutData gridColumn="span 2" />
                             </f:layoutData>
+                            <f:customData>
+                                <core:CustomData key="statusFilter" value="NOT_IN_ECSL" />
+                            </f:customData>
                             <f:content>
-                                <viz:VizFrame 
-                                    id="taxCodeTreemap"
-                                    uiConfig="{applicationSet:'fiori'}"
-                                    height="100%" 
-                                    width="100%" 
-                                    vizType="treemap"
-                                    legendVisible="false">
-                                    <viz:dataset>
-                                        <viz.data:FlattenedDataset data="{view>/reconciliationDetail/treemapData/taxCodes}">
-                                            <viz.data:dimensions>
-                                                <viz.data:DimensionDefinition name="TaxCode" value="{TaxCode}" />
-                                            </viz.data:dimensions>
-                                            <viz.data:measures>
-                                                <viz.data:MeasureDefinition name="Differences" value="{DiffGrossAmount}" />
-                                            </viz.data:measures>
-                                        </viz.data:FlattenedDataset>
-                                    </viz:dataset>
-                                    <viz:feeds>
-                                        <viz.feeds:FeedItem uid="color" type="Measure" values="Differences" />
-                                        <viz.feeds:FeedItem uid="weight" type="Measure" values="Differences" />
-                                        <viz.feeds:FeedItem uid="title" type="Dimension" values="TaxCode" />
-                                    </viz:feeds>
-                                    <viz:dependents>
-                                        <viz:Popover id="taxCodeTreemapPopover"></viz:Popover>
-                                    </viz:dependents>
-                                </viz:VizFrame>
+                                <VBox width="100%" height="100%" class="sapUiSmallMargin">
+                                    <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                                        <core:Icon src="sap-icon://circle-task" size="1.5rem" color="#0070F2" class="sapUiTinyMarginEnd" />
+                                        <Title text="{i18n>reconciliationDetail.NotInEcsl}" titleStyle="H6" />
+                                    </HBox>
+                                    <VBox class="sapUiSmallMarginTop">
+                                        <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiTinyMarginBottom">
+                                            <Label text="{i18n>reconciliationDetail.Total}" design="Bold" />
+                                            <Text 
+                                                text="{path: 'view>/reconciliationDetail/statusCards/notInEcsl/total', formatter: '.formatter.formatCurrency'}" 
+                                                class="sapUiTinyMarginBegin" />
+                                        </HBox>
+                                        <HBox justifyContent="SpaceBetween" alignItems="Center">
+                                            <Label text="{i18n>reconciliationDetail.Count}" design="Bold" />
+                                            <Text 
+                                                text="{view>/reconciliationDetail/statusCards/notInEcsl/count}" 
+                                                class="sapUiTinyMarginBegin statusCardCount" />
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+                            </f:content>
+                        </f:Card>
+                        
+                        <!-- Documents not in VAT Return Card -->
+                        <f:Card id="notInVatrCard" height="220px" press="onStatusCardPress" semanticRole="ListItem">
+                            <f:layoutData>
+                                <cssgrid:GridItemLayoutData gridColumn="span 2" />
+                            </f:layoutData>
+                            <f:customData>
+                                <core:CustomData key="statusFilter" value="NOT_IN_VATR" />
+                            </f:customData>
+                            <f:content>
+                                <VBox width="100%" height="100%" class="sapUiSmallMargin">
+                                    <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                                        <core:Icon src="sap-icon://circle-task" size="1.5rem" color="#0070F2" class="sapUiTinyMarginEnd" />
+                                        <Title text="{i18n>reconciliationDetail.NotInVatr}" titleStyle="H6" />
+                                    </HBox>
+                                    <VBox class="sapUiSmallMarginTop">
+                                        <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiTinyMarginBottom">
+                                            <Label text="{i18n>reconciliationDetail.Total}" design="Bold" />
+                                            <Text 
+                                                text="{path: 'view>/reconciliationDetail/statusCards/notInVatr/total', formatter: '.formatter.formatCurrency'}" 
+                                                class="sapUiTinyMarginBegin" />
+                                        </HBox>
+                                        <HBox justifyContent="SpaceBetween" alignItems="Center">
+                                            <Label text="{i18n>reconciliationDetail.Count}" design="Bold" />
+                                            <Text 
+                                                text="{view>/reconciliationDetail/statusCards/notInVatr/count}" 
+                                                class="sapUiTinyMarginBegin statusCardCount" />
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
+                            </f:content>
+                        </f:Card>
+                        
+                        <!-- Mismatched Documents Card -->
+                        <f:Card id="mismatchedCard" height="220px" press="onStatusCardPress" semanticRole="ListItem">
+                            <f:layoutData>
+                                <cssgrid:GridItemLayoutData gridColumn="span 2" />
+                            </f:layoutData>
+                            <f:customData>
+                                <core:CustomData key="statusFilter" value="MISMATCHED" />
+                            </f:customData>
+                            <f:content>
+                                <VBox width="100%" height="100%" class="sapUiSmallMargin">
+                                    <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                                        <core:Icon src="sap-icon://status-error" size="1.5rem" color="#0070F2" class="sapUiTinyMarginEnd" />
+                                        <Title text="{i18n>reconciliationDetail.Mismatched}" titleStyle="H6" />
+                                    </HBox>
+                                    <VBox class="sapUiSmallMarginTop">
+                                        <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiTinyMarginBottom">
+                                            <Label text="{i18n>reconciliationDetail.Total}" design="Bold" />
+                                            <Text 
+                                                text="{path: 'view>/reconciliationDetail/statusCards/mismatched/total', formatter: '.formatter.formatCurrency'}" 
+                                                class="sapUiTinyMarginBegin" />
+                                        </HBox>
+                                        <HBox justifyContent="SpaceBetween" alignItems="Center">
+                                            <Label text="{i18n>reconciliationDetail.Count}" design="Bold" />
+                                            <Text 
+                                                text="{view>/reconciliationDetail/statusCards/mismatched/count}" 
+                                                class="sapUiTinyMarginBegin statusCardCount" />
+                                        </HBox>
+                                    </VBox>
+                                </VBox>
                             </f:content>
                         </f:Card>
                         

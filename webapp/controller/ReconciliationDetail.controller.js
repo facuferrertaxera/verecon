@@ -34,18 +34,30 @@ sap.ui.define([
                             points: []
                         }
                     },
-                    treemapData: {
-                        companyCodes: [],
-                        taxCodes: []
-                    },
                     totalDifference: {
                         value: 0,
                         scale: "EUR",
                         text: "Total Difference"
                     },
-                    showOnlyDifferences: false,
-                    selectedCompanyCodes: [],
-                    selectedTaxCodes: []
+                    donutChartData: {
+                        segments: []
+                    },
+                    statusCards: {
+                        notInEcsl: {
+                            count: 0,
+                            total: 0
+                        },
+                        notInVatr: {
+                            count: 0,
+                            total: 0
+                        },
+                        mismatched: {
+                            count: 0,
+                            total: 0
+                        }
+                    },
+                    selectedStatusFilter: null,
+                    showOnlyDifferences: false
                 }
             });
             this.getView().setModel(oViewModel, "view");
@@ -61,74 +73,10 @@ sap.ui.define([
             this._loadAvailableCountries();
             this._loadAvailableCompanyCodes();
 
-            // Initialize treemap data with mock data
-            this._setMockTreemapData();
-
             // Get router and attach route matched handler
             const oRouter = this.getRouter();
             if (oRouter) {
                 oRouter.getRoute("ReconciliationDetail").attachPatternMatched(this._onRouteMatched, this);
-            }
-
-            // Configure VizFrames after view is rendered
-            this.getView().addEventDelegate({
-                onAfterRendering: () => {
-                    this._configureTreemaps();
-                }
-            }, this);
-        },
-
-        /**
-         * Configure treemap VizFrames to hide titles and format currency
-         */
-        _configureTreemaps: function() {
-            const oCompanyCodeTreemap = this.byId("companyCodeTreemap");
-            const oTaxCodeTreemap = this.byId("taxCodeTreemap");
-
-            if (oCompanyCodeTreemap) {
-                oCompanyCodeTreemap.setVizProperties({
-                    plotArea: {
-                        dataLabel: {
-                            visible: true,
-                            formatString: "#,##0.00 EUR"
-                        }
-                    },
-                    title: {
-                        visible: false
-                    },
-                    valueAxis: {
-                        label: {
-                            formatString: "#,##0.00 EUR"
-                        }
-                    }
-                });
-                
-                // Add click handlers for company code treemap (both select and deselect)
-                oCompanyCodeTreemap.attachSelectData(this.onCompanyCodeTreemapSelect.bind(this));
-                oCompanyCodeTreemap.attachDeselectData(this.onCompanyCodeTreemapDeselect.bind(this));
-            }
-
-            if (oTaxCodeTreemap) {
-                oTaxCodeTreemap.setVizProperties({
-                    plotArea: {
-                        dataLabel: {
-                            visible: true,
-                            formatString: "#,##0.00 EUR"
-                        }
-                    },
-                    title: {
-                        visible: false
-                    },
-                    valueAxis: {
-                        label: {
-                            formatString: "#,##0.00 EUR"
-                        }
-                    }
-                });
-                
-                // Add click handlers for tax code treemap (both select and deselect)
-                oTaxCodeTreemap.attachSelectData(this.onTaxCodeTreemapSelect.bind(this));
-                oTaxCodeTreemap.attachDeselectData(this.onTaxCodeTreemapDeselect.bind(this));
             }
         },
 
@@ -167,11 +115,13 @@ sap.ui.define([
                         // Populate tokenizers with reconciliation data
                         this._populateReconciliationDetails();
                         
-                        // After reconciliation is loaded, bind the SmartTable and load treemap data
+                        // After reconciliation is loaded, bind the SmartTable and load totals
                         this._bindDocumentsTable(sReconciliationPath);
                         
-                        // Load treemap data once from the full unfiltered dataset
-                        this._loadTreemapDataOnce(sReconciliationPath);
+                        // Load total difference, donut chart, and status card data from the full unfiltered dataset
+                        this._loadTotalDifference(sReconciliationPath);
+                        this._loadDonutChartData(sReconciliationPath);
+                        this._loadStatusCardData(sReconciliationPath);
                     },
                     change: (oEvent) => {
                         // Handle binding errors
@@ -206,21 +156,24 @@ sap.ui.define([
             // Get filter flags from view model
             const oViewModel = this.getView().getModel("view");
             const bShowOnlyDifferences = oViewModel ? oViewModel.getProperty("/reconciliationDetail/showOnlyDifferences") : false;
-            const aSelectedCompanyCodes = oViewModel ? (oViewModel.getProperty("/reconciliationDetail/selectedCompanyCodes") || []) : [];
-            const aSelectedTaxCodes = oViewModel ? (oViewModel.getProperty("/reconciliationDetail/selectedTaxCodes") || []) : [];
+            const sSelectedStatusFilter = oViewModel ? oViewModel.getProperty("/reconciliationDetail/selectedStatusFilter") : null;
             
-            // Remove any existing custom filters (DiffGrossAmount, CompanyCode, TaxCode)
+            // Remove any existing custom filters (DiffGrossAmount, EcslGrossAmount, VatrGrossAmount, Status)
             aFilters = aFilters.filter(function(oFilter) {
                 // Check if this is one of our custom filters
-                if (oFilter.sPath === "DiffGrossAmount" || oFilter.sPath === "CompanyCode" || oFilter.sPath === "TaxCode") {
+                if (oFilter.sPath === "DiffGrossAmount" || oFilter.sPath === "EcslGrossAmount" || 
+                    oFilter.sPath === "VatrGrossAmount" || oFilter.sPath === "Status" || 
+                    oFilter.sPath === "StatusText") {
                     return false;
                 }
                 // Check if it's a composite filter containing our custom filters
                 if (oFilter.aFilters && Array.isArray(oFilter.aFilters)) {
                     const bContainsCustomFilter = oFilter.aFilters.some(function(oSubFilter) {
                         return oSubFilter.sPath === "DiffGrossAmount" || 
-                               oSubFilter.sPath === "CompanyCode" || 
-                               oSubFilter.sPath === "TaxCode";
+                               oSubFilter.sPath === "EcslGrossAmount" || 
+                               oSubFilter.sPath === "VatrGrossAmount" || 
+                               oSubFilter.sPath === "Status" || 
+                               oSubFilter.sPath === "StatusText";
                     });
                     if (bContainsCustomFilter && oFilter.aFilters.length === 1) {
                         return false; // Remove if it's a single-filter composite
@@ -235,33 +188,27 @@ sap.ui.define([
                 aFilters.push(oDiffFilter);
             }
             
-            // Add CompanyCode filter if any are selected (IN filter for multiple values)
-            if (aSelectedCompanyCodes.length > 0) {
-                const aCompanyCodeFilters = aSelectedCompanyCodes.map(function(sCompanyCode) {
-                    return new Filter("CompanyCode", FilterOperator.EQ, sCompanyCode);
-                });
-                if (aCompanyCodeFilters.length === 1) {
-                    aFilters.push(aCompanyCodeFilters[0]);
-                } else if (aCompanyCodeFilters.length > 1) {
-                    // Multiple company codes - use OR filter
+            // Add status filter if a status card is selected
+            if (sSelectedStatusFilter) {
+                if (sSelectedStatusFilter === "NOT_IN_ECSL") {
+                    // Not in EC Sales List: Status = "NE"
+                    const oStatusFilter = new Filter("Status", FilterOperator.EQ, "NE");
+                    aFilters.push(oStatusFilter);
+                } else if (sSelectedStatusFilter === "NOT_IN_VATR") {
+                    // Not in VAT Return: Status = "NV"
+                    const oStatusFilter = new Filter("Status", FilterOperator.EQ, "NV");
+                    aFilters.push(oStatusFilter);
+                } else if (sSelectedStatusFilter === "MISMATCHED") {
+                    // Mismatched Documents: Status = "E" (Error)
+                    const oStatusFilter = new Filter("Status", FilterOperator.EQ, "E");
+                    aFilters.push(oStatusFilter);
+                } else if (sSelectedStatusFilter === "RECONCILED") {
+                    // Reconciled: Status starts with "S" - create OR filter for common S statuses
+                    const aSStatusFilters = ["S", "SR", "SV", "ST", "SX", "SS"].map(function(sStatus) {
+                        return new Filter("Status", FilterOperator.EQ, sStatus);
+                    });
                     aFilters.push(new Filter({
-                        filters: aCompanyCodeFilters,
-                        and: false
-                    }));
-                }
-            }
-            
-            // Add TaxCode filter if any are selected (IN filter for multiple values)
-            if (aSelectedTaxCodes.length > 0) {
-                const aTaxCodeFilters = aSelectedTaxCodes.map(function(sTaxCode) {
-                    return new Filter("TaxCode", FilterOperator.EQ, sTaxCode);
-                });
-                if (aTaxCodeFilters.length === 1) {
-                    aFilters.push(aTaxCodeFilters[0]);
-                } else if (aTaxCodeFilters.length > 1) {
-                    // Multiple tax codes - use OR filter
-                    aFilters.push(new Filter({
-                        filters: aTaxCodeFilters,
+                        filters: aSStatusFilters,
                         and: false
                     }));
                 }
@@ -277,7 +224,6 @@ sap.ui.define([
                 },
                 dataReceived: (oEvent) => {
                     this.getView().setBusy(false);
-                    // Don't recalculate treemap data here - it should only be loaded once on route matched
                 }
             };
         },
@@ -297,211 +243,179 @@ sap.ui.define([
         },
 
         /**
-         * Load treemap data once from the full unfiltered dataset
+         * Load total difference from the full unfiltered dataset
          * This should only be called once when route is matched
          */
-        _loadTreemapDataOnce: async function(sReconciliationPath) {
-            try {
-                // Read all documents without any filters to populate treemaps
-                const oResponse = await this.promRead(`${sReconciliationPath}/to_Document`, {
-                    urlParameters: {
-                        "$select": "CompanyCode,TaxCode,DiffGrossAmount"
-                    }
-                });
-                
-                if (oResponse && oResponse.results) {
-                    this._populateTreemapDataFromResults(oResponse.results);
-                } else {
-                    // Fallback to mock data
-                    this._setMockTreemapData();
-                }
-            } catch (oError) {
-                console.error("Error loading treemap data:", oError);
-                // Fallback to mock data
-                this._setMockTreemapData();
-            }
-        },
-
-        /**
-         * Populate treemap data from results array (used for initial load)
-         */
-        _populateTreemapDataFromResults: function(aResults) {
-            const mCompanyCodeAggregation = {};
-            const mTaxCodeAggregation = {};
-            let fTotalDifference = 0;
-
-            // Aggregate by CompanyCode and TaxCode
-            aResults.forEach((oDocument) => {
-                if (!oDocument) {
-                    return;
-                }
-
-                const sCompanyCode = oDocument.CompanyCode || "Unknown";
-                const sTaxCode = oDocument.TaxCode || "Unknown";
-                const fDiffAmount = Math.abs(oDocument.DiffGrossAmount || 0);
-                
-                // Sum total difference (use absolute value for total)
-                fTotalDifference += fDiffAmount;
-
-                // Aggregate by CompanyCode
-                if (!mCompanyCodeAggregation[sCompanyCode]) {
-                    mCompanyCodeAggregation[sCompanyCode] = {
-                        CompanyCode: sCompanyCode,
-                        DiffGrossAmount: 0,
-                        Currency: "EUR"
-                    };
-                }
-                mCompanyCodeAggregation[sCompanyCode].DiffGrossAmount += fDiffAmount;
-
-                // Aggregate by TaxCode
-                if (!mTaxCodeAggregation[sTaxCode]) {
-                    mTaxCodeAggregation[sTaxCode] = {
-                        TaxCode: sTaxCode,
-                        DiffGrossAmount: 0,
-                        Currency: "EUR"
-                    };
-                }
-                mTaxCodeAggregation[sTaxCode].DiffGrossAmount += fDiffAmount;
-            });
-
-            // Convert to arrays and update view model
-            const aCompanyCodes = Object.values(mCompanyCodeAggregation);
-            const aTaxCodes = Object.values(mTaxCodeAggregation);
-
-            // If no data, use mock data for demonstration
-            if (aCompanyCodes.length === 0 && aTaxCodes.length === 0) {
-                this._setMockTreemapData();
+        _loadTotalDifference: function(sReconciliationPath) {
+            const oModel = this.getModel();
+            if (!oModel) {
                 return;
             }
 
-            const oViewModel = this.getView().getModel("view");
-            if (oViewModel) {
-                oViewModel.setProperty("/reconciliationDetail/treemapData/companyCodes", aCompanyCodes);
-                oViewModel.setProperty("/reconciliationDetail/treemapData/taxCodes", aTaxCodes);
-                
-                // Update total difference
-                oViewModel.setProperty("/reconciliationDetail/totalDifference/value", fTotalDifference);
-            }
-        },
-
-        /**
-         * Aggregate document data for treemap visualizations
-         */
-        _populateTreemapData: function() {
-            const oTable = this.byId("documentsTable");
-            if (!oTable) {
-                return;
-            }
-
-            const oBinding = oTable.getBinding("rows");
-            if (!oBinding) {
-                // If no binding yet, use mock data
-                this._setMockTreemapData();
-                return;
-            }
-
-            const aContexts = oBinding.getContexts();
-            const mCompanyCodeAggregation = {};
-            const mTaxCodeAggregation = {};
-            let fTotalDifference = 0;
-
-            // Aggregate by CompanyCode and TaxCode
-            aContexts.forEach((oContext) => {
-                if (oContext) {
-                    const oDocument = oContext.getObject();
-                    if (!oDocument) {
-                        return;
+            // Read all documents without any filters to calculate total difference
+            oModel.read(`${sReconciliationPath}/to_Document`, {
+                urlParameters: {
+                    "$select": "DiffGrossAmount"
+                },
+                success: (oResponse) => {
+                    if (oResponse && oResponse.results) {
+                        let fTotalDifference = 0;
+                        oResponse.results.forEach((oDocument) => {
+                            if (oDocument) {
+                                // Use absolute value for total difference
+                                fTotalDifference += Math.abs(oDocument.DiffGrossAmount || 0);
+                            }
+                        });
+                        
+                        const oViewModel = this.getView().getModel("view");
+                        if (oViewModel) {
+                            oViewModel.setProperty("/reconciliationDetail/totalDifference/value", fTotalDifference);
+                        }
                     }
-
-                    const sCompanyCode = oDocument.CompanyCode || "Unknown";
-                    const sTaxCode = oDocument.TaxCode || "Unknown";
-                    const fDiffAmount = Math.abs(oDocument.DiffGrossAmount || 0);
-                    
-                    // Sum total difference (use absolute value for total)
-                    fTotalDifference += fDiffAmount;
-
-                    // Aggregate by CompanyCode
-                    if (!mCompanyCodeAggregation[sCompanyCode]) {
-                        mCompanyCodeAggregation[sCompanyCode] = {
-                            CompanyCode: sCompanyCode,
-                            DiffGrossAmount: 0,
-                            Currency: "EUR"
-                        };
-                    }
-                    mCompanyCodeAggregation[sCompanyCode].DiffGrossAmount += fDiffAmount;
-
-                    // Aggregate by TaxCode
-                    if (!mTaxCodeAggregation[sTaxCode]) {
-                        mTaxCodeAggregation[sTaxCode] = {
-                            TaxCode: sTaxCode,
-                            DiffGrossAmount: 0,
-                            Currency: "EUR"
-                        };
-                    }
-                    mTaxCodeAggregation[sTaxCode].DiffGrossAmount += fDiffAmount;
+                },
+                error: (oError) => {
+                    console.error("Error loading total difference:", oError);
                 }
             });
-
-            // Convert to arrays and update view model
-            const aCompanyCodes = Object.values(mCompanyCodeAggregation);
-            const aTaxCodes = Object.values(mTaxCodeAggregation);
-
-            // If no data, use mock data for demonstration
-            if (aCompanyCodes.length === 0 && aTaxCodes.length === 0) {
-                this._setMockTreemapData();
-                return;
-            }
-
-            const oViewModel = this.getView().getModel("view");
-            if (oViewModel) {
-                oViewModel.setProperty("/reconciliationDetail/treemapData/companyCodes", aCompanyCodes);
-                oViewModel.setProperty("/reconciliationDetail/treemapData/taxCodes", aTaxCodes);
-                
-                // Update total difference
-                oViewModel.setProperty("/reconciliationDetail/totalDifference/value", fTotalDifference);
-            }
         },
 
         /**
-         * Set mock data for treemap visualizations
+         * Load donut chart data from the full unfiltered dataset
+         * This should only be called once when route is matched
          */
-        _setMockTreemapData: function() {
-            const aCompanyCodes = [
-                { CompanyCode: "TXNO", DiffGrossAmount: 15000, Currency: "EUR" },
-                { CompanyCode: "TXDE", DiffGrossAmount: 12000, Currency: "EUR" },
-                { CompanyCode: "TXFR", DiffGrossAmount: 9500, Currency: "EUR" },
-                { CompanyCode: "TXSE", DiffGrossAmount: 8500, Currency: "EUR" },
-                { CompanyCode: "TXIT", DiffGrossAmount: 11000, Currency: "EUR" },
-                { CompanyCode: "TXES", DiffGrossAmount: 7200, Currency: "EUR" },
-                { CompanyCode: "TXNL", DiffGrossAmount: 6800, Currency: "EUR" }
-            ];
-
-            const aTaxCodes = [
-                { TaxCode: "A1", DiffGrossAmount: 8000, Currency: "EUR" },
-                { TaxCode: "B2", DiffGrossAmount: 12000, Currency: "EUR" },
-                { TaxCode: "C3", DiffGrossAmount: 6500, Currency: "EUR" },
-                { TaxCode: "D4", DiffGrossAmount: 11000, Currency: "EUR" },
-                { TaxCode: "E5", DiffGrossAmount: 4500, Currency: "EUR" },
-                { TaxCode: "F6", DiffGrossAmount: 9500, Currency: "EUR" },
-                { TaxCode: "G7", DiffGrossAmount: 7800, Currency: "EUR" },
-                { TaxCode: "H8", DiffGrossAmount: 6200, Currency: "EUR" },
-                { TaxCode: "I9", DiffGrossAmount: 10500, Currency: "EUR" },
-                { TaxCode: "J10", DiffGrossAmount: 8800, Currency: "EUR" },
-                { TaxCode: "K11", DiffGrossAmount: 5400, Currency: "EUR" },
-                { TaxCode: "L12", DiffGrossAmount: 11200, Currency: "EUR" },
-                { TaxCode: "M13", DiffGrossAmount: 6900, Currency: "EUR" },
-                { TaxCode: "N14", DiffGrossAmount: 5100, Currency: "EUR" }
-            ];
-
-            // Calculate total difference from company codes (sum of all differences)
-            const fTotalDifference = aCompanyCodes.reduce((fSum, oItem) => fSum + (oItem.DiffGrossAmount || 0), 0);
-
-            const oViewModel = this.getView().getModel("view");
-            if (oViewModel) {
-                oViewModel.setProperty("/reconciliationDetail/treemapData/companyCodes", aCompanyCodes);
-                oViewModel.setProperty("/reconciliationDetail/treemapData/taxCodes", aTaxCodes);
-                oViewModel.setProperty("/reconciliationDetail/totalDifference/value", fTotalDifference);
+        _loadDonutChartData: function(sReconciliationPath) {
+            const oModel = this.getModel();
+            if (!oModel) {
+                return;
             }
+
+            // Read all documents without any filters to calculate donut chart data
+            oModel.read(`${sReconciliationPath}/to_Document`, {
+                urlParameters: {
+                    "$select": "Status,StatusText"
+                },
+                success: (oResponse) => {
+                    if (oResponse && oResponse.results) {
+                        const mStatusCounts = {
+                            "S": 0,  // Reconciled
+                            "NE": 0, // Not in ECSL
+                            "NV": 0, // Not in VAT Return
+                            "E": 0   // Error
+                        };
+
+                        // Count documents by status
+                        oResponse.results.forEach((oDocument) => {
+                            if (!oDocument) {
+                                return;
+                            }
+
+                            const sStatus = oDocument.Status || "";
+                            if (mStatusCounts.hasOwnProperty(sStatus)) {
+                                mStatusCounts[sStatus]++;
+                            } else if (sStatus && sStatus.indexOf("S") === 0) {
+                                // Any status starting with S is considered Reconciled
+                                mStatusCounts["S"]++;
+                            }
+                        });
+
+                        // Create segments array for donut chart
+                        const aSegments = [
+                            {
+                                label: "Reconciled",
+                                value: mStatusCounts["S"],
+                                displayedValue: mStatusCounts["S"].toString(),
+                                status: "S"
+                            },
+                            {
+                                label: "Not in ECSL",
+                                value: mStatusCounts["NE"],
+                                displayedValue: mStatusCounts["NE"].toString(),
+                                status: "NE"
+                            },
+                            {
+                                label: "Not in VAT Return",
+                                value: mStatusCounts["NV"],
+                                displayedValue: mStatusCounts["NV"].toString(),
+                                status: "NV"
+                            },
+                            {
+                                label: "Error",
+                                value: mStatusCounts["E"],
+                                displayedValue: mStatusCounts["E"].toString(),
+                                status: "E"
+                            }
+                        ];
+
+                        const oViewModel = this.getView().getModel("view");
+                        if (oViewModel) {
+                            oViewModel.setProperty("/reconciliationDetail/donutChartData/segments", aSegments);
+                        }
+                    }
+                },
+                error: (oError) => {
+                    console.error("Error loading donut chart data:", oError);
+                }
+            });
+        },
+
+        /**
+         * Load status card data from the full unfiltered dataset
+         * This should only be called once when route is matched
+         */
+        _loadStatusCardData: function(sReconciliationPath) {
+            const oModel = this.getModel();
+            if (!oModel) {
+                return;
+            }
+
+            // Read all documents without any filters to calculate status card data
+            oModel.read(`${sReconciliationPath}/to_Document`, {
+                urlParameters: {
+                    "$select": "Status,StatusText,DiffGrossAmount"
+                },
+                success: (oResponse) => {
+                    if (oResponse && oResponse.results) {
+                        const mStatusData = {
+                            notInEcsl: { count: 0, total: 0 },
+                            notInVatr: { count: 0, total: 0 },
+                            mismatched: { count: 0, total: 0 }
+                        };
+
+                        oResponse.results.forEach((oDocument) => {
+                            if (!oDocument) {
+                                return;
+                            }
+
+                            const fDiffAmount = oDocument.DiffGrossAmount || 0;
+                            const sStatus = oDocument.Status || "";
+
+                            // Not in EC Sales List: Status = "NE"
+                            if (sStatus === "NE") {
+                                mStatusData.notInEcsl.count++;
+                                mStatusData.notInEcsl.total += fDiffAmount;
+                            }
+                            // Not in VAT Return: Status = "NV"
+                            else if (sStatus === "NV") {
+                                mStatusData.notInVatr.count++;
+                                mStatusData.notInVatr.total += fDiffAmount;
+                            }
+                            // Mismatched Documents: Status = "E" (Error)
+                            else if (sStatus === "E") {
+                                mStatusData.mismatched.count++;
+                                mStatusData.mismatched.total += fDiffAmount;
+                            }
+                        });
+
+                        const oViewModel = this.getView().getModel("view");
+                        if (oViewModel) {
+                            oViewModel.setProperty("/reconciliationDetail/statusCards", mStatusData);
+                        }
+                    }
+                },
+                error: (oError) => {
+                    console.error("Error loading status card data:", oError);
+                }
+            });
         },
 
         /**
@@ -544,10 +458,78 @@ sap.ui.define([
         },
 
         /**
-         * Handler for status donut chart selection (placeholder)
+         * Handler for donut chart press - filters table by selected status
          */
-        onSelectStatus: function(oEvent) {
-            // Placeholder - to be implemented
+        onDonutChartPress: function(oEvent) {
+            const oViewModel = this.getView().getModel("view");
+            const oSmartTable = this.byId("documentsSmartTable");
+            
+            if (!oSmartTable || !oViewModel) {
+                return;
+            }
+
+            // Get selected segment from the event
+            const oSegment = oEvent.getParameter("segment");
+            if (!oSegment) {
+                return;
+            }
+
+            // Get the status from the segment's binding context
+            const oBindingContext = oSegment.getBindingContext("view");
+            if (!oBindingContext) {
+                return;
+            }
+
+            const oSegmentData = oBindingContext.getObject();
+            const sStatus = oSegmentData.status;
+
+            // Map status to filter value
+            let sStatusFilter = null;
+            if (sStatus === "NE") {
+                sStatusFilter = "NOT_IN_ECSL";
+            } else if (sStatus === "NV") {
+                sStatusFilter = "NOT_IN_VATR";
+            } else if (sStatus === "E") {
+                sStatusFilter = "MISMATCHED";
+            } else if (sStatus === "S") {
+                // Reconciled - filter by status starting with "S"
+                sStatusFilter = "RECONCILED";
+            }
+
+            // Get currently selected status filter
+            const sCurrentFilter = oViewModel.getProperty("/reconciliationDetail/selectedStatusFilter");
+            
+            // Toggle: if clicking the same status, deselect it; otherwise select the new one
+            const sNewFilter = sCurrentFilter === sStatusFilter ? null : sStatusFilter;
+            oViewModel.setProperty("/reconciliationDetail/selectedStatusFilter", sNewFilter);
+
+            // Update card styling for all status cards
+            const aStatusCards = [
+                { id: "notInEcslCard", filter: "NOT_IN_ECSL" },
+                { id: "notInVatrCard", filter: "NOT_IN_VATR" },
+                { id: "mismatchedCard", filter: "MISMATCHED" }
+            ];
+
+            aStatusCards.forEach(function(oCardInfo) {
+                const oStatusCard = this.byId(oCardInfo.id);
+                if (oStatusCard) {
+                    if (sNewFilter === oCardInfo.filter) {
+                        oStatusCard.addStyleClass("statusCardActive");
+                    } else {
+                        oStatusCard.removeStyleClass("statusCardActive");
+                    }
+                }
+            }.bind(this));
+
+            // Clear total difference card active state when status filter is applied
+            const oTotalDiffCard = this.byId("totalDifferenceCard");
+            if (oTotalDiffCard && sNewFilter) {
+                oTotalDiffCard.removeStyleClass("totalDifferenceCardActive");
+                oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", false);
+            }
+
+            // Trigger rebind
+            oSmartTable.rebindTable();
         },
 
         /**
@@ -686,162 +668,65 @@ sap.ui.define([
         },
 
         /**
-         * Handler for company code treemap selection - filters table by company code
+         * Handler for status card press - filters table by status
          */
-        onCompanyCodeTreemapSelect: function(oEvent) {
+        onStatusCardPress: function(oEvent) {
             const oViewModel = this.getView().getModel("view");
             const oSmartTable = this.byId("documentsSmartTable");
+            const oCard = oEvent.getSource();
             
-            if (!oSmartTable || !oViewModel) {
+            if (!oSmartTable || !oViewModel || !oCard) {
                 return;
             }
 
-            // Get selected data from treemap
-            const aSelectedData = oEvent.getParameter("data") || [];
+            // Get the status filter from custom data
+            const oCustomData = oCard.getCustomData();
+            let sStatusFilter = null;
+            if (oCustomData && oCustomData.length > 0) {
+                const oStatusData = oCustomData.find(function(oData) {
+                    return oData.getKey() === "statusFilter";
+                });
+                if (oStatusData) {
+                    sStatusFilter = oStatusData.getValue();
+                }
+            }
+
+            // Get currently selected status filter
+            const sCurrentFilter = oViewModel.getProperty("/reconciliationDetail/selectedStatusFilter");
             
-            // Get currently selected company codes from view model
-            const aCurrentCompanyCodes = oViewModel.getProperty("/reconciliationDetail/selectedCompanyCodes") || [];
-            let aNewCompanyCodes = [...aCurrentCompanyCodes];
-            
-            // Process selected items - extract CompanyCode from each data point
-            aSelectedData.forEach(function(oDataPoint) {
-                if (oDataPoint && oDataPoint.data) {
-                    // For treemap, the dimension value (CompanyCode) is in the data
-                    const sCompanyCode = oDataPoint.data.CompanyCode || oDataPoint.data[0]?.CompanyCode;
-                    if (sCompanyCode && aNewCompanyCodes.indexOf(sCompanyCode) === -1) {
-                        aNewCompanyCodes.push(sCompanyCode);
+            // Toggle: if clicking the same card, deselect it; otherwise select the new one
+            const sNewFilter = sCurrentFilter === sStatusFilter ? null : sStatusFilter;
+            oViewModel.setProperty("/reconciliationDetail/selectedStatusFilter", sNewFilter);
+
+            // Update card styling for all status cards
+            const aStatusCards = [
+                { id: "notInEcslCard", filter: "NOT_IN_ECSL" },
+                { id: "notInVatrCard", filter: "NOT_IN_VATR" },
+                { id: "mismatchedCard", filter: "MISMATCHED" }
+            ];
+
+            aStatusCards.forEach(function(oCardInfo) {
+                const oStatusCard = this.byId(oCardInfo.id);
+                if (oStatusCard) {
+                    if (sNewFilter === oCardInfo.filter) {
+                        oStatusCard.addStyleClass("statusCardActive");
+                    } else {
+                        oStatusCard.removeStyleClass("statusCardActive");
                     }
                 }
-            });
-            
-            // Update view model - store as array for multiple selections
-            oViewModel.setProperty("/reconciliationDetail/selectedCompanyCodes", aNewCompanyCodes);
-            
-            // Clear tax code filter when company code is selected (mutually exclusive)
-            if (aNewCompanyCodes.length > 0) {
-                oViewModel.setProperty("/reconciliationDetail/selectedTaxCodes", []);
-            }
-            
-            // Trigger rebind
-            oSmartTable.rebindTable();
-        },
+            }.bind(this));
 
-        /**
-         * Handler for company code treemap deselection - removes filter from table
-         */
-        onCompanyCodeTreemapDeselect: function(oEvent) {
-            const oViewModel = this.getView().getModel("view");
-            const oSmartTable = this.byId("documentsSmartTable");
-            
-            if (!oSmartTable || !oViewModel) {
-                return;
+            // Clear total difference card active state when status filter is applied
+            const oTotalDiffCard = this.byId("totalDifferenceCard");
+            if (oTotalDiffCard && sNewFilter) {
+                oTotalDiffCard.removeStyleClass("totalDifferenceCardActive");
+                oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", false);
             }
 
-            // Get deselected data from treemap
-            const aDeselectedData = oEvent.getParameter("data") || [];
-            
-            // Get currently selected company codes from view model
-            const aCurrentCompanyCodes = oViewModel.getProperty("/reconciliationDetail/selectedCompanyCodes") || [];
-            let aNewCompanyCodes = [...aCurrentCompanyCodes];
-            
-            // Process deselected items - remove from selection
-            aDeselectedData.forEach(function(oDataPoint) {
-                if (oDataPoint && oDataPoint.data) {
-                    const sCompanyCode = oDataPoint.data.CompanyCode || oDataPoint.data[0]?.CompanyCode;
-                    if (sCompanyCode) {
-                        const iIndex = aNewCompanyCodes.indexOf(sCompanyCode);
-                        if (iIndex > -1) {
-                            aNewCompanyCodes.splice(iIndex, 1);
-                        }
-                    }
-                }
-            });
-            
-            // Update view model
-            oViewModel.setProperty("/reconciliationDetail/selectedCompanyCodes", aNewCompanyCodes);
-            
-            // Trigger rebind
-            oSmartTable.rebindTable();
-        },
-
-        /**
-         * Handler for tax code treemap selection - filters table by tax code
-         */
-        onTaxCodeTreemapSelect: function(oEvent) {
-            const oViewModel = this.getView().getModel("view");
-            const oSmartTable = this.byId("documentsSmartTable");
-            
-            if (!oSmartTable || !oViewModel) {
-                return;
-            }
-
-            // Get selected data from treemap
-            const aSelectedData = oEvent.getParameter("data") || [];
-            
-            // Get currently selected tax codes from view model
-            const aCurrentTaxCodes = oViewModel.getProperty("/reconciliationDetail/selectedTaxCodes") || [];
-            let aNewTaxCodes = [...aCurrentTaxCodes];
-            
-            // Process selected items - extract TaxCode from each data point
-            aSelectedData.forEach(function(oDataPoint) {
-                if (oDataPoint && oDataPoint.data) {
-                    // For treemap, the dimension value (TaxCode) is in the data
-                    const sTaxCode = oDataPoint.data.TaxCode || oDataPoint.data[0]?.TaxCode;
-                    if (sTaxCode && aNewTaxCodes.indexOf(sTaxCode) === -1) {
-                        aNewTaxCodes.push(sTaxCode);
-                    }
-                }
-            });
-            
-            // Update view model - store as array for multiple selections
-            oViewModel.setProperty("/reconciliationDetail/selectedTaxCodes", aNewTaxCodes);
-            
-            // Clear company code filter when tax code is selected (mutually exclusive)
-            if (aNewTaxCodes.length > 0) {
-                oViewModel.setProperty("/reconciliationDetail/selectedCompanyCodes", []);
-            }
-            
-            // Trigger rebind
-            oSmartTable.rebindTable();
-        },
-
-        /**
-         * Handler for tax code treemap deselection - removes filter from table
-         */
-        onTaxCodeTreemapDeselect: function(oEvent) {
-            const oViewModel = this.getView().getModel("view");
-            const oSmartTable = this.byId("documentsSmartTable");
-            
-            if (!oSmartTable || !oViewModel) {
-                return;
-            }
-
-            // Get deselected data from treemap
-            const aDeselectedData = oEvent.getParameter("data") || [];
-            
-            // Get currently selected tax codes from view model
-            const aCurrentTaxCodes = oViewModel.getProperty("/reconciliationDetail/selectedTaxCodes") || [];
-            let aNewTaxCodes = [...aCurrentTaxCodes];
-            
-            // Process deselected items - remove from selection
-            aDeselectedData.forEach(function(oDataPoint) {
-                if (oDataPoint && oDataPoint.data) {
-                    const sTaxCode = oDataPoint.data.TaxCode || oDataPoint.data[0]?.TaxCode;
-                    if (sTaxCode) {
-                        const iIndex = aNewTaxCodes.indexOf(sTaxCode);
-                        if (iIndex > -1) {
-                            aNewTaxCodes.splice(iIndex, 1);
-                        }
-                    }
-                }
-            });
-            
-            // Update view model
-            oViewModel.setProperty("/reconciliationDetail/selectedTaxCodes", aNewTaxCodes);
-            
             // Trigger rebind
             oSmartTable.rebindTable();
         }
+
     });
 
     return ReconciliationDetailController;

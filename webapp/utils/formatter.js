@@ -291,6 +291,16 @@ sap.ui.define([
             const fFormatted = Math.abs(fValue).toFixed(2);
             const sSign = fValue < 0 ? "-" : "";
             return "EUR " + sSign + fFormatted;
+        },
+
+        /**
+         * Format document count with "docs" suffix
+         * @param {number} iCount - Document count
+         * @returns {string} Formatted string like "100 docs"
+         */
+        formatDocCount: function(iCount) {
+            const iDocCount = iCount || 0;
+            return iDocCount + " docs";
         }
     };
 });

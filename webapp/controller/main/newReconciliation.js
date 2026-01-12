@@ -9,8 +9,9 @@ sap.ui.define([
     "sap/m/Text",
     "sap/m/Label",
     "sap/m/ColumnListItem",
-    "sap/m/Token"
-], function (JSONModel, MessageBox, MessageToast, Filter, FilterOperator, UITableColumn, MColumn, Text, Label, ColumnListItem, Token) {
+    "sap/m/Token",
+    "sap/m/SearchField"
+], function (JSONModel, MessageBox, MessageToast, Filter, FilterOperator, UITableColumn, MColumn, Text, Label, ColumnListItem, Token, SearchField) {
     "use strict";
 
     return {
@@ -28,6 +29,25 @@ sap.ui.define([
             const oViewModel = oView.getModel("view");
             if (!oViewModel) {
                 oView.setModel(new JSONModel(), "view");
+            }
+            
+            // Clear SmartFilterBar and reset validation state before opening
+            const oSmartFilterBar = oView.byId("reconciliationSmartFilterBar");
+            if (oSmartFilterBar) {
+                oSmartFilterBar.fireClear();
+            }
+            
+            // Clear custom controls
+            const oCountryInput = oView.byId("reconciliationCountryListInput");
+            if (oCountryInput) {
+                oCountryInput.setValueState("None");
+                oCountryInput.setTokens([]);
+            }
+            
+            const oCompanyCodeInput = oView.byId("reconciliationCompanyCodeListInput");
+            if (oCompanyCodeInput) {
+                oCompanyCodeInput.setValueState("None");
+                oCompanyCodeInput.setTokens([]);
             }
             
             oReconciliationDialog.open();
@@ -74,14 +94,96 @@ sap.ui.define([
                 return;
             }
 
-            // Validate mandatory fields
+            // Validate custom controls first (since SmartFilterBar.validateMandatoryFields might not work for custom controls)
+            let bIsValid = true;
+            const oCountryInput = oView.byId("reconciliationCountryListInput");
+            if (oCountryInput) {
+                const aCountryTokens = oCountryInput.getTokens();
+                if (!aCountryTokens || aCountryTokens.length === 0) {
+                    oCountryInput.setValueState("Error");
+                    bIsValid = false;
+                } else {
+                    oCountryInput.setValueState("None");
+                }
+            }
+            
+            const oCompanyCodeInput = oView.byId("reconciliationCompanyCodeListInput");
+            if (oCompanyCodeInput) {
+                const aCompanyCodeTokens = oCompanyCodeInput.getTokens();
+                if (!aCompanyCodeTokens || aCompanyCodeTokens.length === 0) {
+                    oCompanyCodeInput.setValueState("Error");
+                    bIsValid = false;
+                } else {
+                    oCompanyCodeInput.setValueState("None");
+                }
+            }
+            
+            // Validate other SmartFilterBar fields (like reporting_date)
             if (!oSmartFilterBar.validateMandatoryFields()) {
+                bIsValid = false;
+            }
+            
+            if (!bIsValid) {
                 MessageToast.show(this.i18n("reconciliationPopup.PleaseFillAllMandatoryFields"));
                 return;
             }
 
             // Get filters from SmartFilterBar
             let aFilters = oSmartFilterBar.getFilters();
+
+            // Manually add filters from custom MultiInput controls
+            // Since we're using custom controls, SmartFilterBar.getFilters() won't include them
+            const aCustomFilters = [];
+            
+            // Get country from custom MultiInput control (reuse oCountryInput from validation above)
+            if (oCountryInput) {
+                const aCountryTokens = oCountryInput.getTokens();
+                if (aCountryTokens && aCountryTokens.length > 0) {
+                    // Get the first token (only one allowed due to maxTokens="1")
+                    const sCountry = aCountryTokens[0].getKey();
+                    if (sCountry) {
+                        aCustomFilters.push(new Filter("country", FilterOperator.EQ, sCountry));
+                    }
+                }
+            }
+            
+            // Get company codes from custom MultiInput control (reuse oCompanyCodeInput from validation above)
+            if (oCompanyCodeInput) {
+                const aCompanyCodeTokens = oCompanyCodeInput.getTokens();
+                if (aCompanyCodeTokens && aCompanyCodeTokens.length > 0) {
+                    const aCompanyCodes = aCompanyCodeTokens.map(function(oToken) {
+                        return oToken.getKey();
+                    });
+                    if (aCompanyCodes.length === 1) {
+                        aCustomFilters.push(new Filter("companycode", FilterOperator.EQ, aCompanyCodes[0]));
+                    } else if (aCompanyCodes.length > 1) {
+                        aCustomFilters.push(new Filter("companycode", FilterOperator.IN, aCompanyCodes));
+                    }
+                }
+            }
+            
+            // Merge custom filters with SmartFilterBar filters
+            if (aCustomFilters.length > 0) {
+                // Remove any existing country/companycode filters from SmartFilterBar filters
+                if (aFilters && aFilters.length > 0 && aFilters[0].aFilters) {
+                    aFilters[0].aFilters = aFilters[0].aFilters.filter(function(oFilter) {
+                        if (oFilter.aFilters && oFilter.aFilters[0]) {
+                            const sPath = oFilter.aFilters[0].sPath;
+                            return sPath !== "country" && sPath !== "companycode";
+                        }
+                        const sPath = oFilter.sPath;
+                        return sPath !== "country" && sPath !== "companycode";
+                    });
+                    // Add custom filters
+                    aFilters[0].aFilters = aFilters[0].aFilters.concat(aCustomFilters);
+                } else if (aFilters && aFilters.length > 0) {
+                    // If filters structure is different, just add custom filters
+                    aFilters = aFilters.concat(aCustomFilters);
+                } else {
+                    // No existing filters, create new filter group
+                    aFilters = [new Filter({filters: aCustomFilters, and: true})];
+                }
+            }
 
             // Get variant name from SmartVariantManagement
             let sVariant = "";
@@ -301,7 +403,7 @@ sap.ui.define([
                     
                     if (oTable.getColumns().length === 0) {
                         const oColumnCountry = new UITableColumn({
-                            label: new Label({text: this.i18n("reconciliationList.CountryList")}),
+                            label: new Label({text: this.i18n("reconciliationPopup.Country")}),
                             template: new Text({text: "{Country}"})
                         });
                         oColumnCountry.data("fieldName", "Country");
@@ -334,7 +436,7 @@ sap.ui.define([
                     });
                     
                     if (oTable.getColumns().length === 0) {
-                        oTable.addColumn(new MColumn({header: new Label({text: this.i18n("reconciliationList.CountryList")})}));
+                        oTable.addColumn(new MColumn({header: new Label({text: this.i18n("reconciliationPopup.Country")})}));
                         oTable.addColumn(new MColumn({header: new Label({text: this.i18n("reconciliationList.CountryName")})}));
                     }
                 }
@@ -354,7 +456,9 @@ sap.ui.define([
             const oMultiInput = oView.byId("reconciliationCountryListInput");
             const oVHD = oView.byId("reconciliationCountryValueHelpDialog");
             
-            oMultiInput.setTokens(aTokens);
+            // Limit to only 1 token (first token if multiple are returned)
+            const aLimitedTokens = aTokens && aTokens.length > 0 ? [aTokens[0]] : [];
+            oMultiInput.setTokens(aLimitedTokens);
             
             if (oVHD) {
                 oVHD.close();
@@ -378,6 +482,35 @@ sap.ui.define([
         },
 
         /**
+         * Handler for country value help search
+         */
+        onReconciliationCountryValueHelpSearch: function (oEvent) {
+            const sQuery = oEvent.getParameter("query") || oEvent.getParameter("newValue") || "";
+            const oView = this.getView();
+            const oVHD = oView.byId("reconciliationCountryValueHelpDialog");
+            
+            if (!oVHD) {
+                return;
+            }
+            
+            oVHD.getTableAsync().then((oTable) => {
+                const oBinding = oTable.getBinding("rows") || oTable.getBinding("items");
+                if (oBinding) {
+                    let aFilters = [];
+                    if (sQuery && sQuery.trim() !== "") {
+                        // Search in both Country code and Country name
+                        const aSearchFilters = [
+                            new Filter("Country", FilterOperator.Contains, sQuery),
+                            new Filter("Country_Text", FilterOperator.Contains, sQuery)
+                        ];
+                        aFilters.push(new Filter({filters: aSearchFilters, and: false}));
+                    }
+                    oBinding.filter(aFilters);
+                }
+            });
+        },
+
+        /**
          * Handler for company code value help request in reconciliation dialog
          */
         onReconciliationCompanyCodeValueHelpRequest: function (oEvent) {
@@ -391,7 +524,7 @@ sap.ui.define([
             }
 
             oVHD.setTokens([]);
-            const aTokens = oMultiInput.getTokens();
+            const aTokens = oMultiInput ? oMultiInput.getTokens() : [];
             const aClonedTokens = aTokens.map((oToken) => {
                 return new Token({
                     key: oToken.getKey(),
@@ -400,12 +533,39 @@ sap.ui.define([
             });
             oVHD.setTokens(aClonedTokens);
             
+            // Get selected country from the custom country MultiInput to filter company codes
+            const oCountryInput = oView.byId("reconciliationCountryListInput");
+            let sSelectedCountry = null;
+            let sSelectedCountryName = null;
+            if (oCountryInput) {
+                const aCountryTokens = oCountryInput.getTokens();
+                if (aCountryTokens && aCountryTokens.length > 0) {
+                    sSelectedCountry = aCountryTokens[0].getKey();
+                    sSelectedCountryName = aCountryTokens[0].getText();
+                }
+            }
+            
+            // Update dialog title to show country filter if a country is selected
+            if (sSelectedCountry && sSelectedCountryName) {
+                const sTitle = this.i18n("reconciliationPopup.CompanyCodesFilteredByCountry", [sSelectedCountryName]);
+                oVHD.setTitle(sTitle);
+            } else {
+                oVHD.setTitle(this.i18n("reconciliationList.SelectCompanyCodes"));
+            }
+            
+            // Build filters array - filter by country if one is selected
+            const aFilters = [];
+            if (sSelectedCountry) {
+                aFilters.push(new Filter("Country", FilterOperator.EQ, sSelectedCountry));
+            }
+            
             oVHD.getTableAsync().then((oTable) => {
                 oTable.setModel(oModel);
                 
                 if (oTable.bindRows) {
                     oTable.bindAggregation("rows", {
                         path: "/CompanyVH",
+                        filters: aFilters.length > 0 ? aFilters : undefined,
                         events: {
                             dataReceived: () => {
                                 oVHD.update();
@@ -434,6 +594,7 @@ sap.ui.define([
                 if (oTable.bindItems) {
                     oTable.bindAggregation("items", {
                         path: "/CompanyVH",
+                        filters: aFilters.length > 0 ? aFilters : undefined,
                         template: new ColumnListItem({
                             cells: [
                                 new Label({text: "{CompanyCode}"}),
@@ -489,6 +650,48 @@ sap.ui.define([
          */
         onReconciliationCompanyCodeValueHelpAfterClose: function () {
             // Cleanup if needed
+        },
+
+        /**
+         * Handler for company code value help search
+         */
+        onReconciliationCompanyCodeValueHelpSearch: function (oEvent) {
+            const sQuery = oEvent.getParameter("query") || oEvent.getParameter("newValue") || "";
+            const oView = this.getView();
+            const oVHD = oView.byId("reconciliationCompanyCodeValueHelpDialog");
+            
+            if (!oVHD) {
+                return;
+            }
+            
+            // Get selected country filter (existing filter)
+            const oCountryInput = oView.byId("reconciliationCountryListInput");
+            let aExistingFilters = [];
+            if (oCountryInput) {
+                const aCountryTokens = oCountryInput.getTokens();
+                if (aCountryTokens && aCountryTokens.length > 0) {
+                    const sSelectedCountry = aCountryTokens[0].getKey();
+                    if (sSelectedCountry) {
+                        aExistingFilters.push(new Filter("Country", FilterOperator.EQ, sSelectedCountry));
+                    }
+                }
+            }
+            
+            oVHD.getTableAsync().then((oTable) => {
+                const oBinding = oTable.getBinding("rows") || oTable.getBinding("items");
+                if (oBinding) {
+                    let aFilters = aExistingFilters.slice(); // Copy existing filters
+                    if (sQuery && sQuery.trim() !== "") {
+                        // Search in both CompanyCode and Name
+                        const aSearchFilters = [
+                            new Filter("CompanyCode", FilterOperator.Contains, sQuery),
+                            new Filter("Name", FilterOperator.Contains, sQuery)
+                        ];
+                        aFilters.push(new Filter({filters: aSearchFilters, and: false}));
+                    }
+                    oBinding.filter(aFilters.length > 0 ? aFilters : undefined);
+                }
+            });
         },
 
         /**

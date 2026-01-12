@@ -36,8 +36,8 @@
                                 <cssgrid:GridItemLayoutData gridColumn="span 3" />
                             </f:layoutData>
                             <f:content>
-                                <VBox class="sapUiMediumMargin" width="100%">
-                                    <Title text="{i18n>reconciliationDetail.ReconciliationDetails}" titleStyle="H4" class="sapUiSmallMarginBottom" />
+                                <VBox class="sapUiSmallMargin" width="100%">
+                                    <Title text="{i18n>reconciliationDetail.ReconciliationDetails}" titleStyle="H6" class="sapUiTinyMarginBottom" />
                                     <HBox width="100%" justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
                                         <Label text="{i18n>reconciliationList.CountryList}" design="Bold" />
                                         <VBox width="100%" class="sapUiTinyMarginBegin" alignItems="End">
@@ -64,9 +64,9 @@
                                 <cssgrid:GridItemLayoutData gridColumn="span 3" />
                             </f:layoutData>
                             <f:content>
-                                <VBox class="sapUiMediumMargin" width="100%" height="100%">
-                                    <Title text="{i18n>reconciliationDetail.DocumentStatus}" titleStyle="H4" class="sapUiSmallMarginBottom" />
-                                    <HBox width="100%" height="100%" alignItems="Center" justifyContent="SpaceBetween">
+                                <VBox class="sapUiSmallMargin" width="100%" height="100%">
+                                    <Title text="{i18n>reconciliationDetail.DocumentStatus}" titleStyle="H6" class="sapUiTinyMarginBottom" />
+                                    <HBox width="100%" height="100%" alignItems="Center" justifyContent="Center">
                                         <mc:InteractiveDonutChart 
                                             id="documentStatusDonutChart"
                                             press="onDonutChartPress"
@@ -81,15 +81,6 @@
                                                     displayedValue="{view>displayedValue}" />
                                             </mc:segments>
                                         </mc:InteractiveDonutChart>
-                                        <VBox class="sapUiSmallMarginBegin" width="50%">
-                                            <VBox items="{view>/reconciliationDetail/donutChartData/segments}">
-                                                <HBox alignItems="Center" class="sapUiTinyMarginBottom">
-                                                    <core:Icon src="sap-icon://circle-task" size="0.75rem" color="#0070F2" class="sapUiTinyMarginEnd" />
-                                                    <Label text="{view>label}" />
-                                                    <Text text="{view>value}" class="sapUiTinyMarginBegin" />
-                                                </HBox>
-                                            </VBox>
-                                        </VBox>
                                     </HBox>
                                 </VBox>
                             </f:content>
@@ -104,24 +95,15 @@
                                 <core:CustomData key="statusFilter" value="NOT_IN_ECSL" />
                             </f:customData>
                             <f:content>
-                                <VBox width="100%" height="100%" class="sapUiSmallMargin">
-                                    <HBox alignItems="Center" class="sapUiSmallMarginBottom">
-                                        <core:Icon src="sap-icon://circle-task" size="1.5rem" color="#0070F2" class="sapUiTinyMarginEnd" />
-                                        <Title text="{i18n>reconciliationDetail.NotInEcsl}" titleStyle="H6" />
-                                    </HBox>
-                                    <VBox class="sapUiSmallMarginTop">
-                                        <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiTinyMarginBottom">
-                                            <Label text="{i18n>reconciliationDetail.Total}" design="Bold" />
-                                            <Text 
-                                                text="{path: 'view>/reconciliationDetail/statusCards/notInEcsl/total', formatter: '.formatter.formatCurrency'}" 
-                                                class="sapUiTinyMarginBegin" />
-                                        </HBox>
-                                        <HBox justifyContent="SpaceBetween" alignItems="Center">
-                                            <Label text="{i18n>reconciliationDetail.Count}" design="Bold" />
-                                            <Text 
-                                                text="{view>/reconciliationDetail/statusCards/notInEcsl/count}" 
-                                                class="sapUiTinyMarginBegin statusCardCount" />
-                                        </HBox>
+                                <VBox width="100%" height="100%" class="sapUiSmallMargin statusCardContent">
+                                    <Title text="{i18n>reconciliationDetail.NotInEcsl}" titleStyle="H6" class="sapUiTinyMarginBottom" />
+                                    <VBox justifyContent="Center" alignItems="Center" width="100%" class="statusCardValueContainer">
+                                        <Text 
+                                            text="{path: 'view>/reconciliationDetail/statusCards/notInEcsl/total', formatter: '.formatter.formatNumberWithScale'}" 
+                                            class="statusCardValue" />
+                                        <Text 
+                                            text="{path: 'view>/reconciliationDetail/statusCards/notInEcsl/count', formatter: '.formatter.formatDocCount'}" 
+                                            class="statusCardCountText" />
                                     </VBox>
                                 </VBox>
                             </f:content>
@@ -136,56 +118,15 @@
                                 <core:CustomData key="statusFilter" value="NOT_IN_VATR" />
                             </f:customData>
                             <f:content>
-                                <VBox width="100%" height="100%" class="sapUiSmallMargin">
-                                    <HBox alignItems="Center" class="sapUiSmallMarginBottom">
-                                        <core:Icon src="sap-icon://circle-task" size="1.5rem" color="#0070F2" class="sapUiTinyMarginEnd" />
-                                        <Title text="{i18n>reconciliationDetail.NotInVatr}" titleStyle="H6" />
-                                    </HBox>
-                                    <VBox class="sapUiSmallMarginTop">
-                                        <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiTinyMarginBottom">
-                                            <Label text="{i18n>reconciliationDetail.Total}" design="Bold" />
-                                            <Text 
-                                                text="{path: 'view>/reconciliationDetail/statusCards/notInVatr/total', formatter: '.formatter.formatCurrency'}" 
-                                                class="sapUiTinyMarginBegin" />
-                                        </HBox>
-                                        <HBox justifyContent="SpaceBetween" alignItems="Center">
-                                            <Label text="{i18n>reconciliationDetail.Count}" design="Bold" />
-                                            <Text 
-                                                text="{view>/reconciliationDetail/statusCards/notInVatr/count}" 
-                                                class="sapUiTinyMarginBegin statusCardCount" />
-                                        </HBox>
-                                    </VBox>
-                                </VBox>
-                            </f:content>
-                        </f:Card>
-                        
-                        <!-- Mismatched Documents Card -->
-                        <f:Card id="mismatchedCard" height="220px" press="onStatusCardPress" semanticRole="ListItem">
-                            <f:layoutData>
-                                <cssgrid:GridItemLayoutData gridColumn="span 2" />
-                            </f:layoutData>
-                            <f:customData>
-                                <core:CustomData key="statusFilter" value="MISMATCHED" />
-                            </f:customData>
-                            <f:content>
-                                <VBox width="100%" height="100%" class="sapUiSmallMargin">
-                                    <HBox alignItems="Center" class="sapUiSmallMarginBottom">
-                                        <core:Icon src="sap-icon://status-error" size="1.5rem" color="#0070F2" class="sapUiTinyMarginEnd" />
-                                        <Title text="{i18n>reconciliationDetail.Mismatched}" titleStyle="H6" />
-                                    </HBox>
-                                    <VBox class="sapUiSmallMarginTop">
-                                        <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiTinyMarginBottom">
-                                            <Label text="{i18n>reconciliationDetail.Total}" design="Bold" />
-                                            <Text 
-                                                text="{path: 'view>/reconciliationDetail/statusCards/mismatched/total', formatter: '.formatter.formatCurrency'}" 
-                                                class="sapUiTinyMarginBegin" />
-                                        </HBox>
-                                        <HBox justifyContent="SpaceBetween" alignItems="Center">
-                                            <Label text="{i18n>reconciliationDetail.Count}" design="Bold" />
-                                            <Text 
-                                                text="{view>/reconciliationDetail/statusCards/mismatched/count}" 
-                                                class="sapUiTinyMarginBegin statusCardCount" />
-                                        </HBox>
+                                <VBox width="100%" height="100%" class="sapUiSmallMargin statusCardContent">
+                                    <Title text="{i18n>reconciliationDetail.NotInVatr}" titleStyle="H6" class="sapUiTinyMarginBottom" />
+                                    <VBox justifyContent="Center" alignItems="Center" width="100%" class="statusCardValueContainer">
+                                        <Text 
+                                            text="{path: 'view>/reconciliationDetail/statusCards/notInVatr/total', formatter: '.formatter.formatNumberWithScale'}" 
+                                            class="statusCardValue" />
+                                        <Text 
+                                            text="{path: 'view>/reconciliationDetail/statusCards/notInVatr/count', formatter: '.formatter.formatDocCount'}" 
+                                            class="statusCardCountText" />
                                     </VBox>
                                 </VBox>
                             </f:content>
@@ -203,6 +144,9 @@
                                         <Text 
                                             text="{path: 'view>/reconciliationDetail/totalDifference/value', formatter: '.formatter.formatNumberWithScale'}" 
                                             class="totalDifferenceValue" />
+                                        <Text 
+                                            text="{path: 'view>/reconciliationDetail/totalDifference/count', formatter: '.formatter.formatDocCount'}" 
+                                            class="statusCardCountText" />
                                     </VBox>
                                 </VBox>
                             </f:content>

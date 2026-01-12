@@ -5,6 +5,8 @@
     xmlns:core="sap.ui.core"
     xmlns:sv="sap.ui.comp.smartvariants"
     xmlns:sfb="sap.ui.comp.smartfilterbar"
+    xmlns:vhd="sap.ui.comp.valuehelpdialog"
+    xmlns:fb="sap.ui.comp.filterbar"
     displayBlock="true">
     <Dialog 
         id="ReconciliationDialog" 
@@ -45,12 +47,31 @@
                             mandatory="mandatory" 
                             index="1" 
                             visibleInAdvancedArea="true">
+                            <sfb:customControl>
+                                <MultiInput 
+                                    id="reconciliationCountryListInput" 
+                                    valueHelpOnly="true" 
+                                    valueHelpRequest="onReconciliationCountryValueHelpRequest" 
+                                    showValueHelp="true" 
+                                    placeholder="{i18n>reconciliationPopup.SelectCountry}" 
+                                    enableMultiLineMode="true"
+                                    maxTokens="1"/>
+                            </sfb:customControl>
                         </sfb:ControlConfiguration>
                         <sfb:ControlConfiguration 
                             key="companycode" 
                             mandatory="mandatory" 
                             index="2" 
                             visibleInAdvancedArea="true">
+                            <sfb:customControl>
+                                <MultiInput 
+                                    id="reconciliationCompanyCodeListInput" 
+                                    valueHelpOnly="true" 
+                                    valueHelpRequest="onReconciliationCompanyCodeValueHelpRequest" 
+                                    showValueHelp="true" 
+                                    placeholder="{i18n>reconciliationList.SelectCompanyCodes}" 
+                                    enableMultiLineMode="true"/>
+                            </sfb:customControl>
                         </sfb:ControlConfiguration>
                         <sfb:ControlConfiguration 
                             key="reporting_date" 
@@ -70,6 +91,63 @@
                     <sfb:layoutData>
                         <FlexItemData shrinkFactor="0"/>
                     </sfb:layoutData>
+                    <sfb:dependents>
+                        <!-- Value Help Dialog for Countries -->
+                        <vhd:ValueHelpDialog id="reconciliationCountryValueHelpDialog" 
+                            title="{i18n>reconciliationPopup.SelectCountry}"
+                            ok="onReconciliationCountryValueHelpOk"
+                            cancel="onReconciliationCountryValueHelpCancel"
+                            afterClose="onReconciliationCountryValueHelpAfterClose"
+                            key="Country"
+                            descriptionKey="Country_Text"
+                            supportMultiselect="false">
+                            <vhd:filterBar>
+                                <fb:FilterBar id="reconciliationCountryFilterBar" 
+                                    search="onReconciliationCountryValueHelpSearch"
+                                    showClearButton="true"
+                                    showRestoreButton="false"
+                                    useToolbar="false">
+                                    <fb:filterItems>
+                                        <fb:FilterItem name="basicSearch" label="">
+                                            <fb:control>
+                                                <SearchField name="basicSearch" 
+                                                    placeholder="Search"
+                                                    search="onReconciliationCountryValueHelpSearch"/>
+                                            </fb:control>
+                                        </fb:FilterItem>
+                                    </fb:filterItems>
+                                </fb:FilterBar>
+                            </vhd:filterBar>
+                        </vhd:ValueHelpDialog>
+                        
+                        <!-- Value Help Dialog for Company Codes -->
+                        <vhd:ValueHelpDialog id="reconciliationCompanyCodeValueHelpDialog" 
+                            title="{i18n>reconciliationList.SelectCompanyCodes}"
+                            ok="onReconciliationCompanyCodeValueHelpOk"
+                            cancel="onReconciliationCompanyCodeValueHelpCancel"
+                            afterClose="onReconciliationCompanyCodeValueHelpAfterClose"
+                            key="CompanyCode"
+                            descriptionKey="Name"
+                            supportMultiselect="true">
+                            <vhd:filterBar>
+                                <fb:FilterBar id="reconciliationCompanyCodeFilterBar" 
+                                    search="onReconciliationCompanyCodeValueHelpSearch"
+                                    showClearButton="true"
+                                    showRestoreButton="false"
+                                    useToolbar="false">
+                                    <fb:filterItems>
+                                        <fb:FilterItem name="basicSearch" label="">
+                                            <fb:control>
+                                                <SearchField name="basicSearch" 
+                                                    placeholder="Search"
+                                                    search="onReconciliationCompanyCodeValueHelpSearch"/>
+                                            </fb:control>
+                                        </fb:FilterItem>
+                                    </fb:filterItems>
+                                </fb:FilterBar>
+                            </vhd:filterBar>
+                        </vhd:ValueHelpDialog>
+                    </sfb:dependents>
                 </sfb:SmartFilterBar>
             </VBox>
         </content>

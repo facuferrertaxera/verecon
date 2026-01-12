@@ -4,15 +4,19 @@
 .totalDifferenceCardContent {
     display: flex !important;
     flex-direction: column !important;
+    height: 100% !important;
 }
 
 /* Total Difference Value Container - Takes remaining space and centers content */
 .totalDifferenceValueContainer {
     flex: 1 1 auto !important;
     display: flex !important;
+    flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
     min-height: 0 !important;
+    flex-shrink: 1 !important;
+    max-height: calc(100% - 5rem) !important;
 }
 
 /* Total Difference Value - Large centered text */
@@ -39,6 +43,102 @@
 }
 
 .totalDifferenceCardActive .totalDifferenceValue {
+    color: #ffffff !important;
+}
+
+.totalDifferenceCardActive .statusCardCount {
+    color: #ffffff !important;
+}
+
+/* Status Card Content - Flex layout (same as Total Difference) */
+.statusCardContent {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+}
+
+/* Status Card Value Container - Takes remaining space and centers content */
+.statusCardValueContainer {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 0 !important;
+    flex-shrink: 1 !important;
+    max-height: calc(100% - 5rem) !important;
+}
+
+/* Status Card Value - Large centered text (blue color) */
+.statusCardValue {
+    font-size: 3rem !important;
+    font-weight: bold !important;
+    color: #0070F2 !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+    width: 100% !important;
+}
+
+/* Status Card - Active state (blue background, white text) */
+.statusCardActive {
+    background-color: #0070F2 !important;
+}
+
+.statusCardActive .sapFCardContent {
+    background-color: #0070F2 !important;
+}
+
+.statusCardActive .sapMTitle {
+    color: #ffffff !important;
+}
+
+.statusCardActive .statusCardValue {
+    color: #ffffff !important;
+}
+
+.statusCardActive .statusCardCount {
+    color: #ffffff !important;
+}
+
+/* Ensure count HBox is visible and doesn't get squeezed */
+.statusCardCountContainer {
+    flex: 0 0 auto !important;
+    min-height: 2.5rem !important;
+    height: auto !important;
+    display: flex !important;
+    visibility: visible !important;
+    width: 100% !important;
+    margin-top: 0.5rem !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.25rem !important;
+}
+
+/* Ensure the count text is visible */
+.statusCardCountContainer .statusCardCount {
+    font-size: 1rem !important;
+    font-weight: normal !important;
+    visibility: visible !important;
+    display: inline-block !important;
+}
+
+/* Status Card Count Text - Smaller italic text below the value */
+.statusCardCountText {
+    font-size: 1rem !important;
+    font-style: italic !important;
+    font-weight: normal !important;
+    text-align: center !important;
+    margin-top: 0.5rem !important;
+    color: #0070F2 !important;
+}
+
+/* Total Difference Count Text - Smaller italic text below the value */
+.totalDifferenceValueContainer .statusCardCountText {
+    color: #bb0000 !important;
+}
+
+/* Active state for count text */
+.statusCardActive .statusCardCountText,
+.totalDifferenceCardActive .statusCardCountText {
     color: #ffffff !important;
 }
 

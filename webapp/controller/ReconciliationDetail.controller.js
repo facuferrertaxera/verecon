@@ -57,7 +57,7 @@ sap.ui.define([
                             total: 0
                         }
                     },
-                    selectedStatusFilter: null,
+                    selectedStatusFilters: [], // Array of selected status filters
                     showOnlyDifferences: false
                 }
             });
@@ -157,7 +157,7 @@ sap.ui.define([
             // Get filter flags from view model
             const oViewModel = this.getView().getModel("view");
             const bShowOnlyDifferences = oViewModel ? oViewModel.getProperty("/reconciliationDetail/showOnlyDifferences") : false;
-            const sSelectedStatusFilter = oViewModel ? oViewModel.getProperty("/reconciliationDetail/selectedStatusFilter") : null;
+            const aSelectedStatusFilters = oViewModel ? oViewModel.getProperty("/reconciliationDetail/selectedStatusFilters") || [] : [];
             
             // Remove any existing custom filters (DiffGrossAmount, EcslGrossAmount, VatrGrossAmount, Status)
             aFilters = aFilters.filter(function(oFilter) {
@@ -189,29 +189,42 @@ sap.ui.define([
                 aFilters.push(oDiffFilter);
             }
             
-            // Add status filter if a status card is selected
-            if (sSelectedStatusFilter) {
-                if (sSelectedStatusFilter === "NOT_IN_ECSL") {
-                    // Not in EC Sales List: Status = "NE"
-                    const oStatusFilter = new Filter("Status", FilterOperator.EQ, "NE");
-                    aFilters.push(oStatusFilter);
-                } else if (sSelectedStatusFilter === "NOT_IN_VATR") {
-                    // Not in VAT Return: Status = "NV"
-                    const oStatusFilter = new Filter("Status", FilterOperator.EQ, "NV");
-                    aFilters.push(oStatusFilter);
-                } else if (sSelectedStatusFilter === "TOTAL_DIFFERENCE") {
-                    // Total Difference: Documents with differences (DiffGrossAmount != 0)
-                    const oDiffFilter = new Filter("DiffGrossAmount", FilterOperator.NE, 0);
-                    aFilters.push(oDiffFilter);
-                } else if (sSelectedStatusFilter === "RECONCILED") {
-                    // Reconciled: Status starts with "S" - create OR filter for common S statuses
-                    const aSStatusFilters = ["S", "SR", "SV", "ST", "SX", "SS"].map(function(sStatus) {
-                        return new Filter("Status", FilterOperator.EQ, sStatus);
-                    });
-                    aFilters.push(new Filter({
-                        filters: aSStatusFilters,
-                        and: false
-                    }));
+            // Add status filters if any status filters are selected
+            if (aSelectedStatusFilters && aSelectedStatusFilters.length > 0) {
+                const aStatusFilters = [];
+                
+                aSelectedStatusFilters.forEach(function(sStatusFilter) {
+                    if (sStatusFilter === "NOT_IN_ECSL") {
+                        // Not in EC Sales List: Status = "NE"
+                        aStatusFilters.push(new Filter("Status", FilterOperator.EQ, "NE"));
+                    } else if (sStatusFilter === "NOT_IN_VATR") {
+                        // Not in VAT Return: Status = "NV"
+                        aStatusFilters.push(new Filter("Status", FilterOperator.EQ, "NV"));
+                    } else if (sStatusFilter === "TOTAL_DIFFERENCE") {
+                        // Total Difference: Documents with differences (DiffGrossAmount != 0)
+                        aStatusFilters.push(new Filter("DiffGrossAmount", FilterOperator.NE, 0));
+                    } else if (sStatusFilter === "RECONCILED") {
+                        // Reconciled: Status starts with "S" - create OR filter for common S statuses
+                        const aSStatusFilters = ["S", "SR", "SV", "ST", "SX", "SS"].map(function(sStatus) {
+                            return new Filter("Status", FilterOperator.EQ, sStatus);
+                        });
+                        aStatusFilters.push(new Filter({
+                            filters: aSStatusFilters,
+                            and: false
+                        }));
+                    }
+                });
+                
+                // Combine all status filters with OR logic (any of the selected statuses)
+                if (aStatusFilters.length > 0) {
+                    if (aStatusFilters.length === 1) {
+                        aFilters.push(aStatusFilters[0]);
+                    } else {
+                        aFilters.push(new Filter({
+                            filters: aStatusFilters,
+                            and: false // OR logic
+                        }));
+                    }
                 }
             }
             
@@ -254,9 +267,11 @@ sap.ui.define([
             }
 
             // Read all documents without any filters to calculate total difference
+            // Use a high $top value to get all records (SAP UI5 defaults to $top=100)
             oModel.read(`${sReconciliationPath}/to_Document`, {
                 urlParameters: {
-                    "$select": "DiffGrossAmount"
+                    "$select": "DiffGrossAmount",
+                    "$top": "999999"  // Set high limit to get all records
                 },
                 success: (oResponse) => {
                     if (oResponse && oResponse.results) {
@@ -298,9 +313,11 @@ sap.ui.define([
             }
 
             // Read all documents without any filters to calculate donut chart data
+            // Use a high $top value to get all records (SAP UI5 defaults to $top=100)
             oModel.read(`${sReconciliationPath}/to_Document`, {
                 urlParameters: {
-                    "$select": "Status,StatusText"
+                    "$select": "Status,StatusText",
+                    "$top": "999999"  // Set high limit to get all records
                 },
                 success: (oResponse) => {
                     if (oResponse && oResponse.results) {
@@ -377,9 +394,11 @@ sap.ui.define([
             }
 
             // Read all documents without any filters to calculate status card data
+            // Use a high $top value to get all records (SAP UI5 defaults to $top=100)
             oModel.read(`${sReconciliationPath}/to_Document`, {
                 urlParameters: {
-                    "$select": "Status,StatusText,DiffGrossAmount"
+                    "$select": "Status,StatusText,DiffGrossAmount",
+                    "$top": "999999"  // Set high limit to get all records
                 },
                 success: (oResponse) => {
                     if (oResponse && oResponse.results) {
@@ -466,9 +485,9 @@ sap.ui.define([
         },
 
         /**
-         * Handler for donut chart press - filters table by selected status
+         * Handler for donut chart selection changed - filters table by selected status
          */
-        onDonutChartPress: function(oEvent) {
+        onDonutChartSelectionChanged: function(oEvent) {
             const oViewModel = this.getView().getModel("view");
             const oSmartTable = this.byId("documentsSmartTable");
             
@@ -476,41 +495,44 @@ sap.ui.define([
                 return;
             }
 
-            // Get selected segment from the event
-            const oSegment = oEvent.getParameter("segment");
-            if (!oSegment) {
-                return;
-            }
-
-            // Get the status from the segment's binding context
-            const oBindingContext = oSegment.getBindingContext("view");
-            if (!oBindingContext) {
-                return;
-            }
-
-            const oSegmentData = oBindingContext.getObject();
-            const sStatus = oSegmentData.status;
-
-            // Map status to filter value
-            let sStatusFilter = null;
-            if (sStatus === "NE") {
-                sStatusFilter = "NOT_IN_ECSL";
-            } else if (sStatus === "NV") {
-                sStatusFilter = "NOT_IN_VATR";
-            } else if (sStatus === "E") {
-                // Error status - filter by total difference (documents with differences)
-                sStatusFilter = "TOTAL_DIFFERENCE";
-            } else if (sStatus === "S") {
-                // Reconciled - filter by status starting with "S"
-                sStatusFilter = "RECONCILED";
-            }
-
-            // Get currently selected status filter
-            const sCurrentFilter = oViewModel.getProperty("/reconciliationDetail/selectedStatusFilter");
+            // Get selected segments from the event
+            // selectionChanged event provides selectedSegments parameter (array)
+            const aSelectedSegments = oEvent.getParameter("selectedSegments") || [];
             
-            // Toggle: if clicking the same status, deselect it; otherwise select the new one
-            const sNewFilter = sCurrentFilter === sStatusFilter ? null : sStatusFilter;
-            oViewModel.setProperty("/reconciliationDetail/selectedStatusFilter", sNewFilter);
+            // Map each selected segment to its status filter
+            const aSelectedStatusFilters = [];
+            
+            aSelectedSegments.forEach(function(oSegment) {
+                // Get the status from the segment's binding context
+                const oBindingContext = oSegment.getBindingContext("view");
+                if (!oBindingContext) {
+                    return;
+                }
+
+                const oSegmentData = oBindingContext.getObject();
+                const sStatus = oSegmentData.status;
+
+                // Map status to filter value
+                let sStatusFilter = null;
+                if (sStatus === "NE") {
+                    sStatusFilter = "NOT_IN_ECSL";
+                } else if (sStatus === "NV") {
+                    sStatusFilter = "NOT_IN_VATR";
+                } else if (sStatus === "E") {
+                    // Error status - filter by total difference (documents with differences)
+                    sStatusFilter = "TOTAL_DIFFERENCE";
+                } else if (sStatus === "S") {
+                    // Reconciled - filter by status starting with "S"
+                    sStatusFilter = "RECONCILED";
+                }
+                
+                if (sStatusFilter) {
+                    aSelectedStatusFilters.push(sStatusFilter);
+                }
+            });
+
+            // Update view model with selected status filters (empty array if none selected)
+            oViewModel.setProperty("/reconciliationDetail/selectedStatusFilters", aSelectedStatusFilters);
 
             // Update card styling for all status cards
             const aStatusCards = [
@@ -521,7 +543,7 @@ sap.ui.define([
             aStatusCards.forEach(function(oCardInfo) {
                 const oStatusCard = this.byId(oCardInfo.id);
                 if (oStatusCard) {
-                    if (sNewFilter === oCardInfo.filter) {
+                    if (aSelectedStatusFilters.indexOf(oCardInfo.filter) !== -1) {
                         oStatusCard.addStyleClass("statusCardActive");
                     } else {
                         oStatusCard.removeStyleClass("statusCardActive");
@@ -532,14 +554,10 @@ sap.ui.define([
             // Update total difference card styling based on filter
             const oTotalDiffCard = this.byId("totalDifferenceCard");
             if (oTotalDiffCard) {
-                if (sNewFilter === "TOTAL_DIFFERENCE") {
+                if (aSelectedStatusFilters.indexOf("TOTAL_DIFFERENCE") !== -1) {
                     oTotalDiffCard.addStyleClass("totalDifferenceCardActive");
                     oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", false);
-                } else if (sNewFilter) {
-                    oTotalDiffCard.removeStyleClass("totalDifferenceCardActive");
-                    oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", false);
                 } else {
-                    // No filter selected - clear total difference card active state
                     oTotalDiffCard.removeStyleClass("totalDifferenceCardActive");
                     oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", false);
                 }
@@ -666,24 +684,30 @@ sap.ui.define([
                 return;
             }
 
-            // Get currently selected status filter
-            const sCurrentFilter = oViewModel.getProperty("/reconciliationDetail/selectedStatusFilter");
+            // Get currently selected status filters
+            const aCurrentFilters = oViewModel.getProperty("/reconciliationDetail/selectedStatusFilters") || [];
             
-            // Toggle: if clicking the same filter, deselect it; otherwise select TOTAL_DIFFERENCE
-            const sNewFilter = sCurrentFilter === "TOTAL_DIFFERENCE" ? null : "TOTAL_DIFFERENCE";
-            oViewModel.setProperty("/reconciliationDetail/selectedStatusFilter", sNewFilter);
+            // Toggle: if TOTAL_DIFFERENCE is already selected, remove it; otherwise add it
+            const aNewFilters = aCurrentFilters.slice(); // Copy array
+            const iIndex = aNewFilters.indexOf("TOTAL_DIFFERENCE");
+            if (iIndex !== -1) {
+                aNewFilters.splice(iIndex, 1);
+            } else {
+                aNewFilters.push("TOTAL_DIFFERENCE");
+            }
+            oViewModel.setProperty("/reconciliationDetail/selectedStatusFilters", aNewFilters);
             oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", false);
 
             // Update card styling based on state
             if (oCard) {
-                if (sNewFilter === "TOTAL_DIFFERENCE") {
+                if (aNewFilters.indexOf("TOTAL_DIFFERENCE") !== -1) {
                     oCard.addStyleClass("totalDifferenceCardActive");
                 } else {
                     oCard.removeStyleClass("totalDifferenceCardActive");
                 }
             }
 
-            // Clear status card active states
+            // Update status card active states based on selected filters
             const aStatusCards = [
                 { id: "notInEcslCard", filter: "NOT_IN_ECSL" },
                 { id: "notInVatrCard", filter: "NOT_IN_VATR" }
@@ -692,7 +716,11 @@ sap.ui.define([
             aStatusCards.forEach(function(oCardInfo) {
                 const oStatusCard = this.byId(oCardInfo.id);
                 if (oStatusCard) {
-                    oStatusCard.removeStyleClass("statusCardActive");
+                    if (aNewFilters.indexOf(oCardInfo.filter) !== -1) {
+                        oStatusCard.addStyleClass("statusCardActive");
+                    } else {
+                        oStatusCard.removeStyleClass("statusCardActive");
+                    }
                 }
             }.bind(this));
 
@@ -725,12 +753,18 @@ sap.ui.define([
                 }
             }
 
-            // Get currently selected status filter
-            const sCurrentFilter = oViewModel.getProperty("/reconciliationDetail/selectedStatusFilter");
+            // Get currently selected status filters
+            const aCurrentFilters = oViewModel.getProperty("/reconciliationDetail/selectedStatusFilters") || [];
             
-            // Toggle: if clicking the same card, deselect it; otherwise select the new one
-            const sNewFilter = sCurrentFilter === sStatusFilter ? null : sStatusFilter;
-            oViewModel.setProperty("/reconciliationDetail/selectedStatusFilter", sNewFilter);
+            // Toggle: if the filter is already selected, remove it; otherwise add it
+            const aNewFilters = aCurrentFilters.slice(); // Copy array
+            const iIndex = aNewFilters.indexOf(sStatusFilter);
+            if (iIndex !== -1) {
+                aNewFilters.splice(iIndex, 1);
+            } else {
+                aNewFilters.push(sStatusFilter);
+            }
+            oViewModel.setProperty("/reconciliationDetail/selectedStatusFilters", aNewFilters);
 
             // Update card styling for all status cards
             const aStatusCards = [
@@ -741,7 +775,7 @@ sap.ui.define([
             aStatusCards.forEach(function(oCardInfo) {
                 const oStatusCard = this.byId(oCardInfo.id);
                 if (oStatusCard) {
-                    if (sNewFilter === oCardInfo.filter) {
+                    if (aNewFilters.indexOf(oCardInfo.filter) !== -1) {
                         oStatusCard.addStyleClass("statusCardActive");
                     } else {
                         oStatusCard.removeStyleClass("statusCardActive");
@@ -752,14 +786,10 @@ sap.ui.define([
             // Update total difference card styling based on filter
             const oTotalDiffCard = this.byId("totalDifferenceCard");
             if (oTotalDiffCard) {
-                if (sNewFilter === "TOTAL_DIFFERENCE") {
+                if (aNewFilters.indexOf("TOTAL_DIFFERENCE") !== -1) {
                     oTotalDiffCard.addStyleClass("totalDifferenceCardActive");
                     oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", false);
-                } else if (sNewFilter) {
-                    oTotalDiffCard.removeStyleClass("totalDifferenceCardActive");
-                    oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", false);
                 } else {
-                    // No filter selected - clear total difference card active state
                     oTotalDiffCard.removeStyleClass("totalDifferenceCardActive");
                     oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", false);
                 }

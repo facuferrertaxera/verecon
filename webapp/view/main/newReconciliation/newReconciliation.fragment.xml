@@ -50,7 +50,7 @@
                             <sfb:customControl>
                                 <MultiInput 
                                     id="reconciliationCountryListInput" 
-                                    valueHelpOnly="true" 
+                                    valueHelpOnly="false" 
                                     valueHelpRequest="onReconciliationCountryValueHelpRequest" 
                                     showValueHelp="true" 
                                     placeholder="{i18n>reconciliationPopup.SelectCountry}" 
@@ -66,7 +66,7 @@
                             <sfb:customControl>
                                 <MultiInput 
                                     id="reconciliationCompanyCodeListInput" 
-                                    valueHelpOnly="true" 
+                                    valueHelpOnly="false" 
                                     valueHelpRequest="onReconciliationCompanyCodeValueHelpRequest" 
                                     showValueHelp="true" 
                                     placeholder="{i18n>reconciliationList.SelectCompanyCodes}" 

@@ -69,7 +69,7 @@
                                     <HBox width="100%" height="100%" alignItems="Center" justifyContent="Center">
                                         <mc:InteractiveDonutChart 
                                             id="documentStatusDonutChart"
-                                            press="onDonutChartPress"
+                                            selectionChanged="onDonutChartSelectionChanged"
                                             showLabel="true"
                                             displayedSegments="4"
                                             size="Responsive"
@@ -170,7 +170,7 @@
                 showTablePersonalisation="true"
                 initialise="true"
                 beforeRebindTable="onBeforeRebindDocumentsTable"
-                requestAtLeastFields="CompanyCode,DocumentNo,PostingDate,TaxCode,Currencycode,VatrGrossAmount,EcslGrossAmount,DiffGrossAmount,Status,StatusText"
+                requestAtLeastFields="CompanyCode,DocumentNo,TaxCode,Currencycode,VatrGrossAmount,EcslGrossAmount,DiffGrossAmount,Status,StatusText"
                 class="sapUiNoContentPadding"
                 height="100%">
                     <st:customToolbar>
@@ -215,22 +215,7 @@
                             <m:Text text="{DocumentNo}" textAlign="Left"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="6rem" sortProperty="FiscalYear" filterProperty="FiscalYear" visible="false">
-                        <table:customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "FiscalYear", "leadingProperty": "FiscalYear", "sortProperty": "FiscalYear", "filterProperty": "FiscalYear", "columnIndex": 8}'/>
-                        </table:customData>
-                        <table:label>
-                            <m:Label text="{i18n>reconciliationDetail.FiscalYear}" visible="false"/>
-                        </table:label>
-                        <table:multiLabels>
-                            <m:Label visible="false"/>
-                            <m:Label text="{i18n>reconciliationDetail.FiscalYear}" textAlign="Center" width="100%"/>
-                        </table:multiLabels>
-                        <table:template>
-                            <m:Text text="{FiscalYear}"/>
-                        </table:template>
-                    </table:Column>
-                    <table:Column width="10rem" sortProperty="PostingDate" filterProperty="PostingDate" hAlign="Left">
+                    <table:Column width="10rem" sortProperty="PostingDate" filterProperty="PostingDate" hAlign="Left" visible="false">
                         <table:customData>
                             <core:CustomData key="p13nData" value='\{"columnKey": "PostingDate", "leadingProperty": "PostingDate", "sortProperty": "PostingDate", "filterProperty": "PostingDate", "columnIndex": 2}'/>
                         </table:customData>
@@ -260,9 +245,24 @@
                             <m:Text text="{TaxCode}" textAlign="Left"/>
                         </table:template>
                     </table:Column>
+                    <table:Column width="6rem" sortProperty="FiscalYear" filterProperty="FiscalYear" visible="false">
+                        <table:customData>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "FiscalYear", "leadingProperty": "FiscalYear", "sortProperty": "FiscalYear", "filterProperty": "FiscalYear", "columnIndex": 20}'/>
+                        </table:customData>
+                        <table:label>
+                            <m:Label text="{i18n>reconciliationDetail.FiscalYear}" visible="false"/>
+                        </table:label>
+                        <table:multiLabels>
+                            <m:Label visible="false"/>
+                            <m:Label text="{i18n>reconciliationDetail.FiscalYear}" textAlign="Center" width="100%"/>
+                        </table:multiLabels>
+                        <table:template>
+                            <m:Text text="{FiscalYear}"/>
+                        </table:template>
+                    </table:Column>
                     <table:Column width="6rem" sortProperty="Currencycode" filterProperty="Currencycode" visible="false">
                         <table:customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "Currencycode", "leadingProperty": "Currencycode", "sortProperty": "Currencycode", "filterProperty": "Currencycode", "columnIndex": 9}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "Currencycode", "leadingProperty": "Currencycode", "sortProperty": "Currencycode", "filterProperty": "Currencycode", "columnIndex": 21}'/>
                         </table:customData>
                         <table:label>
                             <m:Label text="{i18n>reconciliationDetail.Currency}" visible="false"/>
@@ -278,7 +278,7 @@
                     <!-- VATR Column Group - spans 3 columns -->
                     <table:Column width="8rem" sortProperty="VatrBaseAmount" filterProperty="VatrBaseAmount" headerSpan="3,2" visible="false" hAlign="End">
                         <table:customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "VatrBaseAmount", "leadingProperty": "VatrBaseAmount", "sortProperty": "VatrBaseAmount", "filterProperty": "VatrBaseAmount", "columnIndex": 10, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "VatrBaseAmount", "leadingProperty": "VatrBaseAmount", "sortProperty": "VatrBaseAmount", "filterProperty": "VatrBaseAmount", "columnIndex": 11, "type": "numeric"}'/>
                         </table:customData>
                         <table:label>
                             <m:Label text="{i18n>reconciliationDetail.BaseAmount}" visible="false"/>
@@ -291,30 +291,30 @@
                             <m:ObjectNumber number="{VatrBaseAmount}" unit="{Currencycode}" textAlign="End"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="VatrTaxAmount" filterProperty="VatrTaxAmount" headerSpan="2" visible="false">
+                    <table:Column width="8rem" sortProperty="VatrTaxAmount" filterProperty="VatrTaxAmount" headerSpan="2" hAlign="End">
                         <table:customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "VatrTaxAmount", "leadingProperty": "VatrTaxAmount", "sortProperty": "VatrTaxAmount", "filterProperty": "VatrTaxAmount", "columnIndex": 11, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "VatrTaxAmount", "leadingProperty": "VatrTaxAmount", "sortProperty": "VatrTaxAmount", "filterProperty": "VatrTaxAmount", "columnIndex": 4, "type": "numeric"}'/>
                         </table:customData>
                         <table:label>
                             <m:Label text="{i18n>reconciliationDetail.TaxAmount}" visible="false"/>
                         </table:label>
                         <table:multiLabels>
-                            <m:Label text="{i18n>reconciliationDetail.VATR}"/>
+                            <m:Label text="{i18n>reconciliationDetail.VATR}" textAlign="Center" width="100%"/>
                             <m:Label text="{i18n>reconciliationDetail.TaxAmount}" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
-                            <m:ObjectNumber number="{VatrTaxAmount}" unit="{Currencycode}"/>
+                            <m:ObjectNumber number="{VatrTaxAmount}" unit="{Currencycode}" textAlign="End"/>
                         </table:template>
                     </table:Column>
                     <table:Column width="8rem" sortProperty="VatrGrossAmount" filterProperty="VatrGrossAmount" hAlign="End">
                         <table:customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "VatrGrossAmount", "leadingProperty": "VatrGrossAmount", "sortProperty": "VatrGrossAmount", "filterProperty": "VatrGrossAmount", "columnIndex": 4, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "VatrGrossAmount", "leadingProperty": "VatrGrossAmount", "sortProperty": "VatrGrossAmount", "filterProperty": "VatrGrossAmount", "columnIndex": 5, "type": "numeric"}'/>
                         </table:customData>
                         <table:label>
                             <m:Label text="{i18n>reconciliationDetail.GrossAmount}" visible="false"/>
                         </table:label>
                         <table:multiLabels>
-                            <m:Label text="{i18n>reconciliationDetail.VATR}"/>
+                            <m:Label text="{i18n>reconciliationDetail.VATR}" textAlign="Center" width="100%"/>
                             <m:Label text="{i18n>reconciliationDetail.GrossAmount}" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
@@ -337,30 +337,30 @@
                             <m:ObjectNumber number="{EcslBaseAmount}" unit="{Currencycode}" textAlign="End"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="EcslTaxAmount" filterProperty="EcslTaxAmount" headerSpan="2" visible="false">
+                    <table:Column width="8rem" sortProperty="EcslTaxAmount" filterProperty="EcslTaxAmount" headerSpan="2" hAlign="End">
                         <table:customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "EcslTaxAmount", "leadingProperty": "EcslTaxAmount", "sortProperty": "EcslTaxAmount", "filterProperty": "EcslTaxAmount", "columnIndex": 13, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "EcslTaxAmount", "leadingProperty": "EcslTaxAmount", "sortProperty": "EcslTaxAmount", "filterProperty": "EcslTaxAmount", "columnIndex": 6, "type": "numeric"}'/>
                         </table:customData>
                         <table:label>
                             <m:Label text="{i18n>reconciliationDetail.TaxAmount}" visible="false"/>
                         </table:label>
                         <table:multiLabels>
-                            <m:Label text="{i18n>reconciliationDetail.ECSL}"/>
+                            <m:Label text="{i18n>reconciliationDetail.ECSL}" textAlign="Center" width="100%"/>
                             <m:Label text="{i18n>reconciliationDetail.TaxAmount}" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
-                            <m:ObjectNumber number="{EcslTaxAmount}" unit="{Currencycode}"/>
+                            <m:ObjectNumber number="{EcslTaxAmount}" unit="{Currencycode}" textAlign="End"/>
                         </table:template>
                     </table:Column>
                     <table:Column width="8rem" sortProperty="EcslGrossAmount" filterProperty="EcslGrossAmount" hAlign="End">
                         <table:customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "EcslGrossAmount", "leadingProperty": "EcslGrossAmount", "sortProperty": "EcslGrossAmount", "filterProperty": "EcslGrossAmount", "columnIndex": 5, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "EcslGrossAmount", "leadingProperty": "EcslGrossAmount", "sortProperty": "EcslGrossAmount", "filterProperty": "EcslGrossAmount", "columnIndex": 7, "type": "numeric"}'/>
                         </table:customData>
                         <table:label>
                             <m:Label text="{i18n>reconciliationDetail.GrossAmount}" visible="false"/>
                         </table:label>
                         <table:multiLabels>
-                            <m:Label text="{i18n>reconciliationDetail.ECSL}"/>
+                            <m:Label text="{i18n>reconciliationDetail.ECSL}" textAlign="Center" width="100%"/>
                             <m:Label text="{i18n>reconciliationDetail.GrossAmount}" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
@@ -370,7 +370,7 @@
                     <!-- Differences Column Group - spans 3 columns -->
                     <table:Column width="8rem" sortProperty="DiffBaseAmount" filterProperty="DiffBaseAmount" headerSpan="3,2" visible="false" hAlign="End">
                         <table:customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "DiffBaseAmount", "leadingProperty": "DiffBaseAmount", "sortProperty": "DiffBaseAmount", "filterProperty": "DiffBaseAmount", "columnIndex": 14, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "DiffBaseAmount", "leadingProperty": "DiffBaseAmount", "sortProperty": "DiffBaseAmount", "filterProperty": "DiffBaseAmount", "columnIndex": 13, "type": "numeric"}'/>
                         </table:customData>
                         <table:label>
                             <m:Label text="{i18n>reconciliationDetail.BaseAmount}" visible="false"/>
@@ -383,30 +383,30 @@
                             <m:ObjectNumber number="{DiffBaseAmount}" unit="{Currencycode}" state="{path: 'DiffBaseAmount', formatter: '.formatter.formatDiffAmountState'}" textAlign="End"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="DiffTaxAmount" filterProperty="DiffTaxAmount" headerSpan="2" visible="false">
+                    <table:Column width="8rem" sortProperty="DiffTaxAmount" filterProperty="DiffTaxAmount" headerSpan="2" hAlign="End">
                         <table:customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "DiffTaxAmount", "leadingProperty": "DiffTaxAmount", "sortProperty": "DiffTaxAmount", "filterProperty": "DiffTaxAmount", "columnIndex": 15, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "DiffTaxAmount", "leadingProperty": "DiffTaxAmount", "sortProperty": "DiffTaxAmount", "filterProperty": "DiffTaxAmount", "columnIndex": 8, "type": "numeric"}'/>
                         </table:customData>
                         <table:label>
                             <m:Label text="{i18n>reconciliationDetail.TaxAmount}" visible="false"/>
                         </table:label>
                         <table:multiLabels>
-                            <m:Label text="{i18n>reconciliationDetail.Differences}"/>
+                            <m:Label text="{i18n>reconciliationDetail.Differences}" textAlign="Center" width="100%"/>
                             <m:Label text="{i18n>reconciliationDetail.TaxAmount}" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
-                            <m:ObjectNumber number="{DiffTaxAmount}" unit="{Currencycode}" state="{path: 'DiffTaxAmount', formatter: '.formatter.formatDiffAmountState'}"/>
+                            <m:ObjectNumber number="{DiffTaxAmount}" unit="{Currencycode}" state="{path: 'DiffTaxAmount', formatter: '.formatter.formatDiffAmountState'}" textAlign="End"/>
                         </table:template>
                     </table:Column>
                     <table:Column width="8rem" sortProperty="DiffGrossAmount" filterProperty="DiffGrossAmount" hAlign="End">
                         <table:customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "DiffGrossAmount", "leadingProperty": "DiffGrossAmount", "sortProperty": "DiffGrossAmount", "filterProperty": "DiffGrossAmount", "columnIndex": 6, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "DiffGrossAmount", "leadingProperty": "DiffGrossAmount", "sortProperty": "DiffGrossAmount", "filterProperty": "DiffGrossAmount", "columnIndex": 9, "type": "numeric"}'/>
                         </table:customData>
                         <table:label>
                             <m:Label text="{i18n>reconciliationDetail.GrossAmount}" visible="false"/>
                         </table:label>
                         <table:multiLabels>
-                            <m:Label text="{i18n>reconciliationDetail.Differences}"/>
+                            <m:Label text="{i18n>reconciliationDetail.Differences}" textAlign="Center" width="100%"/>
                             <m:Label text="{i18n>reconciliationDetail.GrossAmount}" textAlign="Center" width="100%"/>
                         </table:multiLabels>
                         <table:template>
@@ -416,7 +416,7 @@
                     <!-- Status Column -->
                     <table:Column width="8rem" sortProperty="Status" filterProperty="Status" hAlign="Left">
                         <table:customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "Status", "leadingProperty": "Status", "sortProperty": "Status", "filterProperty": "Status", "columnIndex": 7}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "Status", "leadingProperty": "Status", "sortProperty": "Status", "filterProperty": "Status", "columnIndex": 10}'/>
                         </table:customData>
                         <table:label>
                             <m:Label text="{i18n>reconciliationDetail.Status}" visible="false"/>

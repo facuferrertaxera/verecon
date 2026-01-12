@@ -157,7 +157,14 @@ sap.ui.define([
                     if (aCompanyCodes.length === 1) {
                         aCustomFilters.push(new Filter("companycode", FilterOperator.EQ, aCompanyCodes[0]));
                     } else if (aCompanyCodes.length > 1) {
-                        aCustomFilters.push(new Filter("companycode", FilterOperator.IN, aCompanyCodes));
+                        // Create OR filter for multiple company codes (FilterOperator.IN doesn't exist)
+                        const aCompanyCodeFilters = aCompanyCodes.map(function(sCompanyCode) {
+                            return new Filter("companycode", FilterOperator.EQ, sCompanyCode);
+                        });
+                        aCustomFilters.push(new Filter({
+                            filters: aCompanyCodeFilters,
+                            and: false // OR logic
+                        }));
                     }
                 }
             }
@@ -207,9 +214,10 @@ sap.ui.define([
             this._fixUTC("reporting_date", aFilters);
 
             // Add variant filter if provided (variant name from SmartVariantManagement)
-            if (sVariant) {
-                aFilters.push(new Filter("variant", FilterOperator.EQ, sVariant));
-            }
+            
+            //if (sVariant) {
+            //    aFilters.push(new Filter("variant", FilterOperator.EQ, sVariant));
+            //}
 
             try {
                 oReconciliationDialog.setBusy(true);

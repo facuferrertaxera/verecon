@@ -6,8 +6,7 @@ sap.ui.define([
     return {
         /**
          * Format status icon based on status code
-         * Uses dynamic status data from OData service and pattern matching
-         * @param {string} sStatus - Status code
+         * @param {string} sStatus - Status code (S, NV, NE, E)
          * @returns {string} Icon path
          */
         formatStatusIcon: function(sStatus) {
@@ -15,40 +14,24 @@ sap.ui.define([
                 return "";
             }
             
-            // Pattern-based icon determination
-            // Success statuses (start with S): S, SR, SV, ST, SX, SS
-            if (sStatus.indexOf("S") === 0) {
+            // S (Reconciled) - Success icon
+            if (sStatus === "S") {
                 return "sap-icon://sys-enter-2";
             }
             
-            // Failed statuses (start with F): F, FR, FV, FT, FX, FS, FE
-            if (sStatus.indexOf("F") === 0) {
-                return "sap-icon://error";
+            // NV (Not in VAT Returns) - Warning icon
+            if (sStatus === "NV") {
+                return "sap-icon://alert";
             }
             
-            // In Progress statuses (end with P): P, RP, VP, XP
-            if (sStatus.lastIndexOf("P") === sStatus.length - 1) {
-                return "sap-icon://status-in-process";
+            // NE (Not in EC Sales List) - Warning icon
+            if (sStatus === "NE") {
+                return "sap-icon://alert";
             }
             
-            // Extracted
+            // E (Error) - Error icon
             if (sStatus === "E") {
                 return "sap-icon://error";
-            }
-            
-            // Created
-            if (sStatus === "C") {
-                return "sap-icon://status-in-process";
-            }
-            
-            // Pending Archiving
-            if (sStatus === "PA") {
-                return "sap-icon://pending";
-            }
-            
-            // Tax Authority Review
-            if (sStatus === "TR") {
-                return "sap-icon://status-in-process";
             }
             
             // Default fallback
@@ -57,8 +40,7 @@ sap.ui.define([
 
         /**
          * Format status color based on status code
-         * Uses dynamic status data from OData service and pattern matching
-         * @param {string} sStatus - Status code
+         * @param {string} sStatus - Status code (S, NV, NE, E)
          * @returns {string} Status state (None, Success, Warning, Error)
          */
         formatStatusColor: function(sStatus) {
@@ -66,94 +48,30 @@ sap.ui.define([
                 return "None";
             }
             
-            // Pattern-based color determination
-            // Success statuses (start with S): S, SR, SV, ST, SX, SS
-            if (sStatus.indexOf("S") === 0) {
+            // S (Reconciled) - Success (green)
+            if (sStatus === "S") {
                 return "Success";
             }
             
-            // Failed statuses (start with F): F, FR, FV, FT, FX, FS, FE
-            if (sStatus.indexOf("F") === 0) {
-                return "Error";
-            }
-            
-            // In Progress statuses (end with P): P, RP, VP, XP
-            if (sStatus.lastIndexOf("P") === sStatus.length - 1) {
+            // NV (Not in VAT Returns) - Warning (yellow/orange)
+            if (sStatus === "NV") {
                 return "Warning";
             }
             
-            // Extracted
+            // NE (Not in EC Sales List) - Warning (yellow/orange)
+            if (sStatus === "NE") {
+                return "Warning";
+            }
+            
+            // E (Error) - Error (red)
             if (sStatus === "E") {
                 return "Error";
-            }
-            
-            // Created
-            if (sStatus === "C") {
-                return "Warning";
-            }
-            
-            // Pending Archiving
-            if (sStatus === "PA") {
-                return "Warning";
-            }
-            
-            // Tax Authority Review
-            if (sStatus === "TR") {
-                return "Warning";
             }
             
             // Default fallback
             return "None";
         },
 
-        /**
-         * Format status text based on status code
-         * @param {string} sStatus - Status code
-         * @returns {string} Descriptive status text
-         */
-        formatStatusText: function(sStatus) {
-            if (!sStatus) {
-                return "";
-            }
-            
-            // Success statuses (start with S): S, SR, SV, ST, SX, SS
-            if (sStatus.indexOf("S") === 0) {
-                return "Success";
-            }
-            
-            // Failed statuses (start with F): F, FR, FV, FT, FX, FS, FE
-            if (sStatus.indexOf("F") === 0) {
-                return "Error";
-            }
-            
-            // Extracted
-            if (sStatus === "E") {
-                return "Error";
-            }
-            
-            // In Progress statuses (end with P): P, RP, VP, XP
-            if (sStatus.lastIndexOf("P") === sStatus.length - 1) {
-                return "In Progress";
-            }
-            
-            // Created
-            if (sStatus === "C") {
-                return "Created";
-            }
-            
-            // Pending Archiving
-            if (sStatus === "PA") {
-                return "Pending Archiving";
-            }
-            
-            // Tax Authority Review
-            if (sStatus === "TR") {
-                return "Tax Authority Review";
-            }
-            
-            // Default fallback - return the status code itself
-            return sStatus;
-        },
 
         /**
          * Store controller reference for formatters

@@ -5,18 +5,86 @@ sap.ui.define([
 
     return {
         /**
-         * Format status icon based on status code
-         * @param {string} sStatus - Status code (S, NV, NE, E)
+         * Format reconciliation status icon based on status code
+         * Used for reconciliation list items (Main view)
+         * @param {string} sStatus - Status code (S, RF, P)
          * @returns {string} Icon path
          */
-        formatStatusIcon: function(sStatus) {
+        formatReconciliationStatusIcon: function(sStatus) {
             if (!sStatus) {
                 return "";
             }
             
-            // S (Reconciled) - Success icon
+            // S (Success) - Success icon (tick)
+            // Using accept icon which is more reliable than sys-enter-2
             if (sStatus === "S") {
-                return "sap-icon://sys-enter-2";
+                return "sap-icon://accept";
+            }
+            
+            // RF (Reconciliation Failed) - Error icon (cross)
+            if (sStatus === "RF") {
+                return "sap-icon://error";
+            }
+
+            // RF (Reconciliation Failed) - Error icon (cross)
+            if (sStatus === "E") {
+                return "sap-icon://error";
+            }
+            
+            // P (Extraction in Progress) - Clock icon
+            if (sStatus === "P") {
+                return "sap-icon://time-entry-request";
+            }
+            
+            // Default fallback
+            return "sap-icon://in-progress-2";
+        },
+
+        /**
+         * Format reconciliation status color based on status code
+         * Used for reconciliation list items (Main view)
+         * @param {string} sStatus - Status code (S, RF, P)
+         * @returns {string} Status state (None, Success, Error, Information)
+         */
+        formatReconciliationStatusColor: function(sStatus) {
+            if (!sStatus) {
+                return "None";
+            }
+            
+            // S (Success) - Success (green)
+            if (sStatus === "S") {
+                return "Success";
+            }
+            
+            // RF (Reconciliation Failed) - Error (red)
+            if (sStatus === "RF") {
+                return "Error";
+            }
+            
+            // P (Extraction in Progress) - Information (blue)
+            if (sStatus === "P") {
+                return "Information";
+            }
+            
+            // Default fallback
+            return "None";
+        },
+
+        /**
+         * Format document status icon based on status code
+         * Used for document items in reconciliation detail (ReconciliationDetail view)
+         * @param {string} sStatus - Status code (S, NV, NE, E)
+         * @returns {string} Icon path
+         */
+        formatDocumentStatusIcon: function(sStatus) {
+            if (!sStatus) {
+                return "";
+            }
+            
+            // S (Reconciled) - Success icon (tick)
+            // Using accept icon which is more reliable than sys-enter-2
+            if (sStatus === "S") {
+                return "sap-icon://accept";
             }
             
             // NV (Not in VAT Returns) - Warning icon
@@ -29,7 +97,7 @@ sap.ui.define([
                 return "sap-icon://alert";
             }
             
-            // E (Error) - Error icon
+            // E (Error/Other differences) - Error icon
             if (sStatus === "E") {
                 return "sap-icon://error";
             }
@@ -39,11 +107,52 @@ sap.ui.define([
         },
 
         /**
-         * Format status color based on status code
+         * Format document status icon with key for cell recycling fix
+         * Used for document items in reconciliation detail (ReconciliationDetail view)
+         * Accepts parts array [Status, DocId] to ensure unique binding per row
+         * @param {Array} aParts - Array with [sStatus, sDocId]
+         * @returns {string} Icon path
+         */
+        formatDocumentStatusIconWithKey: function(aParts) {
+            const sStatus = aParts && aParts.length > 0 ? aParts[0] : null;
+            // sDocId is included in parts to ensure unique binding, but not used in logic
+            
+            if (!sStatus) {
+                return "";
+            }
+            
+            // S (Reconciled) - Success icon (tick)
+            // Using accept icon which is more reliable than sys-enter-2
+            if (sStatus === "S") {
+                return "sap-icon://accept";
+            }
+            
+            // NV (Not in VAT Returns) - Warning icon
+            if (sStatus === "NV") {
+                return "sap-icon://alert";
+            }
+            
+            // NE (Not in EC Sales List) - Warning icon
+            if (sStatus === "NE") {
+                return "sap-icon://alert";
+            }
+            
+            // E (Error/Other differences) - Error icon
+            if (sStatus === "E") {
+                return "sap-icon://error";
+            }
+            
+            // Default fallback
+            return "sap-icon://status-in-process";
+        },
+
+        /**
+         * Format document status color based on status code
+         * Used for document items in reconciliation detail (ReconciliationDetail view)
          * @param {string} sStatus - Status code (S, NV, NE, E)
          * @returns {string} Status state (None, Success, Warning, Error)
          */
-        formatStatusColor: function(sStatus) {
+        formatDocumentStatusColor: function(sStatus) {
             if (!sStatus) {
                 return "None";
             }
@@ -63,13 +172,83 @@ sap.ui.define([
                 return "Warning";
             }
             
-            // E (Error) - Error (red)
+            // E (Error/Other differences) - Error (red)
             if (sStatus === "E") {
-                return "Error";
+                return "Information";
             }
             
             // Default fallback
             return "None";
+        },
+
+        /**
+         * Format document status icon color for Icon control
+         * Used for document items in reconciliation detail (ReconciliationDetail view)
+         * @param {string} sStatus - Status code (S, NV, NE, E)
+         * @returns {string} Icon color (positive, critical, negative, default)
+         */
+        formatDocumentStatusIconColor: function(sStatus) {
+            if (!sStatus) {
+                return "";
+            }
+            
+            // S (Reconciled) - Success (green)
+            if (sStatus === "S") {
+                return "positive";
+            }
+            
+            // NV (Not in VAT Returns) - Warning (yellow/orange)
+            if (sStatus === "NV") {
+                return "critical";
+            }
+            
+            // NE (Not in EC Sales List) - Warning (yellow/orange)
+            if (sStatus === "NE") {
+                return "critical";
+            }
+            
+            // E (Error/Other differences) - Error (red)
+            if (sStatus === "E") {
+                return "negative";
+            }
+            
+            // Default fallback
+            return "";
+        },
+
+        /**
+         * Format document status text CSS class for Text control
+         * Used for document items in reconciliation detail (ReconciliationDetail view)
+         * @param {string} sStatus - Status code (S, NV, NE, E)
+         * @returns {string} CSS class for text color
+         */
+        formatDocumentStatusTextClass: function(sStatus) {
+            if (!sStatus) {
+                return "";
+            }
+            
+            // S (Reconciled) - Success (green text)
+            if (sStatus === "S") {
+                return "sapUiTextSuccess";
+            }
+            
+            // NV (Not in VAT Returns) - Warning (orange/yellow text)
+            if (sStatus === "NV") {
+                return "sapUiTextWarning";
+            }
+            
+            // NE (Not in EC Sales List) - Warning (orange/yellow text)
+            if (sStatus === "NE") {
+                return "sapUiTextWarning";
+            }
+            
+            // E (Error/Other differences) - Error (red text)
+            if (sStatus === "E") {
+                return "sapUiTextError";
+            }
+            
+            // Default fallback
+            return "";
         },
 
 

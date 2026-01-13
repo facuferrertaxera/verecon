@@ -146,6 +146,28 @@
 #documentsTable {
     flex: 1 1 auto;
     min-height: 0;
+    height: 100%;
+}
+
+/* Ensure table body has proper padding to show last row */
+#documentsTable .sapUiTableCtrl {
+    padding-bottom: 1rem !important;
+}
+
+/* Ensure table scroll area accounts for all rows */
+#documentsTable .sapUiTableCtrlScr {
+    box-sizing: border-box;
+}
+
+/* Ensure table scroll container has proper height calculation */
+#documentsTable .sapUiTableCtrlScrollContainer {
+    overflow-y: auto !important;
+}
+
+/* Ensure the table content container has proper min-height for Auto mode */
+#documentsTable .sapUiTableCCnt {
+    min-height: 0 !important;
+    flex: 1 1 auto !important;
 }
 
 /* Make SmartTable fill available height in DynamicPage content */
@@ -153,9 +175,19 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    min-height: 0;
 }
 
 #documentsSmartTable .sapUiCompSmartTableInner {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure the table wrapper inside SmartTable has proper height */
+#documentsSmartTable .sapUiCompSmartTableInner > .sapUiTable {
     flex: 1 1 auto;
     min-height: 0;
     height: 100%;

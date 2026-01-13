@@ -31,6 +31,18 @@ sap.ui.define([
                 oView.setModel(new JSONModel(), "view");
             }
             
+            // Initialize suggestions data structure if not exists
+            if (!oViewModel.getProperty("/reconciliationList")) {
+                oViewModel.setProperty("/reconciliationList", {
+                    countrySuggestions: [],
+                    companyCodeSuggestions: []
+                });
+            }
+            
+            // Load suggestions data
+            await this._loadCountrySuggestions();
+            await this._loadCompanyCodeSuggestions();
+            
             // Clear SmartFilterBar and reset validation state before opening
             const oSmartFilterBar = oView.byId("reconciliationSmartFilterBar");
             if (oSmartFilterBar) {
@@ -81,166 +93,116 @@ sap.ui.define([
             // Can be used to react to filter changes if needed
         },
 
-        /**
-         * Handler for proceed button - validates and creates reconciliation via NewRecParameter read
-         */
-        onNewReconciliationProceed: async function () {
-            const oView = this.getView();
-            const oReconciliationDialog = oView.byId("ReconciliationDialog");
-            const oSmartFilterBar = oView.byId("reconciliationSmartFilterBar");
-            
-            if (!oSmartFilterBar) {
-                MessageToast.show("SmartFilterBar not found.");
-                return;
-            }
+      onNewReconciliationProceed: async function () {
+    const oView = this.getView();
+    const oReconciliationDialog = oView.byId("ReconciliationDialog");
+    const oSmartFilterBar = oView.byId("reconciliationSmartFilterBar");
+    
+    if (!oSmartFilterBar) {
+        MessageToast.show("SmartFilterBar not found.");
+        return;
+    }
 
-            // Validate custom controls first (since SmartFilterBar.validateMandatoryFields might not work for custom controls)
-            let bIsValid = true;
-            const oCountryInput = oView.byId("reconciliationCountryListInput");
-            if (oCountryInput) {
-                const aCountryTokens = oCountryInput.getTokens();
-                if (!aCountryTokens || aCountryTokens.length === 0) {
-                    oCountryInput.setValueState("Error");
-                    bIsValid = false;
-                } else {
-                    oCountryInput.setValueState("None");
-                }
-            }
-            
-            const oCompanyCodeInput = oView.byId("reconciliationCompanyCodeListInput");
-            if (oCompanyCodeInput) {
-                const aCompanyCodeTokens = oCompanyCodeInput.getTokens();
-                if (!aCompanyCodeTokens || aCompanyCodeTokens.length === 0) {
-                    oCompanyCodeInput.setValueState("Error");
-                    bIsValid = false;
-                } else {
-                    oCompanyCodeInput.setValueState("None");
-                }
-            }
-            
-            // Validate other SmartFilterBar fields (like reporting_date)
-            if (!oSmartFilterBar.validateMandatoryFields()) {
-                bIsValid = false;
-            }
-            
-            if (!bIsValid) {
-                MessageToast.show(this.i18n("reconciliationPopup.PleaseFillAllMandatoryFields"));
-                return;
-            }
+    // Validation code (same as before)
+    let bIsValid = true;
+    const oCountryInput = oView.byId("reconciliationCountryListInput");
+    if (oCountryInput) {
+        const aCountryTokens = oCountryInput.getTokens();
+        if (!aCountryTokens || aCountryTokens.length === 0) {
+            oCountryInput.setValueState("Error");
+            bIsValid = false;
+        } else {
+            oCountryInput.setValueState("None");
+        }
+    }
+    
+    const oCompanyCodeInput = oView.byId("reconciliationCompanyCodeListInput");
+    if (oCompanyCodeInput) {
+        const aCompanyCodeTokens = oCompanyCodeInput.getTokens();
+        if (!aCompanyCodeTokens || aCompanyCodeTokens.length === 0) {
+            oCompanyCodeInput.setValueState("Error");
+            bIsValid = false;
+        } else {
+            oCompanyCodeInput.setValueState("None");
+        }
+    }
+    
+    if (!oSmartFilterBar.validateMandatoryFields()) {
+        bIsValid = false;
+    }
+    
+    if (!bIsValid) {
+        MessageToast.show(this.i18n("reconciliationPopup.PleaseFillAllMandatoryFields"));
+        return;
+    }
 
-            // Get filters from SmartFilterBar
-            let aFilters = oSmartFilterBar.getFilters();
+    // ✅ BUILD FILTERS PROPERLY (avoid mixing AND/OR at top level)
+    const aAllFilters = [];
 
-            // Manually add filters from custom MultiInput controls
-            // Since we're using custom controls, SmartFilterBar.getFilters() won't include them
-            const aCustomFilters = [];
-            
-            // Get country from custom MultiInput control (reuse oCountryInput from validation above)
-            if (oCountryInput) {
-                const aCountryTokens = oCountryInput.getTokens();
-                if (aCountryTokens && aCountryTokens.length > 0) {
-                    // Get the first token (only one allowed due to maxTokens="1")
-                    const sCountry = aCountryTokens[0].getKey();
-                    if (sCountry) {
-                        aCustomFilters.push(new Filter("country", FilterOperator.EQ, sCountry));
-                    }
-                }
-            }
-            
-            // Get company codes from custom MultiInput control (reuse oCompanyCodeInput from validation above)
-            if (oCompanyCodeInput) {
-                const aCompanyCodeTokens = oCompanyCodeInput.getTokens();
-                if (aCompanyCodeTokens && aCompanyCodeTokens.length > 0) {
-                    const aCompanyCodes = aCompanyCodeTokens.map(function(oToken) {
-                        return oToken.getKey();
-                    });
-                    if (aCompanyCodes.length === 1) {
-                        aCustomFilters.push(new Filter("companycode", FilterOperator.EQ, aCompanyCodes[0]));
-                    } else if (aCompanyCodes.length > 1) {
-                        // Create OR filter for multiple company codes (FilterOperator.IN doesn't exist)
-                        const aCompanyCodeFilters = aCompanyCodes.map(function(sCompanyCode) {
-                            return new Filter("companycode", FilterOperator.EQ, sCompanyCode);
-                        });
-                        aCustomFilters.push(new Filter({
-                            filters: aCompanyCodeFilters,
-                            and: false // OR logic
-                        }));
-                    }
-                }
-            }
-            
-            // Merge custom filters with SmartFilterBar filters
-            if (aCustomFilters.length > 0) {
-                // Remove any existing country/companycode filters from SmartFilterBar filters
-                if (aFilters && aFilters.length > 0 && aFilters[0].aFilters) {
-                    aFilters[0].aFilters = aFilters[0].aFilters.filter(function(oFilter) {
-                        if (oFilter.aFilters && oFilter.aFilters[0]) {
-                            const sPath = oFilter.aFilters[0].sPath;
-                            return sPath !== "country" && sPath !== "companycode";
-                        }
-                        const sPath = oFilter.sPath;
-                        return sPath !== "country" && sPath !== "companycode";
-                    });
-                    // Add custom filters
-                    aFilters[0].aFilters = aFilters[0].aFilters.concat(aCustomFilters);
-                } else if (aFilters && aFilters.length > 0) {
-                    // If filters structure is different, just add custom filters
-                    aFilters = aFilters.concat(aCustomFilters);
-                } else {
-                    // No existing filters, create new filter group
-                    aFilters = [new Filter({filters: aCustomFilters, and: true})];
-                }
-            }
+    // Get SmartFilterBar filters (e.g., reporting_date)
+    const aSmartFilters = oSmartFilterBar.getFilters();
+    if (aSmartFilters && aSmartFilters.length > 0) {
+        aAllFilters.push(...aSmartFilters);
+    }
 
-            // Get variant name from SmartVariantManagement
-            let sVariant = "";
-            try {
-                const oVariantMgmt = oView.byId("reconciliationSmartVariantManagement");
-                if (oVariantMgmt) {
-                    const sCurrentVariantKey = oVariantMgmt.getCurrentVariantKey();
-                    if (sCurrentVariantKey) {
-                        const oVariantItem = oVariantMgmt.getItemByKey(sCurrentVariantKey);
-                        if (oVariantItem) {
-                            sVariant = oVariantItem.getProperty("title") || "";
-                        }
-                    }
-                }
-            } catch (oError) {
-                // If variant retrieval fails, variant will remain empty
-                console.warn("Could not get variant name from SmartVariantManagement:", oError);
-            }
+    // Build country filter (single value, so simple EQ)
+    if (oCountryInput) {
+        const aCountryTokens = oCountryInput.getTokens();
+        if (aCountryTokens && aCountryTokens.length > 0) {
+            const sCountry = aCountryTokens[0].getKey();
+            aAllFilters.push(new Filter("country", FilterOperator.EQ, sCountry));
+        }
+    }
 
-            // Fix UTC for date filters
-            this._fixUTC("reporting_date", aFilters);
-
-            // Add variant filter if provided (variant name from SmartVariantManagement)
-            
-            //if (sVariant) {
-            //    aFilters.push(new Filter("variant", FilterOperator.EQ, sVariant));
-            //}
-
-            try {
-                oReconciliationDialog.setBusy(true);
-                
-                // Single read to NewRecParameter with all filters
-                // Backend will handle finding all matching records and doing the reconciliation
-                const oResponse = await this.promRead("/NewRecParameter", {
-                    filters: aFilters,
-                    urlParameters: {
-                        "$select": "companycode,country,reporting_date,recon_id"
-                    }
+    // Build company code filter (single or multiple values)
+    if (oCompanyCodeInput) {
+        const aCompanyCodeTokens = oCompanyCodeInput.getTokens();
+        if (aCompanyCodeTokens && aCompanyCodeTokens.length > 0) {
+            if (aCompanyCodeTokens.length === 1) {
+                aAllFilters.push(new Filter("companycode", FilterOperator.EQ, aCompanyCodeTokens[0].getKey()));
+            } else {
+                // Multiple company codes: create OR filter
+                const aCompanyFilters = aCompanyCodeTokens.map(function(oToken) {
+                    return new Filter("companycode", FilterOperator.EQ, oToken.getKey());
                 });
-                
-                oReconciliationDialog.close();
-                oSmartFilterBar.fireClear();
-                this._refreshView();
-                MessageToast.show(this.i18n("reconciliationList.CreateReconciliationConfirmation"));
-            } catch (oError) {
-                this._handleReconciliationCreateError(oError);
-            } finally {
-                oReconciliationDialog.setBusy(false);
+                aAllFilters.push(new Filter({
+                    filters: aCompanyFilters,
+                    and: false // OR between company codes
+                }));
             }
-        },
+        }
+    }
+
+    // ✅ KEY FIX: Wrap all filters with AND logic
+    // This ensures the structure is: (date RANGE) AND (country EQ) AND (companycode OR filters)
+    const oFinalFilter = new Filter({
+        filters: aAllFilters,
+        and: true  // ← Important: AND combines all conditions
+    });
+
+    this._fixUTC("reporting_date", [oFinalFilter]);
+
+    try {
+        oReconciliationDialog.setBusy(true);
+        
+        const oResponse = await this.promRead("/NewRecParameter", {
+            filters: [oFinalFilter],  // ← Pass as array with single combined filter
+            urlParameters: {
+                "$select": "companycode,country,reporting_date,recon_id"
+            }
+        });
+        
+        oReconciliationDialog.close();
+        oSmartFilterBar.fireClear();
+        this._refreshView();
+        MessageToast.show(this.i18n("reconciliationList.CreateReconciliationConfirmation"));
+    } catch (oError) {
+        this._handleReconciliationCreateError(oError);
+    } finally {
+        oReconciliationDialog.setBusy(false);
+    }
+},
+
 
         /**
          * Fix UTC for date filters
@@ -1030,6 +992,190 @@ sap.ui.define([
                     }
                 }
             }
+        },
+
+        /**
+         * Load country suggestions for MultiInput
+         * @private
+         */
+        _loadCountrySuggestions: async function() {
+            const oModel = this.getModel();
+            const oViewModel = this.getView().getModel("view");
+            
+            if (!oModel || !oViewModel) {
+                return;
+            }
+            
+            try {
+                const oResponse = await this.promRead("/Country", {
+                    urlParameters: {
+                        "$select": "Country,Country_Text",
+                        "$top": "9999"
+                    }
+                });
+                
+                if (oResponse && oResponse.results) {
+                    oViewModel.setProperty("/reconciliationList/countrySuggestions", oResponse.results);
+                }
+            } catch (oError) {
+                console.error("Error loading country suggestions:", oError);
+                oViewModel.setProperty("/reconciliationList/countrySuggestions", []);
+            }
+        },
+
+        /**
+         * Load company code suggestions for MultiInput
+         * @private
+         */
+        _loadCompanyCodeSuggestions: async function() {
+            const oModel = this.getModel();
+            const oViewModel = this.getView().getModel("view");
+            
+            if (!oModel || !oViewModel) {
+                return;
+            }
+            
+            try {
+                const oResponse = await this.promRead("/CompanyVH", {
+                    urlParameters: {
+                        "$select": "CompanyCode,Name,Country",
+                        "$top": "9999"
+                    }
+                });
+                
+                if (oResponse && oResponse.results) {
+                    oViewModel.setProperty("/reconciliationList/companyCodeSuggestions", oResponse.results);
+                }
+            } catch (oError) {
+                console.error("Error loading company code suggestions:", oError);
+                oViewModel.setProperty("/reconciliationList/companyCodeSuggestions", []);
+            }
+        },
+
+        /**
+         * Handler for country token update - validates token
+         */
+        onReconciliationCountryTokenUpdate: function(oEvent) {
+            const oView = this.getView();
+            const oMultiInput = oEvent.getSource();
+            const oToken = oEvent.getParameter("token");
+            const oViewModel = oView.getModel("view");
+            
+            if (!oToken || !oViewModel) {
+                return;
+            }
+            
+            const sCountryCode = oToken.getKey();
+            const aCountrySuggestions = oViewModel.getProperty("/reconciliationList/countrySuggestions") || [];
+            
+            // Validate that the country exists
+            const oCountry = aCountrySuggestions.find(function(oItem) {
+                return oItem.Country === sCountryCode;
+            });
+            
+            if (!oCountry) {
+                // Invalid country - remove token and show error
+                oToken.setEditable(false);
+                oMultiInput.setValueState("Error");
+                oMultiInput.setValueStateText(this.i18n("reconciliationPopup.InvalidCountry"));
+                // Remove invalid token
+                const aTokens = oMultiInput.getTokens();
+                const iIndex = aTokens.indexOf(oToken);
+                if (iIndex !== -1) {
+                    oMultiInput.removeToken(oToken);
+                }
+            } else {
+                // Valid country - update token text if needed
+                if (oCountry.Country_Text) {
+                    oToken.setText(oCountry.Country_Text + " (" + sCountryCode + ")");
+                }
+                oMultiInput.setValueState("None");
+                
+                // Update company code suggestions based on selected country
+                this._updateCompanyCodeSuggestionsForCountry(sCountryCode);
+            }
+        },
+
+        /**
+         * Handler for company code token update - validates token
+         */
+        onReconciliationCompanyCodeTokenUpdate: function(oEvent) {
+            const oView = this.getView();
+            const oMultiInput = oEvent.getSource();
+            const oToken = oEvent.getParameter("token");
+            const oViewModel = oView.getModel("view");
+            const oCountryInput = oView.byId("reconciliationCountryListInput");
+            
+            if (!oToken || !oViewModel) {
+                return;
+            }
+            
+            const sCompanyCode = oToken.getKey();
+            const aCompanyCodeSuggestions = oViewModel.getProperty("/reconciliationList/companyCodeSuggestions") || [];
+            
+            // Get selected country
+            let sSelectedCountry = null;
+            if (oCountryInput) {
+                const aCountryTokens = oCountryInput.getTokens();
+                if (aCountryTokens && aCountryTokens.length > 0) {
+                    sSelectedCountry = aCountryTokens[0].getKey();
+                }
+            }
+            
+            // Validate that the company code exists
+            const oCompanyCode = aCompanyCodeSuggestions.find(function(oItem) {
+                return oItem.CompanyCode === sCompanyCode;
+            });
+            
+            if (!oCompanyCode) {
+                // Invalid company code - remove token and show error
+                oToken.setEditable(false);
+                oMultiInput.setValueState("Error");
+                oMultiInput.setValueStateText(this.i18n("reconciliationPopup.InvalidCompanyCode"));
+                const aTokens = oMultiInput.getTokens();
+                const iIndex = aTokens.indexOf(oToken);
+                if (iIndex !== -1) {
+                    oMultiInput.removeToken(oToken);
+                }
+            } else if (sSelectedCountry && oCompanyCode.Country !== sSelectedCountry) {
+                // Company code doesn't belong to selected country
+                oToken.setEditable(false);
+                oMultiInput.setValueState("Error");
+                oMultiInput.setValueStateText(this.i18n("reconciliationPopup.CompanyCodeNotInCountry"));
+                const aTokens = oMultiInput.getTokens();
+                const iIndex = aTokens.indexOf(oToken);
+                if (iIndex !== -1) {
+                    oMultiInput.removeToken(oToken);
+                }
+            } else {
+                // Valid company code - update token text if needed
+                if (oCompanyCode.Name) {
+                    oToken.setText(oCompanyCode.CompanyCode + " - " + oCompanyCode.Name);
+                }
+                oMultiInput.setValueState("None");
+            }
+        },
+
+        /**
+         * Update company code suggestions based on selected country
+         * @private
+         */
+        _updateCompanyCodeSuggestionsForCountry: function(sCountryCode) {
+            const oViewModel = this.getView().getModel("view");
+            if (!oViewModel) {
+                return;
+            }
+            
+            const aAllCompanyCodes = oViewModel.getProperty("/reconciliationList/companyCodeSuggestions") || [];
+            
+            // Filter company codes by country
+            const aFilteredCompanyCodes = aAllCompanyCodes.filter(function(oItem) {
+                return oItem.Country === sCountryCode;
+            });
+            
+            // Update the suggestions (this will update the MultiInput suggestionItems)
+            // Note: We keep all company codes in the model, but the MultiInput will filter based on country
+            // The validation in tokenUpdate will ensure only valid company codes are accepted
         },
 
     };

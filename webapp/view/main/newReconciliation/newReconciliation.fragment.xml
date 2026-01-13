@@ -55,7 +55,13 @@
                                     showValueHelp="true" 
                                     placeholder="{i18n>reconciliationPopup.SelectCountry}" 
                                     enableMultiLineMode="true"
-                                    maxTokens="1"/>
+                                    maxTokens="1"
+                                    tokenUpdate="onReconciliationCountryTokenUpdate"
+                                    suggestionItems="{view>/reconciliationList/countrySuggestions}">
+                                    <suggestionItems>
+                                        <core:Item key="{view>Country}" text="{view>Country_Text} ({view>Country})"/>
+                                    </suggestionItems>
+                                </MultiInput>
                             </sfb:customControl>
                         </sfb:ControlConfiguration>
                         <sfb:ControlConfiguration 
@@ -70,7 +76,13 @@
                                     valueHelpRequest="onReconciliationCompanyCodeValueHelpRequest" 
                                     showValueHelp="true" 
                                     placeholder="{i18n>reconciliationList.SelectCompanyCodes}" 
-                                    enableMultiLineMode="true"/>
+                                    enableMultiLineMode="true"
+                                    tokenUpdate="onReconciliationCompanyCodeTokenUpdate"
+                                    suggestionItems="{view>/reconciliationList/companyCodeSuggestions}">
+                                    <suggestionItems>
+                                        <core:Item key="{view>CompanyCode}" text="{view>CompanyCode} - {view>Name}"/>
+                                    </suggestionItems>
+                                </MultiInput>
                             </sfb:customControl>
                         </sfb:ControlConfiguration>
                         <sfb:ControlConfiguration 

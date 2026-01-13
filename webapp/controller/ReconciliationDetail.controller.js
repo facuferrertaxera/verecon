@@ -4,8 +4,9 @@ sap.ui.define([
     "sap/ui/model/FilterOperator",
     "sap/ui/model/json/JSONModel",
     "tech/taxera/taxreporting/verecon/utils/formatter",
-    "tech/taxera/taxreporting/verecon/utils/types"
-], (BaseController, Filter, FilterOperator, JSONModel, formatter, types) => {
+    "tech/taxera/taxreporting/verecon/utils/types",
+    "sap/ui/core/ResizeHandler"
+], (BaseController, Filter, FilterOperator, JSONModel, formatter, types, ResizeHandler) => {
     "use strict";
 
     const ReconciliationDetailController = BaseController.extend("tech.taxera.taxreporting.verecon.controller.ReconciliationDetail", {
@@ -84,6 +85,132 @@ sap.ui.define([
         /**
          * Handler for route matched - loads reconciliation data
          */
+        onAfterRendering: function() {
+            // Ensure table container has proper height for Auto mode calculation
+            this._ensureTableHeight();
+        },
+
+        /**
+         * Ensures the table has proper height by calculating and setting visible row count
+         * This is called after rendering and when header toggles
+         */
+        _ensureTableHeight: function() {
+            const oTable = this.byId("documentsTable");
+            const oSmartTable = this.byId("documentsSmartTable");
+            
+            if (!oTable || !oSmartTable) {
+                return;
+            }
+
+            // Use multiple attempts to ensure height is calculated
+            const fnCalculateHeight = () => {
+                const oTableDomRef = oTable.getDomRef();
+                const oSmartTableDomRef = oSmartTable.getDomRef();
+                
+                if (!oTableDomRef || !oSmartTableDomRef) {
+                    return;
+                }
+
+                // Get the table's content container (where rows are rendered)
+                const oTableCCnt = oTableDomRef.querySelector('.sapUiTableCCnt');
+                const oTableCtrl = oTableDomRef.querySelector('.sapUiTableCtrl');
+                const oTableHeader = oTableDomRef.querySelector('.sapUiTableColHdrCnt');
+                
+                if (!oTableCCnt || !oTableCtrl) {
+                    return;
+                }
+
+                // Get the actual available height for the content area
+                const iTableCCntHeight = oTableCCnt.clientHeight || oTableCCnt.offsetHeight;
+                const iTableHeight = oTableDomRef.offsetHeight || oTableDomRef.clientHeight;
+                
+                // Only proceed if we have a valid height
+                if (iTableCCntHeight > 0 || iTableHeight > 0) {
+                    // Get header height
+                    const iHeaderHeight = oTableHeader ? (oTableHeader.offsetHeight || oTableHeader.clientHeight || 0) : 66; // Default 2-row header
+                    
+                    // Get row height - try multiple methods
+                    let iRowHeight = 0;
+                    if (oTable.getRowHeight) {
+                        iRowHeight = oTable.getRowHeight();
+                    }
+                    if (iRowHeight === 0) {
+                        // Try to get from first visible content row
+                        const oFirstContentRow = oTableCtrl.querySelector('.sapUiTableContentRow');
+                        if (oFirstContentRow) {
+                            iRowHeight = oFirstContentRow.offsetHeight || oFirstContentRow.clientHeight;
+                        }
+                    }
+                    if (iRowHeight === 0) {
+                        // Fallback: check computed style or use default
+                        const oFirstRow = oTableCtrl.querySelector('.sapUiTableRow');
+                        if (oFirstRow) {
+                            const oStyle = window.getComputedStyle(oFirstRow);
+                            iRowHeight = parseInt(oStyle.height) || parseInt(oStyle.minHeight) || 34;
+                        } else {
+                            iRowHeight = 34; // Default fallback
+                        }
+                    }
+                    
+                    // Calculate available height for rows
+                    // Use the content container height minus header
+                    const iAvailableHeight = iTableCCntHeight > 0 ? iTableCCntHeight : (iTableHeight - iHeaderHeight);
+                    
+                    // Calculate visible row count (use available height divided by row height)
+                    if (iAvailableHeight > 0 && iRowHeight > 0) {
+                        const iCalculatedRowCount = Math.floor(iAvailableHeight / iRowHeight);
+                        
+                        // Only set if we get a reasonable count (at least 3 rows)
+                        if (iCalculatedRowCount >= 3) {
+                            // Switch to Fixed mode with calculated count
+                            if (oTable.getVisibleRowCountMode() !== "Fixed" || oTable.getVisibleRowCount() !== iCalculatedRowCount) {
+                                oTable.setVisibleRowCountMode("Fixed");
+                                oTable.setVisibleRowCount(iCalculatedRowCount);
+                            }
+                        } else if (oTable.getVisibleRowCountMode() === "Auto" && iTableHeight === 0) {
+                            // If Auto mode and zero height, try to trigger recalculation
+                            window.dispatchEvent(new Event('resize'));
+                            ResizeHandler.fireResize(oTableDomRef);
+                            ResizeHandler.fireResize(oSmartTableDomRef);
+                            oTable.invalidate();
+                        }
+                    }
+                } else {
+                    // If no height yet, try to trigger recalculation
+                    window.dispatchEvent(new Event('resize'));
+                    ResizeHandler.fireResize(oTableDomRef);
+                    oTable.invalidate();
+                }
+            };
+
+            // Try immediately
+            setTimeout(fnCalculateHeight, 50);
+            
+            // Try again after a short delay (for async rendering)
+            setTimeout(fnCalculateHeight, 200);
+            
+            // Try once more after header animations complete
+            setTimeout(fnCalculateHeight, 500);
+        },
+
+        /**
+         * Handler for DynamicPage header toggle
+         * Recalculates table height when header expands/collapses
+         */
+        onToggleHeader: function(oEvent) {
+            const bExpanded = oEvent.getParameter("expanded");
+            // Update view model
+            const oViewModel = this.getView().getModel("view");
+            if (oViewModel) {
+                oViewModel.setProperty("/reconciliationDetail/headerExpanded", bExpanded);
+            }
+            
+            // Recalculate table height after header toggle animation
+            setTimeout(() => {
+                this._ensureTableHeight();
+            }, 400); // Wait for animation to complete
+        },
+
         _onRouteMatched: function(oEvent) {
             const oArgs = oEvent.getParameter("arguments");
             const sReconId = oArgs.reconId;
@@ -203,6 +330,12 @@ sap.ui.define([
                     } else if (sStatusFilter === "TOTAL_DIFFERENCE") {
                         // Total Difference: Documents with differences (DiffGrossAmount != 0)
                         aStatusFilters.push(new Filter("DiffGrossAmount", FilterOperator.NE, 0));
+                    } else if (sStatusFilter === "ERROR") {
+                        // Error status: Status = "E"
+                        aStatusFilters.push(new Filter("Status", FilterOperator.EQ, "E"));
+                    } else if (sStatusFilter === "ALL_DIFFERENCES") {
+                        // All differences: Status != "S" (all non-success statuses)
+                        aStatusFilters.push(new Filter("Status", FilterOperator.NE, "S"));
                     } else if (sStatusFilter === "RECONCILED") {
                         // Reconciled: Status starts with "S" - create OR filter for common S statuses
                         const aSStatusFilters = ["S", "SR", "SV", "ST", "SX", "SS"].map(function(sStatus) {
@@ -238,6 +371,10 @@ sap.ui.define([
                 },
                 dataReceived: (oEvent) => {
                     this.getView().setBusy(false);
+                    // Ensure table height after data is received
+                    setTimeout(() => {
+                        this._ensureTableHeight();
+                    }, 100);
                 }
             };
         },
@@ -253,6 +390,11 @@ sap.ui.define([
             const oSmartTable = this.byId("documentsSmartTable");
             if (oSmartTable) {
                 oSmartTable.rebindTable();
+                
+                // Also ensure height after rebind (dataReceived will also call it)
+                setTimeout(() => {
+                    this._ensureTableHeight();
+                }, 300);
             }
         },
 
@@ -364,7 +506,7 @@ sap.ui.define([
                                 status: "NV"
                             },
                             {
-                                label: "Error",
+                                label: "Other differences",
                                 value: mStatusCounts["E"],
                                 displayedValue: mStatusCounts["E"].toString(),
                                 status: "E"
@@ -519,8 +661,8 @@ sap.ui.define([
                 } else if (sStatus === "NV") {
                     sStatusFilter = "NOT_IN_VATR";
                 } else if (sStatus === "E") {
-                    // Error status - filter by total difference (documents with differences)
-                    sStatusFilter = "TOTAL_DIFFERENCE";
+                    // Error status - filter by Status = "E"
+                    sStatusFilter = "ERROR";
                 } else if (sStatus === "S") {
                     // Reconciled - filter by status starting with "S"
                     sStatusFilter = "RECONCILED";
@@ -554,7 +696,7 @@ sap.ui.define([
             // Update total difference card styling based on filter
             const oTotalDiffCard = this.byId("totalDifferenceCard");
             if (oTotalDiffCard) {
-                if (aSelectedStatusFilters.indexOf("TOTAL_DIFFERENCE") !== -1) {
+                if (aSelectedStatusFilters.indexOf("ALL_DIFFERENCES") !== -1) {
                     oTotalDiffCard.addStyleClass("totalDifferenceCardActive");
                     oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", false);
                 } else {
@@ -687,20 +829,23 @@ sap.ui.define([
             // Get currently selected status filters
             const aCurrentFilters = oViewModel.getProperty("/reconciliationDetail/selectedStatusFilters") || [];
             
-            // Toggle: if TOTAL_DIFFERENCE is already selected, remove it; otherwise add it
+            // Toggle: if ALL_DIFFERENCES is already selected, remove it; otherwise add it
             const aNewFilters = aCurrentFilters.slice(); // Copy array
-            const iIndex = aNewFilters.indexOf("TOTAL_DIFFERENCE");
+            const iIndex = aNewFilters.indexOf("ALL_DIFFERENCES");
             if (iIndex !== -1) {
                 aNewFilters.splice(iIndex, 1);
             } else {
-                aNewFilters.push("TOTAL_DIFFERENCE");
+                // Remove any other status filters when selecting ALL_DIFFERENCES
+                // (since ALL_DIFFERENCES means Status != "S", it's mutually exclusive)
+                aNewFilters.length = 0;
+                aNewFilters.push("ALL_DIFFERENCES");
             }
             oViewModel.setProperty("/reconciliationDetail/selectedStatusFilters", aNewFilters);
             oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", false);
 
             // Update card styling based on state
             if (oCard) {
-                if (aNewFilters.indexOf("TOTAL_DIFFERENCE") !== -1) {
+                if (aNewFilters.indexOf("ALL_DIFFERENCES") !== -1) {
                     oCard.addStyleClass("totalDifferenceCardActive");
                 } else {
                     oCard.removeStyleClass("totalDifferenceCardActive");
@@ -786,7 +931,7 @@ sap.ui.define([
             // Update total difference card styling based on filter
             const oTotalDiffCard = this.byId("totalDifferenceCard");
             if (oTotalDiffCard) {
-                if (aNewFilters.indexOf("TOTAL_DIFFERENCE") !== -1) {
+                if (aNewFilters.indexOf("ALL_DIFFERENCES") !== -1) {
                     oTotalDiffCard.addStyleClass("totalDifferenceCardActive");
                     oViewModel.setProperty("/reconciliationDetail/showOnlyDifferences", false);
                 } else {

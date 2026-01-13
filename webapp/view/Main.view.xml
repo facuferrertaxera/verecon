@@ -158,7 +158,7 @@
                                 <Tokenizer id="companyCodeListCellTokenizer" editable="false" class="sapUiTinyMargin selectedCountriesTokenizer" width="100%" multiLine="true"/>
                                 <Text text="{path: 'FromDate', type: '.types.TaxeraDateType'}"/>
                                 <Text text="{path: 'ToDate', type: '.types.TaxeraDateType'}"/>
-                                <ObjectStatus inverted="false" text="{StatusText}" icon="{path: 'Status', formatter: '.formatter.formatStatusIcon' }" state="{path: 'Status', formatter: '.formatter.formatStatusColor' }"/>
+                                <ObjectStatus inverted="false" text="{StatusText}" icon="{path: 'Status', formatter: '.formatter.formatReconciliationStatusIcon' }" state="{path: 'Status', formatter: '.formatter.formatReconciliationStatusColor' }"/>
                                 <Text text="{LastChangedByName}"/>
                                 <Text text="{path: 'ConvLastChangedAt', type: '.types.TaxeraDateTimeType'}"/>
                             </cells>

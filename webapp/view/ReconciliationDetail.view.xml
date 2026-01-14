@@ -217,7 +217,7 @@
                             <m:Text text="{DocumentNo}" textAlign="Left"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="10rem" sortProperty="PostingDate" filterProperty="PostingDate" hAlign="Left" visible="false">
+                    <table:Column width="10rem" sortProperty="PostingDate" filterProperty="PostingDate" hAlign="Left" visible="true">
                         <table:customData>
                             <core:CustomData key="p13nData" value='\{"columnKey": "PostingDate", "leadingProperty": "PostingDate", "sortProperty": "PostingDate", "filterProperty": "PostingDate", "columnIndex": 2}'/>
                         </table:customData>
@@ -229,7 +229,7 @@
                             <m:Label text="{i18n>reconciliationDetail.PostingDate}" textAlign="Left" width="100%"/>
                         </table:multiLabels>
                         <table:template>
-                            <m:Text text="{path: 'PostingDate', type: 'sap.ui.model.type.Date', formatOptions: {style: 'medium'}}" textAlign="Left"/>
+                            <m:Text text="{path: 'PostingDate', type: 'sap.ui.model.type.Date', formatOptions: {pattern: 'MMM yyyy'}}" textAlign="Left"/>
                         </table:template>
                     </table:Column>
                     <table:Column width="5rem" sortProperty="TaxCode" filterProperty="TaxCode" hAlign="Left">

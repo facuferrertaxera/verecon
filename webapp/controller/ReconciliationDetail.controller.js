@@ -65,6 +65,20 @@ sap.ui.define([
             });
             this.getView().setModel(oViewModel, "view");
 
+            // Initialize totals model
+            const oTotalsModel = new JSONModel({
+                VatrBaseAmount: 0,
+                VatrTaxAmount: 0,
+                VatrGrossAmount: 0,
+                EcslTaxAmount: 0,
+                EcslBaseAmount: 0,
+                EcslGrossAmount: 0,
+                DiffBaseAmount: 0,
+                DiffGrossAmount: 0,
+                Currencycode: ""
+            });
+            this.getView().setModel(oTotalsModel, "totals");
+
             // Initialize country and company code maps for formatter
             this._mCountryMap = {};
             this._mCompanyCodeMap = {};
@@ -406,62 +420,75 @@ sap.ui.define([
          * Calculate and update totals in table footer
          */
         _updateTableTotals: function() {
-            const oTable = this.byId("documentsTable");
-            if (!oTable) {
-                return;
-            }
-
-            const oBinding = oTable.getBinding("items");
-            if (!oBinding) {
-                return;
-            }
-
-            const aContexts = oBinding.getContexts(0, oBinding.getLength());
-            if (!aContexts || aContexts.length === 0) {
-                // Reset all totals to 0
-                this._resetTotals();
-                return;
-            }
-
-            // Initialize totals
-            const oTotals = {
-                VatrBaseAmount: 0,
-                VatrTaxAmount: 0,
-                VatrGrossAmount: 0,
-                EcslTaxAmount: 0,
-                EcslBaseAmount: 0,
-                EcslGrossAmount: 0,
-                DiffBaseAmount: 0,
-                DiffGrossAmount: 0,
-                Currencycode: ""
-            };
-
-            // Sum all numeric values
-            aContexts.forEach((oContext) => {
-                const oData = oContext.getObject();
-                oTotals.VatrBaseAmount += parseFloat(oData.VatrBaseAmount || 0);
-                oTotals.VatrTaxAmount += parseFloat(oData.VatrTaxAmount || 0);
-                oTotals.VatrGrossAmount += parseFloat(oData.VatrGrossAmount || 0);
-                oTotals.EcslTaxAmount += parseFloat(oData.EcslTaxAmount || 0);
-                oTotals.EcslBaseAmount += parseFloat(oData.EcslBaseAmount || 0);
-                oTotals.EcslGrossAmount += parseFloat(oData.EcslGrossAmount || 0);
-                oTotals.DiffBaseAmount += parseFloat(oData.DiffBaseAmount || 0);
-                oTotals.DiffGrossAmount += parseFloat(oData.DiffGrossAmount || 0);
-                
-                // Get currency code from first record
-                if (!oTotals.Currencycode && oData.Currencycode) {
-                    oTotals.Currencycode = oData.Currencycode;
+            // Use setTimeout to ensure binding is ready
+            setTimeout(() => {
+                const oTable = this.byId("documentsTable");
+                if (!oTable) {
+                    return;
                 }
-            });
 
-            // Update totals model (used for footer binding)
-            let oTotalsModel = this.getView().getModel("totals");
-            if (!oTotalsModel) {
-                oTotalsModel = new JSONModel(oTotals);
-                this.getView().setModel(oTotalsModel, "totals");
-            } else {
-                oTotalsModel.setData(oTotals);
-            }
+                const oBinding = oTable.getBinding("items");
+                if (!oBinding) {
+                    return;
+                }
+
+                const iLength = oBinding.getLength();
+                const aContexts = oBinding.getContexts(0, iLength);
+                
+                if (!aContexts || aContexts.length === 0) {
+                    // Reset all totals to 0
+                    this._resetTotals();
+                    return;
+                }
+
+                // Initialize totals
+                const oTotals = {
+                    VatrBaseAmount: 0,
+                    VatrTaxAmount: 0,
+                    VatrGrossAmount: 0,
+                    EcslTaxAmount: 0,
+                    EcslBaseAmount: 0,
+                    EcslGrossAmount: 0,
+                    DiffBaseAmount: 0,
+                    DiffGrossAmount: 0,
+                    Currencycode: ""
+                };
+
+                // Sum all numeric values
+                aContexts.forEach((oContext) => {
+                    if (!oContext) {
+                        return;
+                    }
+                    
+                    try {
+                        const oData = oContext.getObject();
+                        if (oData) {
+                            oTotals.VatrBaseAmount += parseFloat(oData.VatrBaseAmount || 0);
+                            oTotals.VatrTaxAmount += parseFloat(oData.VatrTaxAmount || 0);
+                            oTotals.VatrGrossAmount += parseFloat(oData.VatrGrossAmount || 0);
+                            oTotals.EcslTaxAmount += parseFloat(oData.EcslTaxAmount || 0);
+                            oTotals.EcslBaseAmount += parseFloat(oData.EcslBaseAmount || 0);
+                            oTotals.EcslGrossAmount += parseFloat(oData.EcslGrossAmount || 0);
+                            oTotals.DiffBaseAmount += parseFloat(oData.DiffBaseAmount || 0);
+                            oTotals.DiffGrossAmount += parseFloat(oData.DiffGrossAmount || 0);
+                            
+                            // Get currency code from first record
+                            if (!oTotals.Currencycode && oData.Currencycode) {
+                                oTotals.Currencycode = oData.Currencycode;
+                            }
+                        }
+                    } catch (oError) {
+                        console.error("Error processing context in _updateTableTotals:", oError);
+                    }
+                });
+
+                // Update totals model (used for footer binding)
+                const oTotalsModel = this.getView().getModel("totals");
+                if (oTotalsModel) {
+                    oTotalsModel.setData(oTotals);
+                    oTotalsModel.refresh(true);
+                }
+            }, 100);
         },
 
         /**

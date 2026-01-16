@@ -79,6 +79,10 @@ sap.ui.define([
             });
             this.getView().setModel(oTotalsModel, "totals");
 
+            // Initialize group subtotals model
+            const oGroupTotalsModel = new JSONModel({});
+            this.getView().setModel(oGroupTotalsModel, "groupTotals");
+
             // Initialize country and company code maps for formatter
             this._mCountryMap = {};
             this._mCompanyCodeMap = {};
@@ -409,10 +413,34 @@ sap.ui.define([
             const sCompanyCode = oContext.getProperty("CompanyCode") || "";
             const sBox = oContext.getProperty("Box") || "";
             const sKey = `${sCompanyCode}|${sBox}`;
-            const sText = sBox ? `${sCompanyCode} - ${sBox}` : sCompanyCode;
+            let sText = sBox ? `${sCompanyCode} - ${sBox}` : sCompanyCode;
+            
+            // Get subtotals for this group if available
+            const oGroupTotalsModel = this.getView().getModel("groupTotals");
+            if (oGroupTotalsModel) {
+                const oGroupTotal = oGroupTotalsModel.getProperty(`/${sKey}`);
+                if (oGroupTotal) {
+                    const sCurrency = oGroupTotal.Currencycode || "";
+                    const aSubtotals = [];
+                    
+                    // Add key subtotals if they have values
+                    if (oGroupTotal.DiffGrossAmount) {
+                        const fDiffGross = Math.abs(parseFloat(oGroupTotal.DiffGrossAmount || 0));
+                        if (fDiffGross > 0) {
+                            aSubtotals.push(`Diff: ${fDiffGross.toFixed(2)} ${sCurrency}`);
+                        }
+                    }
+                    
+                    if (aSubtotals.length > 0) {
+                        sText = `${sText} | ${aSubtotals.join(", ")}`;
+                    }
+                }
+            }
+            
             return {
                 key: sKey,
-                text: sText
+                text: sText,
+                groupKey: sKey
             };
         },
 
@@ -441,7 +469,7 @@ sap.ui.define([
                     return;
                 }
 
-                // Initialize totals
+                // Initialize totals and group totals
                 const oTotals = {
                     VatrBaseAmount: 0,
                     VatrTaxAmount: 0,
@@ -454,7 +482,9 @@ sap.ui.define([
                     Currencycode: ""
                 };
 
-                // Sum all numeric values
+                const mGroupTotals = {};
+
+                // Sum all numeric values and calculate group subtotals
                 aContexts.forEach((oContext) => {
                     if (!oContext) {
                         return;
@@ -463,14 +493,57 @@ sap.ui.define([
                     try {
                         const oData = oContext.getObject();
                         if (oData) {
-                            oTotals.VatrBaseAmount += parseFloat(oData.VatrBaseAmount || 0);
-                            oTotals.VatrTaxAmount += parseFloat(oData.VatrTaxAmount || 0);
-                            oTotals.VatrGrossAmount += parseFloat(oData.VatrGrossAmount || 0);
-                            oTotals.EcslTaxAmount += parseFloat(oData.EcslTaxAmount || 0);
-                            oTotals.EcslBaseAmount += parseFloat(oData.EcslBaseAmount || 0);
-                            oTotals.EcslGrossAmount += parseFloat(oData.EcslGrossAmount || 0);
-                            oTotals.DiffBaseAmount += parseFloat(oData.DiffBaseAmount || 0);
-                            oTotals.DiffGrossAmount += parseFloat(oData.DiffGrossAmount || 0);
+                            const sCompanyCode = oData.CompanyCode || "";
+                            const sBox = oData.Box || "";
+                            const sGroupKey = `${sCompanyCode}|${sBox}`;
+
+                            // Initialize group totals if not exists
+                            if (!mGroupTotals[sGroupKey]) {
+                                mGroupTotals[sGroupKey] = {
+                                    CompanyCode: sCompanyCode,
+                                    Box: sBox,
+                                    VatrBaseAmount: 0,
+                                    VatrTaxAmount: 0,
+                                    VatrGrossAmount: 0,
+                                    EcslTaxAmount: 0,
+                                    EcslBaseAmount: 0,
+                                    EcslGrossAmount: 0,
+                                    DiffBaseAmount: 0,
+                                    DiffGrossAmount: 0,
+                                    Currencycode: oData.Currencycode || ""
+                                };
+                            }
+
+                            // Calculate values
+                            const fVatrBase = parseFloat(oData.VatrBaseAmount || 0);
+                            const fVatrTax = parseFloat(oData.VatrTaxAmount || 0);
+                            const fVatrGross = parseFloat(oData.VatrGrossAmount || 0);
+                            const fEcslTax = parseFloat(oData.EcslTaxAmount || 0);
+                            const fEcslBase = parseFloat(oData.EcslBaseAmount || 0);
+                            const fEcslGross = parseFloat(oData.EcslGrossAmount || 0);
+                            const fDiffBase = parseFloat(oData.DiffBaseAmount || 0);
+                            const fDiffGross = parseFloat(oData.DiffGrossAmount || 0);
+
+                            // Add to group totals
+                            const oGroupTotal = mGroupTotals[sGroupKey];
+                            oGroupTotal.VatrBaseAmount += fVatrBase;
+                            oGroupTotal.VatrTaxAmount += fVatrTax;
+                            oGroupTotal.VatrGrossAmount += fVatrGross;
+                            oGroupTotal.EcslTaxAmount += fEcslTax;
+                            oGroupTotal.EcslBaseAmount += fEcslBase;
+                            oGroupTotal.EcslGrossAmount += fEcslGross;
+                            oGroupTotal.DiffBaseAmount += fDiffBase;
+                            oGroupTotal.DiffGrossAmount += fDiffGross;
+
+                            // Add to overall totals
+                            oTotals.VatrBaseAmount += fVatrBase;
+                            oTotals.VatrTaxAmount += fVatrTax;
+                            oTotals.VatrGrossAmount += fVatrGross;
+                            oTotals.EcslTaxAmount += fEcslTax;
+                            oTotals.EcslBaseAmount += fEcslBase;
+                            oTotals.EcslGrossAmount += fEcslGross;
+                            oTotals.DiffBaseAmount += fDiffBase;
+                            oTotals.DiffGrossAmount += fDiffGross;
                             
                             // Get currency code from first record
                             if (!oTotals.Currencycode && oData.Currencycode) {
@@ -487,6 +560,13 @@ sap.ui.define([
                 if (oTotalsModel) {
                     oTotalsModel.setData(oTotals);
                     oTotalsModel.refresh(true);
+                }
+
+                // Update group totals model
+                const oGroupTotalsModel = this.getView().getModel("groupTotals");
+                if (oGroupTotalsModel) {
+                    oGroupTotalsModel.setData(mGroupTotals);
+                    oGroupTotalsModel.refresh(true);
                 }
             }, 100);
         },

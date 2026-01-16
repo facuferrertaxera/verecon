@@ -398,6 +398,47 @@ sap.ui.define([
         formatDocCount: function(iCount) {
             const iDocCount = iCount || 0;
             return iDocCount + " docs";
+        },
+
+        /**
+         * Format group subtotals for display in group header
+         * @param {object} mGroupTotals - Map of all group totals
+         * @param {string} sGroupKey - Group key (CompanyCode|Box)
+         * @returns {string} Formatted subtotal text
+         */
+        formatGroupSubtotal: function(mGroupTotals, sGroupKey) {
+            if (!mGroupTotals || !sGroupKey) {
+                return "";
+            }
+            
+            const oGroupTotal = mGroupTotals[sGroupKey];
+            if (!oGroupTotal) {
+                return "";
+            }
+            
+            const sCurrency = oGroupTotal.Currencycode || "";
+            const aParts = [];
+            
+            // Add key subtotals
+            if (oGroupTotal.DiffGrossAmount) {
+                const fDiffGross = Math.abs(parseFloat(oGroupTotal.DiffGrossAmount || 0));
+                if (fDiffGross > 0) {
+                    aParts.push(`Diff: ${fDiffGross.toFixed(2)} ${sCurrency}`);
+                }
+            }
+            
+            return aParts.length > 0 ? aParts.join(", ") : "";
+        },
+
+        /**
+         * Format group subtotal count
+         * @param {object} mGroupTotals - Map of all group totals
+         * @param {string} sGroupKey - Group key
+         * @returns {string} Formatted count
+         */
+        formatGroupSubtotalCount: function(mGroupTotals, sGroupKey) {
+            // This can be used to show count of items in group if needed
+            return "";
         }
     };
 });

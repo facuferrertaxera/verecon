@@ -207,13 +207,13 @@
                     </Column>
                     <Column demandPopin="true" hAlign="Left">
                         <customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "Box", "leadingProperty": "Box", "sortProperty": "Box", "filterProperty": "Box", "columnIndex": 22}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "Box", "leadingProperty": "Box", "sortProperty": "Box", "filterProperty": "Box", "columnIndex": 3}'/>
                         </customData>
                         <Text text="{i18n>reconciliationDetail.Box}"/>
                     </Column>
                     <Column demandPopin="true" hAlign="Left">
                         <customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "TaxCode", "leadingProperty": "TaxCode", "sortProperty": "TaxCode", "filterProperty": "TaxCode", "columnIndex": 3}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "TaxCode", "leadingProperty": "TaxCode", "sortProperty": "TaxCode", "filterProperty": "TaxCode", "columnIndex": 4}'/>
                         </customData>
                         <Text text="{i18n>reconciliationDetail.TaxCode}"/>
                     </Column>
@@ -232,7 +232,7 @@
                     <!-- VAT Columns -->
                     <Column demandPopin="true" hAlign="End">
                         <customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "VatrBaseAmount", "leadingProperty": "VatrBaseAmount", "sortProperty": "VatrBaseAmount", "filterProperty": "VatrBaseAmount", "columnIndex": 4, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "VatrBaseAmount", "leadingProperty": "VatrBaseAmount", "sortProperty": "VatrBaseAmount", "filterProperty": "VatrBaseAmount", "columnIndex": 5, "type": "numeric"}'/>
                         </customData>
                         <Text text="VAT: Base"/>
                         <footer>
@@ -241,7 +241,7 @@
                     </Column>
                     <Column demandPopin="true" hAlign="End">
                         <customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "VatrTaxAmount", "leadingProperty": "VatrTaxAmount", "sortProperty": "VatrTaxAmount", "filterProperty": "VatrTaxAmount", "columnIndex": 5, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "VatrTaxAmount", "leadingProperty": "VatrTaxAmount", "sortProperty": "VatrTaxAmount", "filterProperty": "VatrTaxAmount", "columnIndex": 6, "type": "numeric"}'/>
                         </customData>
                         <Text text="VAT: Tax"/>
                         <footer>
@@ -250,7 +250,7 @@
                     </Column>
                     <Column demandPopin="true" hAlign="End">
                         <customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "VatrGrossAmount", "leadingProperty": "VatrGrossAmount", "sortProperty": "VatrGrossAmount", "filterProperty": "VatrGrossAmount", "columnIndex": 6, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "VatrGrossAmount", "leadingProperty": "VatrGrossAmount", "sortProperty": "VatrGrossAmount", "filterProperty": "VatrGrossAmount", "columnIndex": 7, "type": "numeric"}'/>
                         </customData>
                         <Text text="VAT: Gross"/>
                         <footer>
@@ -269,7 +269,7 @@
                     </Column>
                     <Column demandPopin="true" hAlign="End">
                         <customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "EcslBaseAmount", "leadingProperty": "EcslBaseAmount", "sortProperty": "EcslBaseAmount", "filterProperty": "EcslBaseAmount", "columnIndex": 7, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "EcslBaseAmount", "leadingProperty": "EcslBaseAmount", "sortProperty": "EcslBaseAmount", "filterProperty": "EcslBaseAmount", "columnIndex": 9, "type": "numeric"}'/>
                         </customData>
                         <Text text="ECSL: Base"/>
                         <footer>
@@ -278,7 +278,7 @@
                     </Column>
                     <Column demandPopin="true" hAlign="End">
                         <customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "EcslGrossAmount", "leadingProperty": "EcslGrossAmount", "sortProperty": "EcslGrossAmount", "filterProperty": "EcslGrossAmount", "columnIndex": 9, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "EcslGrossAmount", "leadingProperty": "EcslGrossAmount", "sortProperty": "EcslGrossAmount", "filterProperty": "EcslGrossAmount", "columnIndex": 10, "type": "numeric"}'/>
                         </customData>
                         <Text text="ECSL: Gross"/>
                         <footer>
@@ -288,7 +288,7 @@
                     <!-- Diff Columns -->
                     <Column demandPopin="true" hAlign="End">
                         <customData>
-                            <core:CustomData key="p13nData" value='\{"columnKey": "DiffBaseAmount", "leadingProperty": "DiffBaseAmount", "sortProperty": "DiffBaseAmount", "filterProperty": "DiffBaseAmount", "columnIndex": 10, "type": "numeric"}'/>
+                            <core:CustomData key="p13nData" value='\{"columnKey": "DiffBaseAmount", "leadingProperty": "DiffBaseAmount", "sortProperty": "DiffBaseAmount", "filterProperty": "DiffBaseAmount", "columnIndex": 11, "type": "numeric"}'/>
                         </customData>
                         <Text text="Diff: Base"/>
                         <footer>

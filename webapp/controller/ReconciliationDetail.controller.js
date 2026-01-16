@@ -384,10 +384,10 @@ sap.ui.define([
             oBindingParams.filters = aFilters;
             
             // Add grouping by CompanyCode and Box
-            //const aSorters = oBindingParams.sorter || [];
-            //aSorters.push(new Sorter("CompanyCode", false, this._groupByCompanyCodeAndBox.bind(this)));
-            //aSorters.push(new Sorter("Box", false));
-            //oBindingParams.sorter = aSorters;
+            const aSorters = oBindingParams.sorter || [];
+            aSorters.push(new Sorter("CompanyCode", false, this._groupByCompanyCodeAndBox.bind(this)));
+            aSorters.push(new Sorter("Box", false));
+            oBindingParams.sorter = aSorters;
             
             // Add event handlers
             oBindingParams.events = {
@@ -442,6 +442,39 @@ sap.ui.define([
                 text: sText,
                 groupKey: sKey
             };
+        },
+
+        /**
+         * Safely add two decimal numbers and return rounded result to 2 decimal places
+         * Handles JavaScript floating point precision errors
+         * @param {number} fSum - Current sum
+         * @param {number} fValue - Value to add
+         * @returns {number} Rounded sum to 2 decimal places
+         */
+        _safeAddDecimal: function(fSum, fValue) {
+            // Convert to cents (multiply by 100) to avoid floating point errors
+            // Add as integers, then convert back and round
+            const iSumCents = Math.round((fSum || 0) * 100);
+            const iValueCents = Math.round((fValue || 0) * 100);
+            const iTotalCents = iSumCents + iValueCents;
+            // Convert back to decimal and ensure 2 decimal places
+            return Math.round(iTotalCents) / 100;
+        },
+
+        /**
+         * Round a number to 2 decimal places
+         * @param {number} fValue - Value to round
+         * @returns {number} Rounded value to 2 decimal places
+         */
+        _roundToTwoDecimals: function(fValue) {
+            if (isNaN(fValue) || fValue === null || fValue === undefined) {
+                return 0;
+            }
+            const fNumValue = typeof fValue === "number" ? fValue : parseFloat(fValue);
+            if (isNaN(fNumValue)) {
+                return 0;
+            }
+            return Math.round(fNumValue * 100) / 100;
         },
 
         /**
@@ -514,36 +547,36 @@ sap.ui.define([
                                 };
                             }
 
-                            // Calculate values
-                            const fVatrBase = parseFloat(oData.VatrBaseAmount || 0);
-                            const fVatrTax = parseFloat(oData.VatrTaxAmount || 0);
-                            const fVatrGross = parseFloat(oData.VatrGrossAmount || 0);
-                            const fEcslTax = parseFloat(oData.EcslTaxAmount || 0);
-                            const fEcslBase = parseFloat(oData.EcslBaseAmount || 0);
-                            const fEcslGross = parseFloat(oData.EcslGrossAmount || 0);
-                            const fDiffBase = parseFloat(oData.DiffBaseAmount || 0);
-                            const fDiffGross = parseFloat(oData.DiffGrossAmount || 0);
+                            // Parse values (handle null, undefined, empty string)
+                            const fVatrBase = parseFloat(oData.VatrBaseAmount || 0) || 0;
+                            const fVatrTax = parseFloat(oData.VatrTaxAmount || 0) || 0;
+                            const fVatrGross = parseFloat(oData.VatrGrossAmount || 0) || 0;
+                            const fEcslTax = parseFloat(oData.EcslTaxAmount || 0) || 0;
+                            const fEcslBase = parseFloat(oData.EcslBaseAmount || 0) || 0;
+                            const fEcslGross = parseFloat(oData.EcslGrossAmount || 0) || 0;
+                            const fDiffBase = parseFloat(oData.DiffBaseAmount || 0) || 0;
+                            const fDiffGross = parseFloat(oData.DiffGrossAmount || 0) || 0;
 
-                            // Add to group totals
+                            // Add to group totals using safe decimal addition
                             const oGroupTotal = mGroupTotals[sGroupKey];
-                            oGroupTotal.VatrBaseAmount += fVatrBase;
-                            oGroupTotal.VatrTaxAmount += fVatrTax;
-                            oGroupTotal.VatrGrossAmount += fVatrGross;
-                            oGroupTotal.EcslTaxAmount += fEcslTax;
-                            oGroupTotal.EcslBaseAmount += fEcslBase;
-                            oGroupTotal.EcslGrossAmount += fEcslGross;
-                            oGroupTotal.DiffBaseAmount += fDiffBase;
-                            oGroupTotal.DiffGrossAmount += fDiffGross;
+                            oGroupTotal.VatrBaseAmount = this._safeAddDecimal(oGroupTotal.VatrBaseAmount, fVatrBase);
+                            oGroupTotal.VatrTaxAmount = this._safeAddDecimal(oGroupTotal.VatrTaxAmount, fVatrTax);
+                            oGroupTotal.VatrGrossAmount = this._safeAddDecimal(oGroupTotal.VatrGrossAmount, fVatrGross);
+                            oGroupTotal.EcslTaxAmount = this._safeAddDecimal(oGroupTotal.EcslTaxAmount, fEcslTax);
+                            oGroupTotal.EcslBaseAmount = this._safeAddDecimal(oGroupTotal.EcslBaseAmount, fEcslBase);
+                            oGroupTotal.EcslGrossAmount = this._safeAddDecimal(oGroupTotal.EcslGrossAmount, fEcslGross);
+                            oGroupTotal.DiffBaseAmount = this._safeAddDecimal(oGroupTotal.DiffBaseAmount, fDiffBase);
+                            oGroupTotal.DiffGrossAmount = this._safeAddDecimal(oGroupTotal.DiffGrossAmount, fDiffGross);
 
-                            // Add to overall totals
-                            oTotals.VatrBaseAmount += fVatrBase;
-                            oTotals.VatrTaxAmount += fVatrTax;
-                            oTotals.VatrGrossAmount += fVatrGross;
-                            oTotals.EcslTaxAmount += fEcslTax;
-                            oTotals.EcslBaseAmount += fEcslBase;
-                            oTotals.EcslGrossAmount += fEcslGross;
-                            oTotals.DiffBaseAmount += fDiffBase;
-                            oTotals.DiffGrossAmount += fDiffGross;
+                            // Add to overall totals using safe decimal addition
+                            oTotals.VatrBaseAmount = this._safeAddDecimal(oTotals.VatrBaseAmount, fVatrBase);
+                            oTotals.VatrTaxAmount = this._safeAddDecimal(oTotals.VatrTaxAmount, fVatrTax);
+                            oTotals.VatrGrossAmount = this._safeAddDecimal(oTotals.VatrGrossAmount, fVatrGross);
+                            oTotals.EcslTaxAmount = this._safeAddDecimal(oTotals.EcslTaxAmount, fEcslTax);
+                            oTotals.EcslBaseAmount = this._safeAddDecimal(oTotals.EcslBaseAmount, fEcslBase);
+                            oTotals.EcslGrossAmount = this._safeAddDecimal(oTotals.EcslGrossAmount, fEcslGross);
+                            oTotals.DiffBaseAmount = this._safeAddDecimal(oTotals.DiffBaseAmount, fDiffBase);
+                            oTotals.DiffGrossAmount = this._safeAddDecimal(oTotals.DiffGrossAmount, fDiffGross);
                             
                             // Get currency code from first record
                             if (!oTotals.Currencycode && oData.Currencycode) {
@@ -553,6 +586,29 @@ sap.ui.define([
                     } catch (oError) {
                         console.error("Error processing context in _updateTableTotals:", oError);
                     }
+                });
+
+                // Round all final totals to ensure 2 decimal places
+                oTotals.VatrBaseAmount = this._roundToTwoDecimals(oTotals.VatrBaseAmount);
+                oTotals.VatrTaxAmount = this._roundToTwoDecimals(oTotals.VatrTaxAmount);
+                oTotals.VatrGrossAmount = this._roundToTwoDecimals(oTotals.VatrGrossAmount);
+                oTotals.EcslTaxAmount = this._roundToTwoDecimals(oTotals.EcslTaxAmount);
+                oTotals.EcslBaseAmount = this._roundToTwoDecimals(oTotals.EcslBaseAmount);
+                oTotals.EcslGrossAmount = this._roundToTwoDecimals(oTotals.EcslGrossAmount);
+                oTotals.DiffBaseAmount = this._roundToTwoDecimals(oTotals.DiffBaseAmount);
+                oTotals.DiffGrossAmount = this._roundToTwoDecimals(oTotals.DiffGrossAmount);
+
+                // Round all group totals to ensure 2 decimal places
+                Object.keys(mGroupTotals).forEach((sKey) => {
+                    const oGroupTotal = mGroupTotals[sKey];
+                    oGroupTotal.VatrBaseAmount = this._roundToTwoDecimals(oGroupTotal.VatrBaseAmount);
+                    oGroupTotal.VatrTaxAmount = this._roundToTwoDecimals(oGroupTotal.VatrTaxAmount);
+                    oGroupTotal.VatrGrossAmount = this._roundToTwoDecimals(oGroupTotal.VatrGrossAmount);
+                    oGroupTotal.EcslTaxAmount = this._roundToTwoDecimals(oGroupTotal.EcslTaxAmount);
+                    oGroupTotal.EcslBaseAmount = this._roundToTwoDecimals(oGroupTotal.EcslBaseAmount);
+                    oGroupTotal.EcslGrossAmount = this._roundToTwoDecimals(oGroupTotal.EcslGrossAmount);
+                    oGroupTotal.DiffBaseAmount = this._roundToTwoDecimals(oGroupTotal.DiffBaseAmount);
+                    oGroupTotal.DiffGrossAmount = this._roundToTwoDecimals(oGroupTotal.DiffGrossAmount);
                 });
 
                 // Update totals model (used for footer binding)

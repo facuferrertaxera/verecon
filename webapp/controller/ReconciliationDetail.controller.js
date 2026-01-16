@@ -384,10 +384,10 @@ sap.ui.define([
             oBindingParams.filters = aFilters;
             
             // Add grouping by CompanyCode and Box
-            const aSorters = oBindingParams.sorter || [];
-            aSorters.push(new Sorter("CompanyCode", false, this._groupByCompanyCodeAndBox.bind(this)));
-            aSorters.push(new Sorter("Box", false));
-            oBindingParams.sorter = aSorters;
+            //const aSorters = oBindingParams.sorter || [];
+            //aSorters.push(new Sorter("CompanyCode", false, this._groupByCompanyCodeAndBox.bind(this)));
+            //aSorters.push(new Sorter("Box", false));
+            //oBindingParams.sorter = aSorters;
             
             // Add event handlers
             oBindingParams.events = {

@@ -216,6 +216,23 @@
     clear: both !important;
 }
 
+/* Group header row styling */
+.sapUiTableGroupHeaderRow {
+    background-color: #f7f7f7 !important;
+    border-bottom: 1px solid #d3d3d3 !important;
+}
+
+.sapMTableGroupHeaderCell {
+    font-weight: bold;
+    color: #32363a;
+}
+
+/* Ensure group header cells align with table columns */
+.sapUiTableGroupHeaderRow .sapMLIBContent {
+    display: flex;
+    width: 100%;
+}
+
 /* Ensure each filter field takes full width and appears on its own row */
 .reconciliationSingleColumnFilterBar .sapUiRespGridMedia-Std-Phone > div,
 .reconciliationSingleColumnFilterBar .sapUiRespGridMedia-Std-Tablet > div,

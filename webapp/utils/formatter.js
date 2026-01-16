@@ -439,6 +439,56 @@ sap.ui.define([
         formatGroupSubtotalCount: function(mGroupTotals, sGroupKey) {
             // This can be used to show count of items in group if needed
             return "";
+        },
+
+        /**
+         * Format group subtotal summary text
+         * @param {object} mGroupTotals - Map of all group totals
+         * @param {string} sGroupKey - Group key (CompanyCode|Box)
+         * @returns {string} Formatted summary text
+         */
+        formatGroupSubtotalSummary: function(mGroupTotals, sGroupKey) {
+            if (!mGroupTotals || !sGroupKey) {
+                return "Subtotals";
+            }
+            
+            const oGroupTotal = mGroupTotals[sGroupKey];
+            if (!oGroupTotal) {
+                return "Subtotals";
+            }
+            
+            return "Subtotals";
+        },
+
+        /**
+         * Format group subtotal currency value for display in group header cells
+         * @param {object} mGroupTotals - Map of all group totals
+         * @param {string} sGroupKey - Group key (CompanyCode|Box)
+         * @param {string} sFieldName - Field name (e.g., "VatrBaseAmount")
+         * @param {string} sCurrencyField - Currency field name (usually "Currencycode")
+         * @returns {string} Formatted currency value
+         */
+        formatGroupSubtotalCurrency: function(mGroupTotals, sGroupKey, sFieldName, sCurrencyField) {
+            if (!mGroupTotals || !sGroupKey || !sFieldName) {
+                return "";
+            }
+            
+            const oGroupTotal = mGroupTotals[sGroupKey];
+            if (!oGroupTotal || !oGroupTotal[sFieldName]) {
+                return "";
+            }
+            
+            const fValue = parseFloat(oGroupTotal[sFieldName] || 0);
+            if (isNaN(fValue) || fValue === 0) {
+                return "";
+            }
+            
+            // Round to 2 decimal places
+            const fRounded = Math.round(fValue * 100) / 100;
+            const sCurrency = oGroupTotal[sCurrencyField] || "";
+            
+            // Format as currency with currency code
+            return fRounded.toFixed(2) + " " + sCurrency;
         }
     };
 });

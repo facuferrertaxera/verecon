@@ -2,11 +2,12 @@ sap.ui.define([
     "tech/taxera/taxreporting/verecon/controller/BaseController",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
+    "sap/ui/model/Sorter",
     "sap/ui/model/json/JSONModel",
     "tech/taxera/taxreporting/verecon/utils/formatter",
     "tech/taxera/taxreporting/verecon/utils/types",
     "sap/ui/core/ResizeHandler"
-], (BaseController, Filter, FilterOperator, JSONModel, formatter, types, ResizeHandler) => {
+], (BaseController, Filter, FilterOperator, Sorter, JSONModel, formatter, types, ResizeHandler) => {
     "use strict";
 
     const ReconciliationDetailController = BaseController.extend("tech.taxera.taxreporting.verecon.controller.ReconciliationDetail", {
@@ -364,6 +365,12 @@ sap.ui.define([
             // Set the filters
             oBindingParams.filters = aFilters;
             
+            // Add grouping by CompanyCode and Box
+            const aSorters = oBindingParams.sorter || [];
+            aSorters.push(new Sorter("CompanyCode", false, this._groupByCompanyCodeAndBox.bind(this)));
+            aSorters.push(new Sorter("Box", false));
+            oBindingParams.sorter = aSorters;
+            
             // Add event handlers
             oBindingParams.events = {
                 dataRequested: () => {
@@ -371,12 +378,115 @@ sap.ui.define([
                 },
                 dataReceived: (oEvent) => {
                     this.getView().setBusy(false);
+                    // Calculate and update totals
+                    this._updateTableTotals();
                     // Ensure table height after data is received
                     setTimeout(() => {
                         this._ensureTableHeight();
                     }, 100);
                 }
             };
+        },
+
+        /**
+         * Group function for grouping by CompanyCode and Box
+         */
+        _groupByCompanyCodeAndBox: function(oContext) {
+            const sCompanyCode = oContext.getProperty("CompanyCode") || "";
+            const sBox = oContext.getProperty("Box") || "";
+            const sKey = `${sCompanyCode}|${sBox}`;
+            const sText = sBox ? `${sCompanyCode} - ${sBox}` : sCompanyCode;
+            return {
+                key: sKey,
+                text: sText
+            };
+        },
+
+        /**
+         * Calculate and update totals in table footer
+         */
+        _updateTableTotals: function() {
+            const oTable = this.byId("documentsTable");
+            if (!oTable) {
+                return;
+            }
+
+            const oBinding = oTable.getBinding("items");
+            if (!oBinding) {
+                return;
+            }
+
+            const aContexts = oBinding.getContexts(0, oBinding.getLength());
+            if (!aContexts || aContexts.length === 0) {
+                // Reset all totals to 0
+                this._resetTotals();
+                return;
+            }
+
+            // Initialize totals
+            const oTotals = {
+                VatrBaseAmount: 0,
+                VatrTaxAmount: 0,
+                VatrGrossAmount: 0,
+                EcslTaxAmount: 0,
+                EcslBaseAmount: 0,
+                EcslGrossAmount: 0,
+                DiffBaseAmount: 0,
+                DiffGrossAmount: 0,
+                Currencycode: ""
+            };
+
+            // Sum all numeric values
+            aContexts.forEach((oContext) => {
+                const oData = oContext.getObject();
+                oTotals.VatrBaseAmount += parseFloat(oData.VatrBaseAmount || 0);
+                oTotals.VatrTaxAmount += parseFloat(oData.VatrTaxAmount || 0);
+                oTotals.VatrGrossAmount += parseFloat(oData.VatrGrossAmount || 0);
+                oTotals.EcslTaxAmount += parseFloat(oData.EcslTaxAmount || 0);
+                oTotals.EcslBaseAmount += parseFloat(oData.EcslBaseAmount || 0);
+                oTotals.EcslGrossAmount += parseFloat(oData.EcslGrossAmount || 0);
+                oTotals.DiffBaseAmount += parseFloat(oData.DiffBaseAmount || 0);
+                oTotals.DiffGrossAmount += parseFloat(oData.DiffGrossAmount || 0);
+                
+                // Get currency code from first record
+                if (!oTotals.Currencycode && oData.Currencycode) {
+                    oTotals.Currencycode = oData.Currencycode;
+                }
+            });
+
+            // Update totals model (used for footer binding)
+            let oTotalsModel = this.getView().getModel("totals");
+            if (!oTotalsModel) {
+                oTotalsModel = new JSONModel(oTotals);
+                this.getView().setModel(oTotalsModel, "totals");
+            } else {
+                oTotalsModel.setData(oTotals);
+            }
+        },
+
+        /**
+         * Reset all totals to 0
+         */
+        _resetTotals: function() {
+            const oTotals = {
+                VatrBaseAmount: 0,
+                VatrTaxAmount: 0,
+                VatrGrossAmount: 0,
+                EcslTaxAmount: 0,
+                EcslBaseAmount: 0,
+                EcslGrossAmount: 0,
+                DiffBaseAmount: 0,
+                DiffGrossAmount: 0,
+                Currencycode: ""
+            };
+            
+            let oTotalsModel = this.getView().getModel("totals");
+            if (!oTotalsModel) {
+                oTotalsModel = new JSONModel(oTotals);
+                this.getView().setModel(oTotalsModel, "totals");
+            } else {
+                oTotalsModel.setData(oTotals);
+            }
         },
 
         /**

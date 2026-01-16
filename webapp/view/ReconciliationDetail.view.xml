@@ -236,7 +236,7 @@
                         </customData>
                         <Text text="VAT: Base"/>
                         <footer>
-                            <Text text="{parts: [{path: 'totals>VatrBaseAmount'}, {path: 'totals>Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
+                            <Text text="{parts: [{path: 'totals>/VatrBaseAmount'}, {path: 'totals>/Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
                         </footer>
                     </Column>
                     <Column demandPopin="true" hAlign="End">
@@ -245,7 +245,7 @@
                         </customData>
                         <Text text="VAT: Tax"/>
                         <footer>
-                            <Text text="{parts: [{path: 'totals>VatrTaxAmount'}, {path: 'totals>Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
+                            <Text text="{parts: [{path: 'totals>/VatrTaxAmount'}, {path: 'totals>/Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
                         </footer>
                     </Column>
                     <Column demandPopin="true" hAlign="End">
@@ -254,7 +254,7 @@
                         </customData>
                         <Text text="VAT: Gross"/>
                         <footer>
-                            <Text text="{parts: [{path: 'totals>VatrGrossAmount'}, {path: 'totals>Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
+                            <Text text="{parts: [{path: 'totals>/VatrGrossAmount'}, {path: 'totals>/Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
                         </footer>
                     </Column>
                     <!-- ECSL Columns -->
@@ -264,7 +264,7 @@
                         </customData>
                         <Text text="ECSL: Tax"/>
                         <footer>
-                            <Text text="{parts: [{path: 'totals>EcslTaxAmount'}, {path: 'totals>Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
+                            <Text text="{parts: [{path: 'totals>/EcslTaxAmount'}, {path: 'totals>/Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
                         </footer>
                     </Column>
                     <Column demandPopin="true" hAlign="End">
@@ -273,7 +273,7 @@
                         </customData>
                         <Text text="ECSL: Base"/>
                         <footer>
-                            <Text text="{parts: [{path: 'totals>EcslBaseAmount'}, {path: 'totals>Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
+                            <Text text="{parts: [{path: 'totals>/EcslBaseAmount'}, {path: 'totals>/Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
                         </footer>
                     </Column>
                     <Column demandPopin="true" hAlign="End">
@@ -282,7 +282,7 @@
                         </customData>
                         <Text text="ECSL: Gross"/>
                         <footer>
-                            <Text text="{parts: [{path: 'totals>EcslGrossAmount'}, {path: 'totals>Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
+                            <Text text="{parts: [{path: 'totals>/EcslGrossAmount'}, {path: 'totals>/Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
                         </footer>
                     </Column>
                     <!-- Diff Columns -->
@@ -292,7 +292,7 @@
                         </customData>
                         <Text text="Diff: Base"/>
                         <footer>
-                            <Text text="{parts: [{path: 'totals>DiffBaseAmount'}, {path: 'totals>Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
+                            <Text text="{parts: [{path: 'totals>/DiffBaseAmount'}, {path: 'totals>/Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
                         </footer>
                     </Column>
                     <Column demandPopin="true" hAlign="End">
@@ -301,7 +301,7 @@
                         </customData>
                         <Text text="Diff: Gross"/>
                         <footer>
-                            <Text text="{parts: [{path: 'totals>DiffGrossAmount'}, {path: 'totals>Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
+                            <Text text="{parts: [{path: 'totals>/DiffGrossAmount'}, {path: 'totals>/Currencycode'}], type: 'sap.ui.model.type.Currency'}"/>
                         </footer>
                     </Column>
                     <!-- Status Column -->

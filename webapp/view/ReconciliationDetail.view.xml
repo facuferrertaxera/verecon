@@ -175,6 +175,13 @@
                             <ToolbarSpacer />
                         </OverflowToolbar>
                     </st:customToolbar>
+                    <table:AnalyticalTable
+                        id="documentsTable"
+                        alternateRowColors="true"
+                        selectionMode="None"
+                        enableColumnFreeze="true"
+                        visibleRowCountMode="Auto">
+                    </table:AnalyticalTable>
                 </st:SmartTable>
         </f:content>
     </f:DynamicPage>

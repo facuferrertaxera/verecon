@@ -404,10 +404,10 @@ sap.ui.define([
             
             // Set numberOfExpandedLevels for AnalyticalTable to show 2 levels initially
             // This expands groups by CompanyCode and Box on first load
-            oBindingParams.numberOfExpandedLevels = 2;
+            oBindingParams.parameters.numberOfExpandedLevels = 2;
             
             // Set sumOnTop to display subtotals in group headers (on top) rather than at bottom
-            oBindingParams.sumOnTop = true;
+            oBindingParams.parameters.sumOnTop = true;
             
             // Add event handlers
             oBindingParams.events = {

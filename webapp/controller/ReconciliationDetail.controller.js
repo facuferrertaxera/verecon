@@ -402,6 +402,13 @@ sap.ui.define([
             aSorters.push(new Sorter("Box", false));
             oBindingParams.sorter = aSorters;
             
+            // Set numberOfExpandedLevels for AnalyticalTable to show 2 levels initially
+            // This expands groups by CompanyCode and Box on first load
+            oBindingParams.numberOfExpandedLevels = 2;
+            
+            // Set sumOnTop to display subtotals in group headers (on top) rather than at bottom
+            oBindingParams.sumOnTop = true;
+            
             // Add event handlers
             oBindingParams.events = {
                 dataRequested: () => {

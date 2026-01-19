@@ -21,11 +21,19 @@
         "type": "OData",
         "settings": {
           "annotations": [
-            "TAXERA_VERECON_UI_O2_VAN",
-            "annotation"
+            "TAXERA_VERECON_UI_O2_VAN"
           ],
+          "localUri": "annotations/metadata.xml",
           "odataVersion": "2.0"
         }
+      },
+      "TAXERA_VERECON_UI_O2_VAN": {
+        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='%2FTAXERA%2FVERECON_UI_O2_VAN',Version='0001')/$value/",
+        "type": "ODataAnnotation",
+        "settings": {
+          "localUri": "annotations/annotation.xml"
+        }
+      }
       }
     },
     "crossNavigation": {

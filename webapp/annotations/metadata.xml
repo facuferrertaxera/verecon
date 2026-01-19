@@ -1,76 +1,64 @@
-<?xml version="1.0" encoding="utf-8"?>
-<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx"
+This XML file does not appear to have any style information associated with it. The document tree is
+shown below.
+<edmx:Edmx xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx"
     xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"
-    xmlns:sap="http://www.sap.com/Protocols/SAPData">
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_AGGREGATION',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    xmlns:sap="http://www.sap.com/Protocols/SAPData" Version="1.0">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_AGGREGATION',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="Org.OData.Aggregation.V1" Alias="Aggregation" />
     </edmx:Reference>
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ANALYTICS',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ANALYTICS',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="com.sap.vocabularies.Analytics.v1" Alias="Analytics" />
     </edmx:Reference>
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CAPABILITIES',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CAPABILITIES',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities" />
     </edmx:Reference>
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CODELIST',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CODELIST',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="com.sap.vocabularies.CodeList.v1" Alias="SAP__CodeList" />
     </edmx:Reference>
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common" />
         <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="SAP__common" />
     </edmx:Reference>
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication" />
     </edmx:Reference>
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CORE',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CORE',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="Org.OData.Core.V1" Alias="SAP__core" />
     </edmx:Reference>
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_MEASURES',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_MEASURES',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="Org.OData.Measures.V1" Alias="Measures" />
     </edmx:Reference>
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ODM',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ODM',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="com.sap.vocabularies.ODM.v1" Alias="SAP__ODM" />
     </edmx:Reference>
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PDF',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PDF',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="com.sap.vocabularies.PDF.v1" Alias="SAP__PDF" />
     </edmx:Reference>
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="com.sap.vocabularies.PersonalData.v1" Alias="PersonalData" />
     </edmx:Reference>
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_UI',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_UI',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="UI" />
     </edmx:Reference>
-    <edmx:Reference
-        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_VALIDATION',Version='0001',SAP__Origin='')/$value"
-        xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx"
+        Uri="/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_VALIDATION',Version='0001',SAP__Origin='')/$value">
         <edmx:Include Namespace="Org.OData.Validation.V1" Alias="Validation" />
     </edmx:Reference>
     <edmx:DataServices m:DataServiceVersion="2.0">
-        <Schema Namespace="cds_xtaxeraxverecon_ui" xml:lang="en" sap:schema-version="1"
-            xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <Schema xmlns="http://schemas.microsoft.com/ado/2008/09/edm"
+            Namespace="cds_xtaxeraxverecon_ui" xml:lang="en" sap:schema-version="1">
             <EntityType Name="CompanyVHType" sap:label="Consumption View for Company Value Help"
                 sap:value-list="true" sap:content-version="1">
                 <Key>
@@ -124,6 +112,8 @@
                     sap:unit="Currencycode" sap:variable-scale="true" sap:label="Amount" />
                 <Property Name="VatrGrossAmount" Type="Edm.Decimal" Precision="18" Scale="3"
                     sap:unit="Currencycode" sap:variable-scale="true" sap:label="Gross Total" />
+                <Property Name="Box" Type="Edm.String" MaxLength="10"
+                    sap:label="VAT Return form box" sap:heading="" />
                 <Property Name="EcslBaseAmount" Type="Edm.Decimal" Precision="18" Scale="3"
                     sap:unit="Currencycode" sap:variable-scale="true" sap:label="Amount" />
                 <Property Name="EcslTaxAmount" Type="Edm.Decimal" Precision="18" Scale="3"
@@ -136,12 +126,82 @@
                     sap:unit="Currencycode" sap:variable-scale="true" sap:label="Amount" />
                 <Property Name="DiffGrossAmount" Type="Edm.Decimal" Precision="18" Scale="3"
                     sap:unit="Currencycode" sap:variable-scale="true" sap:label="Gross Total" />
-                <Property Name="Status" Type="Edm.String" MaxLength="1"
+                <Property Name="Status" Type="Edm.String" MaxLength="2"
                     sap:display-format="UpperCase" sap:label="Status" sap:quickinfo="Status Code" />
+                <Property Name="StatusText" Type="Edm.String" MaxLength="60"
+                    sap:label="Short Descript." sap:quickinfo="Short Text for Fixed Values" />
+                <Property Name="VatrCreatedAt" Type="Edm.DateTimeOffset" Precision="7"
+                    sap:label="VATR Report" sap:quickinfo="Created On" />
+                <Property Name="EcslCreatedAt" Type="Edm.DateTimeOffset" Precision="7"
+                    sap:label="ECSL Report" />
                 <NavigationProperty Name="to_reconciliation"
                     Relationship="cds_xtaxeraxverecon_ui.assoc_058E11E1C267E7D8252350E73ED1D5B7"
                     FromRole="ToRole_assoc_058E11E1C267E7D8252350E73ED1D5B7"
                     ToRole="FromRole_assoc_058E11E1C267E7D8252350E73ED1D5B7" />
+            </EntityType>
+            <EntityType Name="DocumentSUMType" sap:semantics="aggregate"
+                sap:label="Aggregation view for VE Documents" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="ID" />
+                </Key>
+                <Property Name="ID" Type="Edm.String" Nullable="false" sap:sortable="false"
+                    sap:filterable="false" />
+                <Property Name="ReconId" Type="Edm.Guid" sap:aggregation-role="dimension"
+                    sap:label="UUID" sap:quickinfo="Global Unique ID for table" />
+                <Property Name="DocId" Type="Edm.String" MaxLength="32"
+                    sap:aggregation-role="dimension" sap:label="Document"
+                    sap:quickinfo="Document ID" />
+                <Property Name="CompanyCode" Type="Edm.String" MaxLength="4"
+                    sap:aggregation-role="dimension" sap:label="Company Code" />
+                <Property Name="DocumentNo" Type="Edm.String" MaxLength="10"
+                    sap:aggregation-role="dimension" sap:label="Doc. No."
+                    sap:quickinfo="Document Number" />
+                <Property Name="PostingDate" Type="Edm.DateTime" Precision="0"
+                    sap:aggregation-role="dimension" sap:display-format="Date"
+                    sap:label="Posting Date" />
+                <Property Name="Box" Type="Edm.String" MaxLength="10"
+                    sap:aggregation-role="dimension" sap:label="VAT Return form box" sap:heading="" />
+                <Property Name="TaxCode" Type="Edm.String" MaxLength="9"
+                    sap:aggregation-role="dimension" sap:label="Tax Code" />
+                <Property Name="FiscalYear" Type="Edm.String" MaxLength="4"
+                    sap:aggregation-role="dimension" sap:label="Fiscal Year" />
+                <Property Name="Currencycode" Type="Edm.String" MaxLength="5"
+                    sap:aggregation-role="dimension" sap:label="Currency Code"
+                    sap:semantics="currency-code" />
+                <Property Name="VatrBaseAmount" Type="Edm.Decimal" Precision="18" Scale="3"
+                    sap:aggregation-role="measure" sap:unit="Currencycode" sap:variable-scale="true"
+                    sap:label="Amount" sap:filterable="false" />
+                <Property Name="VatrTaxAmount" Type="Edm.Decimal" Precision="18" Scale="3"
+                    sap:aggregation-role="measure" sap:unit="Currencycode" sap:variable-scale="true"
+                    sap:label="Amount" sap:filterable="false" />
+                <Property Name="VatrGrossAmount" Type="Edm.Decimal" Precision="18" Scale="3"
+                    sap:aggregation-role="measure" sap:unit="Currencycode" sap:variable-scale="true"
+                    sap:label="Gross Total" sap:filterable="false" />
+                <Property Name="EcslTaxAmount" Type="Edm.Decimal" Precision="18" Scale="3"
+                    sap:aggregation-role="measure" sap:unit="Currencycode" sap:variable-scale="true"
+                    sap:label="Amount" sap:filterable="false" />
+                <Property Name="EcslBaseAmount" Type="Edm.Decimal" Precision="18" Scale="3"
+                    sap:aggregation-role="measure" sap:unit="Currencycode" sap:variable-scale="true"
+                    sap:label="Amount" sap:filterable="false" />
+                <Property Name="EcslGrossAmount" Type="Edm.Decimal" Precision="18" Scale="3"
+                    sap:aggregation-role="measure" sap:unit="Currencycode" sap:variable-scale="true"
+                    sap:label="Gross Total" sap:filterable="false" />
+                <Property Name="DiffBaseAmount" Type="Edm.Decimal" Precision="18" Scale="3"
+                    sap:aggregation-role="measure" sap:unit="Currencycode" sap:variable-scale="true"
+                    sap:label="Amount" sap:filterable="false" />
+                <Property Name="DiffGrossAmount" Type="Edm.Decimal" Precision="18" Scale="3"
+                    sap:aggregation-role="measure" sap:unit="Currencycode" sap:variable-scale="true"
+                    sap:label="Gross Total" sap:filterable="false" />
+                <Property Name="Status" Type="Edm.String" MaxLength="2"
+                    sap:aggregation-role="dimension" sap:display-format="UpperCase"
+                    sap:label="Status" sap:quickinfo="Status Code" />
+                <Property Name="StatusText" Type="Edm.String" MaxLength="60"
+                    sap:aggregation-role="dimension" sap:label="Short Descript."
+                    sap:quickinfo="Short Text for Fixed Values" />
+                <Property Name="VatrCreatedAt" Type="Edm.DateTimeOffset" Precision="7"
+                    sap:aggregation-role="dimension" sap:label="Created On" />
+                <Property Name="EcslCreatedAt" Type="Edm.DateTimeOffset" Precision="7"
+                    sap:aggregation-role="dimension" />
             </EntityType>
             <EntityType Name="MessagesType"
                 sap:label="VAT Returns - EC Sales List Reconciliation Messages"
@@ -212,8 +272,8 @@
                 <Property Name="Id" Type="Edm.Guid" Nullable="false" sap:label="UUID"
                     sap:quickinfo="Global Unique ID for table" sap:creatable="false"
                     sap:updatable="false" />
-                <Property Name="CountryList" Type="Edm.String" MaxLength="256"
-                    sap:label="Country List" sap:quickinfo="Country list" />
+                <Property Name="CountryList" Type="Edm.String" MaxLength="256" sap:label="Country"
+                    sap:quickinfo="Country list" />
                 <Property Name="CompanyCodeList" Type="Edm.String" MaxLength="256"
                     sap:label="Company Code List" sap:quickinfo="Company code list" />
                 <Property Name="FromDate" Type="Edm.DateTime" Nullable="false" Precision="0"
@@ -245,6 +305,10 @@
                     Relationship="cds_xtaxeraxverecon_ui.assoc_058E11E1C267E7D8252350E73ED1D5B7"
                     FromRole="FromRole_assoc_058E11E1C267E7D8252350E73ED1D5B7"
                     ToRole="ToRole_assoc_058E11E1C267E7D8252350E73ED1D5B7" />
+                <NavigationProperty Name="to_DocumentSUM"
+                    Relationship="cds_xtaxeraxverecon_ui.assoc_9D436F5471C52AEECCA19EFE6584D6C2"
+                    FromRole="FromRole_assoc_9D436F5471C52AEECCA19EFE6584D6C2"
+                    ToRole="ToRole_assoc_9D436F5471C52AEECCA19EFE6584D6C2" />
                 <NavigationProperty Name="to_Messages"
                     Relationship="cds_xtaxeraxverecon_ui.assoc_13A02D397F39247395288291BA4638C3"
                     FromRole="FromRole_assoc_13A02D397F39247395288291BA4638C3"
@@ -577,6 +641,12 @@
                     sap:creatable="false" sap:updatable="false" sap:sortable="false"
                     sap:filterable="false" />
             </ComplexType>
+            <Association Name="assoc_9D436F5471C52AEECCA19EFE6584D6C2" sap:content-version="1">
+                <End Type="cds_xtaxeraxverecon_ui.ReconciliationType" Multiplicity="1"
+                    Role="FromRole_assoc_9D436F5471C52AEECCA19EFE6584D6C2" />
+                <End Type="cds_xtaxeraxverecon_ui.DocumentSUMType" Multiplicity="*"
+                    Role="ToRole_assoc_9D436F5471C52AEECCA19EFE6584D6C2" />
+            </Association>
             <Association Name="assoc_13A02D397F39247395288291BA4638C3" sap:content-version="1">
                 <End Type="cds_xtaxeraxverecon_ui.ReconciliationType" Multiplicity="1"
                     Role="FromRole_assoc_13A02D397F39247395288291BA4638C3">
@@ -744,12 +814,16 @@
                 <EntitySet Name="Document" EntityType="cds_xtaxeraxverecon_ui.DocumentType"
                     sap:searchable="true" sap:content-version="1" sap:deletable-path="Delete_mc"
                     sap:updatable-path="Update_mc" />
+                <EntitySet Name="DocumentSUM" EntityType="cds_xtaxeraxverecon_ui.DocumentSUMType"
+                    sap:creatable="false" sap:updatable="false" sap:deletable="false"
+                    sap:content-version="1" />
                 <EntitySet Name="Messages" EntityType="cds_xtaxeraxverecon_ui.MessagesType"
                     sap:searchable="true" sap:content-version="1" sap:deletable-path="Delete_mc"
                     sap:updatable-path="Update_mc" />
                 <EntitySet Name="Reconciliation"
-                    EntityType="cds_xtaxeraxverecon_ui.ReconciliationType" sap:content-version="1"
-                    sap:deletable-path="Delete_mc" sap:updatable-path="Update_mc" />
+                    EntityType="cds_xtaxeraxverecon_ui.ReconciliationType" sap:searchable="true"
+                    sap:content-version="1" sap:deletable-path="Delete_mc"
+                    sap:updatable-path="Update_mc" />
                 <EntitySet Name="Country" EntityType="cds_xtaxeraxverecon_ui.CountryType"
                     sap:creatable="false" sap:updatable="false" sap:deletable="false"
                     sap:content-version="1" />
@@ -829,6 +903,15 @@
                         Role="FromRole_assoc_058E11E1C267E7D8252350E73ED1D5B7" />
                     <End EntitySet="Document" Role="ToRole_assoc_058E11E1C267E7D8252350E73ED1D5B7" />
                 </AssociationSet>
+                <AssociationSet Name="assoc_9D436F5471C52AEECCA19EFE6584D6C2"
+                    Association="cds_xtaxeraxverecon_ui.assoc_9D436F5471C52AEECCA19EFE6584D6C2"
+                    sap:creatable="false" sap:updatable="false" sap:deletable="false"
+                    sap:content-version="1">
+                    <End EntitySet="Reconciliation"
+                        Role="FromRole_assoc_9D436F5471C52AEECCA19EFE6584D6C2" />
+                    <End EntitySet="DocumentSUM"
+                        Role="ToRole_assoc_9D436F5471C52AEECCA19EFE6584D6C2" />
+                </AssociationSet>
                 <AssociationSet Name="to_HierarchySet"
                     Association="cds_xtaxeraxverecon_ui.to_Hierarchy" sap:creatable="false"
                     sap:updatable="false" sap:deletable="false" sap:content-version="1">
@@ -884,10 +967,10 @@
                     <End EntitySet="SAP__CoverPageSet" Role="ToRole_to_coverpage" />
                 </AssociationSet>
             </EntityContainer>
-            <Annotation Term="Core.SchemaVersion" String="1.0.0"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm" />
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/Status"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotation xmlns="http://docs.oasis-open.org/odata/ns/edm" Term="Core.SchemaVersion"
+                String="1.0.0" />
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/Status">
                 <Annotation Term="Common.ValueList">
                     <Record>
                         <PropertyValue Property="Label" String="Status" />
@@ -910,8 +993,8 @@
                 <Annotation Term="Common.ValueListWithFixedValues" />
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.CountryType/Country"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.CountryType/Country">
                 <Annotation Term="Common.ValueList">
                     <Record>
                         <PropertyValue Property="Label" String="Country/Region Key" />
@@ -936,8 +1019,8 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.xTAXERAxI_EC_COUNTRYType/Country"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.xTAXERAxI_EC_COUNTRYType/Country">
                 <Annotation Term="Common.ValueList">
                     <Record>
                         <PropertyValue Property="Label" String="Country/Region Key" />
@@ -962,8 +1045,8 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.xTAXERAxI_SF_COUNTRYType/Country"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.xTAXERAxI_SF_COUNTRYType/Country">
                 <Annotation Term="Common.ValueList">
                     <Record>
                         <PropertyValue Property="Label" String="Country/Region Key" />
@@ -988,8 +1071,8 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.NewRecParameterType/companycode"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.NewRecParameterType/companycode">
                 <Annotation Term="Common.ValueList">
                     <Record>
                         <PropertyValue Property="Label" String="Company Code" />
@@ -1008,7 +1091,9 @@
                                 <Record Type="Common.ValueListParameterDisplayOnly">
                                     <PropertyValue Property="ValueListProperty" String="CityName" />
                                 </Record>
-                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                <Record Type="Common.ValueListParameterIn">
+                                    <PropertyValue Property="LocalDataProperty"
+                                        PropertyPath="country" />
                                     <PropertyValue Property="ValueListProperty" String="Country" />
                                 </Record>
                             </Collection>
@@ -1016,8 +1101,8 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.NewRecParameterType/country"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.NewRecParameterType/country">
                 <Annotation Term="Common.ValueList">
                     <Record>
                         <PropertyValue Property="Label" String="Country" />
@@ -1042,26 +1127,26 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities">
                 <Annotation Term="Common.ApplyMultiUnitBehaviorForSortingAndFiltering" Bool="true" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType">
                 <Annotation Term="Common.ChangedBy" Path="LastChangedBy" />
                 <Annotation Term="Common.CreatedAt" Path="CreatedAt" />
                 <Annotation Term="Common.CreatedBy" Path="CreatedBy" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/to_Document"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/to_Document">
                 <Annotation Term="Common.Composition" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/to_Messages"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/to_Messages">
                 <Annotation Term="Common.Composition" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/CompanyVH"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/CompanyVH">
                 <Annotation Term="Capabilities.DeleteRestrictions">
                     <Record>
                         <PropertyValue Property="Deletable" Bool="false" />
@@ -1078,8 +1163,8 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/Country"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/Country">
                 <Annotation Term="Capabilities.DeleteRestrictions">
                     <Record>
                         <PropertyValue Property="Deletable" Bool="false" />
@@ -1096,8 +1181,8 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/Document"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/Document">
                 <Annotation Term="Capabilities.DeleteRestrictions">
                     <Record>
                         <PropertyValue Property="Deletable" Path="Delete_mc" />
@@ -1154,8 +1239,52 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/Messages"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/DocumentSUM">
+                <Annotation Term="Capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false" />
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="NonFilterableProperties">
+                            <Collection>
+                                <PropertyPath>ID</PropertyPath>
+                                <PropertyPath>VatrBaseAmount</PropertyPath>
+                                <PropertyPath>VatrTaxAmount</PropertyPath>
+                                <PropertyPath>VatrGrossAmount</PropertyPath>
+                                <PropertyPath>EcslTaxAmount</PropertyPath>
+                                <PropertyPath>EcslBaseAmount</PropertyPath>
+                                <PropertyPath>EcslGrossAmount</PropertyPath>
+                                <PropertyPath>DiffBaseAmount</PropertyPath>
+                                <PropertyPath>DiffGrossAmount</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false" />
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.SortRestrictions">
+                    <Record>
+                        <PropertyValue Property="NonSortableProperties">
+                            <Collection>
+                                <PropertyPath>ID</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false" />
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/Messages">
                 <Annotation Term="Capabilities.DeleteRestrictions">
                     <Record>
                         <PropertyValue Property="Deletable" Path="Delete_mc" />
@@ -1222,9 +1351,8 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations
-                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/NewRecParameter"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/NewRecParameter">
                 <Annotation Term="Capabilities.DeleteRestrictions">
                     <Record>
                         <PropertyValue Property="Deletable" Bool="false" />
@@ -1271,9 +1399,8 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations
-                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/Reconciliation"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/Reconciliation">
                 <Annotation Term="Capabilities.DeleteRestrictions">
                     <Record>
                         <PropertyValue Property="Deletable" Path="Delete_mc" />
@@ -1333,6 +1460,15 @@
                                 </Record>
                                 <Record>
                                     <PropertyValue Property="NavigationProperty"
+                                        NavigationPropertyPath="to_DocumentSUM" />
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false" />
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty"
                                         NavigationPropertyPath="to_Messages" />
                                     <PropertyValue Property="InsertRestrictions">
                                         <Record>
@@ -1374,9 +1510,8 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations
-                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/xTAXERAxI_EC_COUNTRY"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/xTAXERAxI_EC_COUNTRY">
                 <Annotation Term="Capabilities.DeleteRestrictions">
                     <Record>
                         <PropertyValue Property="Deletable" Bool="false" />
@@ -1393,9 +1528,8 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations
-                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/xTAXERAxI_SF_COUNTRY"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/xTAXERAxI_SF_COUNTRY">
                 <Annotation Term="Capabilities.DeleteRestrictions">
                     <Record>
                         <PropertyValue Property="Deletable" Bool="false" />
@@ -1412,9 +1546,8 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations
-                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/xTAXERAxI_SF_STATUS_VH"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities/xTAXERAxI_SF_STATUS_VH">
                 <Annotation Term="Capabilities.DeleteRestrictions">
                     <Record>
                         <PropertyValue Property="Deletable" Bool="false" />
@@ -1431,160 +1564,176 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/CompanyCode"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/Box">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/Currencycode"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/CompanyCode">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/DiffBaseAmount"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/Currencycode">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/DiffGrossAmount"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/DiffBaseAmount">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/DiffTaxAmount"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/DiffGrossAmount">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/DocumentNo"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/DiffTaxAmount">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/EcslBaseAmount"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/DocumentNo">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/EcslGrossAmount"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/EcslBaseAmount">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/EcslTaxAmount"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/EcslCreatedAt">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/FiscalYear"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/EcslGrossAmount">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/PostingDate"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/EcslTaxAmount">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/Status"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/FiscalYear">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/TaxCode"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/PostingDate">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/VatrBaseAmount"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/Status">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/VatrGrossAmount"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/StatusText">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.DocumentType/VatrTaxAmount"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/TaxCode">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Detail"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/VatrBaseAmount">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Field"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/VatrCreatedAt">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Id"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/VatrGrossAmount">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Message"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/VatrTaxAmount">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV1"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Detail">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV2"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Field">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV3"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Id">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV4"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Message">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Msgnumber"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV1">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Msgrow"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV2">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Type"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV3">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/CompanyCodeList"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV4">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/ConvCreatedAt"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Msgnumber">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/ConvLastChangedAt"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Msgrow">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/CountryList"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Type">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/CreatedAt"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/CompanyCodeList">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/CreatedBy"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/ConvCreatedAt">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/CreatedByName"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/ConvLastChangedAt">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/LastChangedAt"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/CountryList">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/LastChangedBy"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/CreatedAt">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/LastChangedByName"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/CreatedBy">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/StatusText"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/CreatedByName">
                 <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/LastChangedAt">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
+            </Annotations>
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/LastChangedBy">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
+            </Annotations>
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/LastChangedByName">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
+            </Annotations>
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/StatusText">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Optional" />
+            </Annotations>
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.cds_xtaxeraxverecon_ui_Entities">
                 <Annotation Term="Org.OData.Capabilities.V1.BatchSupport">
                     <Record Type="Org.OData.Capabilities.V1.BatchSupportType">
                         <PropertyValue Property="ReferencesAcrossChangeSetsSupported" Bool="true" />
@@ -1633,136 +1782,146 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV1"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV1">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=SYMSGV&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=SYMSGV&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.xTAXERAxI_SF_COUNTRYType/Country"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.xTAXERAxI_SF_COUNTRYType/Country">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=LAND1&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=LAND1&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV4"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV4">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=SYMSGV&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=SYMSGV&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.CountryType/Country"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.CountryType/Country">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=LAND1&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=LAND1&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/LastChangedBy"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/LastChangedBy">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=ABP_LASTCHANGE_USER&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=ABP_LASTCHANGE_USER&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Msgnumber"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentSUMType/StatusText">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=SYMSGNO&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=VAL_TEXT&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Msgrow"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Msgnumber">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=BAPI_LINE&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=SYMSGNO&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.xTAXERAxI_EC_COUNTRYType/Country"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Msgrow">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=LAND1&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=BAPI_LINE&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV3"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.xTAXERAxI_EC_COUNTRYType/Country">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=SYMSGV&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=LAND1&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Message"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV3">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=%2FTAXERA%2FE_MESSAGE&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=SYMSGV&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Type"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.DocumentType/StatusText">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=BAPI_MTYPE&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=VAL_TEXT&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.xTAXERAxI_SF_STATUS_VHType/Description"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Message">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=VAL_TEXT&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=%2FTAXERA%2FE_MESSAGE&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.xTAXERAxI_SF_STATUS_VHType/Status"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Type">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=DOMVALUE_L&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=BAPI_MTYPE&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.CountryType/CountryThreeLetterISOCode"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.xTAXERAxI_SF_STATUS_VHType/Description">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=INTCA3&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=VAL_TEXT&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.CountryType/CountryThreeDigitISOCode"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.xTAXERAxI_SF_STATUS_VHType/Status">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=INTCN3&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=DOMVALUE_L&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.CompanyVHType/CountryName"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.CountryType/CountryThreeLetterISOCode">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=LANDX50&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=INTCA3&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.ReconciliationType/StatusText"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.CountryType/CountryThreeDigitISOCode">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=VAL_TEXT&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=INTCN3&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV2"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.CompanyVHType/CountryName">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=SYMSGV&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=LANDX50&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.CountryType/Country_Text"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.ReconciliationType/StatusText">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=LANDX50&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=VAL_TEXT&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Field"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/MessageV2">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=BAPI_FLD&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=SYMSGV&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.MessagesType/Id"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.CountryType/Country_Text">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=SYMSGID&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=LANDX50&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.xTAXERAxI_EC_COUNTRYType/CountryISOCode"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Field">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=INTCA&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=BAPI_FLD&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.xTAXERAxI_SF_COUNTRYType/CountryISOCode"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.MessagesType/Id">
                 <Annotation Term="SAP__common.DocumentationRef"
-                    String="urn:sap-com:documentation:key?=type=DE&amp;id=INTCA&amp;origin=DEV_100" />
+                    String="urn:sap-com:documentation:key?=type=DE&id=SYMSGID&origin=DEV_100" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__Currency/CurrencyCode"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.xTAXERAxI_EC_COUNTRYType/CountryISOCode">
+                <Annotation Term="SAP__common.DocumentationRef"
+                    String="urn:sap-com:documentation:key?=type=DE&id=INTCA&origin=DEV_100" />
+            </Annotations>
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.xTAXERAxI_SF_COUNTRYType/CountryISOCode">
+                <Annotation Term="SAP__common.DocumentationRef"
+                    String="urn:sap-com:documentation:key?=type=DE&id=INTCA&origin=DEV_100" />
+            </Annotations>
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__Currency/CurrencyCode">
                 <Annotation Term="SAP__common.Text" Path="Text" />
                 <Annotation Term="SAP__common.UnitSpecificScale" Path="DecimalPlaces" />
                 <Annotation Term="SAP__CodeList.StandardCode" Path="ISOCode" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__UnitOfMeasure/UnitCode"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__UnitOfMeasure/UnitCode">
                 <Annotation Term="SAP__common.Text" Path="Text" />
                 <Annotation Term="SAP__common.UnitSpecificScale" Path="DecimalPlaces" />
                 <Annotation Term="SAP__CodeList.StandardCode" Path="ISOCode" />
                 <Annotation Term="SAP__CodeList.ExternalCode" Path="ExternalCode" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__UnitOfMeasure"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__UnitOfMeasure">
                 <Annotation Term="SAP__core.AlternateKeys">
                     <Collection>
                         <Record>
@@ -1778,23 +1937,23 @@
                     </Collection>
                 </Annotation>
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__DocumentDescription/CreatedBy"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__DocumentDescription/CreatedBy">
                 <Annotation Term="SAP__core.Computed" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__DocumentDescription/CreatedAt"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__DocumentDescription/CreatedAt">
                 <Annotation Term="SAP__core.Computed" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__Format/TextDirectionLayout"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__Format/TextDirectionLayout">
                 <Annotation Term="SAP__core.Description"
                     String="Setting the text direction-layout is supported" />
                 <Annotation Term="SAP__core.LongDescription"
                     String="PDF supports setting the text direction-layout (e.g. left-to-right or right-to-left) in the document description" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__DocumentDescription"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__DocumentDescription">
                 <Annotation Term="SAP__capabilties.InsertRestrictions">
                     <Record>
                         <PropertyValue Property="Insertable" Bool="false" />
@@ -1834,8 +1993,8 @@
                     </Record>
                 </Annotation>
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__Format/FitToPage/ErrorRecoveryBehavior"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__Format/FitToPage/ErrorRecoveryBehavior">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1845,8 +2004,8 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__Format/FontName"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__Format/FontName">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1856,8 +2015,8 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__Format/PaperSize"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__Format/PaperSize">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1867,8 +2026,8 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__PDFHeader/Left"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__PDFHeader/Left">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1878,8 +2037,8 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__PDFHeader/Right"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__PDFHeader/Right">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1889,8 +2048,8 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__PDFHeader/Center"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__PDFHeader/Center">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1900,8 +2059,8 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__PDFFooter/Left"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__PDFFooter/Left">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1911,8 +2070,8 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__PDFFooter/Right"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__PDFFooter/Right">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1922,8 +2081,8 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__PDFFooter/Center"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__PDFFooter/Center">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1933,8 +2092,8 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__TableColumns/Format/Display_Format"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__TableColumns/Format/Display_Format">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1944,8 +2103,8 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__FileShare"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__FileShare">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1955,8 +2114,8 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__Format/Orientation"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__Format/Orientation">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1966,8 +2125,8 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <Annotations Target="cds_xtaxeraxverecon_ui.SAP__TableColumns/HorizontalAlignment"
-                xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotations xmlns="http://docs.oasis-open.org/odata/ns/edm"
+                Target="cds_xtaxeraxverecon_ui.SAP__TableColumns/HorizontalAlignment">
                 <Annotation Term="SAP__common.ValueListReferences">
                     <Record>
                         <PropertyValue Property="Url" String="./$metadata" />
@@ -1977,10 +2136,10 @@
                 </Annotation>
                 <Annotation Term="SAP__common.ValueListWithFixedValues" />
             </Annotations>
-            <atom:link rel="self" href="/sap/opu/odata/TAXERA/VERECON_UI_O2/$metadata"
-                xmlns:atom="http://www.w3.org/2005/Atom" />
-            <atom:link rel="latest-version" href="/sap/opu/odata/TAXERA/VERECON_UI_O2/$metadata"
-                xmlns:atom="http://www.w3.org/2005/Atom" />
+            <atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="self"
+                href="/sap/opu/odata/TAXERA/VERECON_UI_O2/$metadata" />
+            <atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="latest-version"
+                href="/sap/opu/odata/TAXERA/VERECON_UI_O2/$metadata" />
         </Schema>
     </edmx:DataServices>
 </edmx:Edmx>

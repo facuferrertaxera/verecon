@@ -6,8 +6,7 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "tech/taxera/taxreporting/verecon/utils/formatter",
     "tech/taxera/taxreporting/verecon/utils/types",
-    "sap/ui/core/ResizeHandler"
-], (BaseController, Filter, FilterOperator, Sorter, JSONModel, formatter, types, ResizeHandler) => {
+], (BaseController, Filter, FilterOperator, Sorter, JSONModel, formatter, types) => {
     "use strict";
 
     const ReconciliationDetailController = BaseController.extend("tech.taxera.taxreporting.verecon.controller.ReconciliationDetail", {
@@ -74,119 +73,42 @@ sap.ui.define([
         },
 
         /**
-         * Handler for route matched - loads reconciliation data
+         * Gets the AnalyticalTable from SmartTable
+         * @returns {sap.ui.table.AnalyticalTable|null} The AnalyticalTable instance or null
          */
-        onAfterRendering: function() {
-            // Ensure table container has proper height for Auto mode calculation
-            this._ensureTableHeight();
-        },
-
-        /**
-         * Ensures the table has proper height by calculating and setting visible row count
-         * This is called after rendering and when header toggles
-         */
-        _ensureTableHeight: function() {
-            const oTable = this.byId("documentsTable");
+        _getAnalyticalTable: function() {
             const oSmartTable = this.byId("documentsSmartTable");
-            
-            if (!oTable || !oSmartTable) {
-                return;
+            if (!oSmartTable) {
+                return null;
             }
-
-            // Use multiple attempts to ensure height is calculated
-            const fnCalculateHeight = () => {
-                const oTableDomRef = oTable.getDomRef();
-                const oSmartTableDomRef = oSmartTable.getDomRef();
-                
-                if (!oTableDomRef || !oSmartTableDomRef) {
-                    return;
-                }
-
-                // Get the table's content container (where rows are rendered)
-                const oTableCCnt = oTableDomRef.querySelector('.sapUiTableCCnt');
-                const oTableCtrl = oTableDomRef.querySelector('.sapUiTableCtrl');
-                const oTableHeader = oTableDomRef.querySelector('.sapUiTableColHdrCnt');
-                
-                if (!oTableCCnt || !oTableCtrl) {
-                    return;
-                }
-
-                // Get the actual available height for the content area
-                const iTableCCntHeight = oTableCCnt.clientHeight || oTableCCnt.offsetHeight;
-                const iTableHeight = oTableDomRef.offsetHeight || oTableDomRef.clientHeight;
-                
-                // Only proceed if we have a valid height
-                if (iTableCCntHeight > 0 || iTableHeight > 0) {
-                    // Get header height
-                    const iHeaderHeight = oTableHeader ? (oTableHeader.offsetHeight || oTableHeader.clientHeight || 0) : 66; // Default 2-row header
-                    
-                    // Get row height - try multiple methods
-                    let iRowHeight = 0;
-                    if (oTable.getRowHeight) {
-                        iRowHeight = oTable.getRowHeight();
-                    }
-                    if (iRowHeight === 0) {
-                        // Try to get from first visible content row
-                        const oFirstContentRow = oTableCtrl.querySelector('.sapUiTableContentRow');
-                        if (oFirstContentRow) {
-                            iRowHeight = oFirstContentRow.offsetHeight || oFirstContentRow.clientHeight;
-                        }
-                    }
-                    if (iRowHeight === 0) {
-                        // Fallback: check computed style or use default
-                        const oFirstRow = oTableCtrl.querySelector('.sapUiTableRow');
-                        if (oFirstRow) {
-                            const oStyle = window.getComputedStyle(oFirstRow);
-                            iRowHeight = parseInt(oStyle.height) || parseInt(oStyle.minHeight) || 34;
-                        } else {
-                            iRowHeight = 34; // Default fallback
-                        }
-                    }
-                    
-                    // Calculate available height for rows
-                    // Use the content container height minus header
-                    const iAvailableHeight = iTableCCntHeight > 0 ? iTableCCntHeight : (iTableHeight - iHeaderHeight);
-                    
-                    // Calculate visible row count (use available height divided by row height)
-                    if (iAvailableHeight > 0 && iRowHeight > 0) {
-                        const iCalculatedRowCount = Math.floor(iAvailableHeight / iRowHeight);
-                        
-                        // Only set if we get a reasonable count (at least 3 rows)
-                        if (iCalculatedRowCount >= 3) {
-                            // Switch to Fixed mode with calculated count
-                            if (oTable.getVisibleRowCountMode() !== "Fixed" || oTable.getVisibleRowCount() !== iCalculatedRowCount) {
-                                oTable.setVisibleRowCountMode("Fixed");
-                                oTable.setVisibleRowCount(iCalculatedRowCount);
-                            }
-                        } else if (oTable.getVisibleRowCountMode() === "Auto" && iTableHeight === 0) {
-                            // If Auto mode and zero height, try to trigger recalculation
-                            window.dispatchEvent(new Event('resize'));
-                            ResizeHandler.fireResize(oTableDomRef);
-                            ResizeHandler.fireResize(oSmartTableDomRef);
-                            oTable.invalidate();
-                        }
-                    }
-                } else {
-                    // If no height yet, try to trigger recalculation
-                    window.dispatchEvent(new Event('resize'));
-                    ResizeHandler.fireResize(oTableDomRef);
-                    oTable.invalidate();
-                }
-            };
-
-            // Try immediately
-            setTimeout(fnCalculateHeight, 50);
             
-            // Try again after a short delay (for async rendering)
-            setTimeout(fnCalculateHeight, 200);
+            // Try getTable method first
+            if (oSmartTable.getTable) {
+                const oTable = oSmartTable.getTable();
+                if (oTable && oTable.isA && oTable.isA("sap.ui.table.AnalyticalTable")) {
+                    return oTable;
+                }
+            }
             
-            // Try once more after header animations complete
-            setTimeout(fnCalculateHeight, 500);
+            // Try to find in aggregations
+            const oContent = oSmartTable.getContent && oSmartTable.getContent();
+            if (oContent && oContent.isA && oContent.isA("sap.ui.table.AnalyticalTable")) {
+                return oContent;
+            }
+            
+            // Try to find by searching aggregations
+            const aAggregations = oSmartTable.getAggregation("content") || [];
+            for (let i = 0; i < aAggregations.length; i++) {
+                if (aAggregations[i] && aAggregations[i].isA && aAggregations[i].isA("sap.ui.table.AnalyticalTable")) {
+                    return aAggregations[i];
+                }
+            }
+            
+            return null;
         },
 
         /**
          * Handler for DynamicPage header toggle
-         * Recalculates table height when header expands/collapses
          */
         onToggleHeader: function(oEvent) {
             const bExpanded = oEvent.getParameter("expanded");
@@ -195,11 +117,6 @@ sap.ui.define([
             if (oViewModel) {
                 oViewModel.setProperty("/reconciliationDetail/headerExpanded", bExpanded);
             }
-            
-            // Recalculate table height after header toggle animation
-            setTimeout(() => {
-                this._ensureTableHeight();
-            }, 400); // Wait for animation to complete
         },
 
         _onRouteMatched: function(oEvent) {
@@ -388,12 +305,24 @@ sap.ui.define([
                 },
                 dataReceived: (oEvent) => {
                     this.getView().setBusy(false);
-                    // Ensure table height after data is received
-                    setTimeout(() => {
-                        this._ensureTableHeight();
-                    }, 100);
+                    // Configure AnalyticalTable properties
+                    this._configureAnalyticalTable();
                 }
             };
+        },
+
+        /**
+         * Configure AnalyticalTable properties after it's created by SmartTable
+         */
+        _configureAnalyticalTable: function() {
+            const oTable = this._getAnalyticalTable();
+            
+            if (oTable && oTable.isA && oTable.isA("sap.ui.table.AnalyticalTable")) {
+                // Set AnalyticalTable properties
+                oTable.setAlternateRowColors(true);
+                oTable.setSelectionMode("None");
+                oTable.setEnableColumnFreeze(true);
+            }
         },
 
         /**
@@ -422,11 +351,6 @@ sap.ui.define([
             const oSmartTable = this.byId("documentsSmartTable");
             if (oSmartTable) {
                 oSmartTable.rebindTable();
-                
-                // Also ensure height after rebind (dataReceived will also call it)
-                setTimeout(() => {
-                    this._ensureTableHeight();
-                }, 300);
             }
         },
 

@@ -293,8 +293,8 @@ sap.ui.define([
             const oBindingParams = oEvent.getParameter("bindingParams");
             
             if (this._sReconciliationPath) {
-                // Set the binding path to the navigation property
-                oBindingParams.path = `${this._sReconciliationPath}/to_Document`;
+                // Set the binding path to the navigation property for aggregated view
+                oBindingParams.path = `${this._sReconciliationPath}/to_DocumentSUM`;
             }
             
             // Get existing filters or initialize empty array
@@ -396,7 +396,7 @@ sap.ui.define([
                 },
                 dataReceived: (oEvent) => {
                     this.getView().setBusy(false);
-                    // Calculate and update totals
+                    // Calculate and update totals (for footer display if needed)
                     this._updateTableTotals();
                     // Ensure table height after data is received
                     setTimeout(() => {

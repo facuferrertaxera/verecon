@@ -159,8 +159,8 @@
         <f:content>
             <st:SmartTable
                 id="documentsSmartTable"
-                entitySet="Document"
-                tableBindingPath="to_Document"
+                entitySet="DocumentSUM"
+                tableBindingPath="to_DocumentSUM"
                 tableType="AnalyticalTable"
                 useExportToExcel="true"
                 useVariantManagement="false"
@@ -265,7 +265,7 @@
                         </table:template>
                     </table:Column>
                     <!-- VAT Columns -->
-                    <table:Column width="8rem" sortProperty="VatrBaseAmount" filterProperty="VatrBaseAmount" hAlign="End" sum="VatrBaseAmount">
+                    <table:Column width="8rem" sortProperty="VatrBaseAmount" filterProperty="VatrBaseAmount" hAlign="End">
                         <table:customData>
                             <core:CustomData key="p13nData" value='\{"columnKey": "VatrBaseAmount", "leadingProperty": "VatrBaseAmount", "sortProperty": "VatrBaseAmount", "filterProperty": "VatrBaseAmount", "columnIndex": 5, "type": "numeric"}'/>
                         </table:customData>
@@ -276,7 +276,7 @@
                             <m:ObjectNumber number="{VatrBaseAmount}" unit="{Currencycode}" textAlign="End"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="VatrTaxAmount" filterProperty="VatrTaxAmount" hAlign="End" sum="VatrTaxAmount">
+                    <table:Column width="8rem" sortProperty="VatrTaxAmount" filterProperty="VatrTaxAmount" hAlign="End">
                         <table:customData>
                             <core:CustomData key="p13nData" value='\{"columnKey": "VatrTaxAmount", "leadingProperty": "VatrTaxAmount", "sortProperty": "VatrTaxAmount", "filterProperty": "VatrTaxAmount", "columnIndex": 6, "type": "numeric"}'/>
                         </table:customData>
@@ -287,7 +287,7 @@
                             <m:ObjectNumber number="{VatrTaxAmount}" unit="{Currencycode}" textAlign="End"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="VatrGrossAmount" filterProperty="VatrGrossAmount" hAlign="End" sum="VatrGrossAmount">
+                    <table:Column width="8rem" sortProperty="VatrGrossAmount" filterProperty="VatrGrossAmount" hAlign="End">
                         <table:customData>
                             <core:CustomData key="p13nData" value='\{"columnKey": "VatrGrossAmount", "leadingProperty": "VatrGrossAmount", "sortProperty": "VatrGrossAmount", "filterProperty": "VatrGrossAmount", "columnIndex": 7, "type": "numeric"}'/>
                         </table:customData>
@@ -299,7 +299,7 @@
                         </table:template>
                     </table:Column>
                     <!-- ECSL Columns -->
-                    <table:Column width="8rem" sortProperty="EcslTaxAmount" filterProperty="EcslTaxAmount" hAlign="End" sum="EcslTaxAmount">
+                    <table:Column width="8rem" sortProperty="EcslTaxAmount" filterProperty="EcslTaxAmount" hAlign="End">
                         <table:customData>
                             <core:CustomData key="p13nData" value='\{"columnKey": "EcslTaxAmount", "leadingProperty": "EcslTaxAmount", "sortProperty": "EcslTaxAmount", "filterProperty": "EcslTaxAmount", "columnIndex": 8, "type": "numeric"}'/>
                         </table:customData>
@@ -310,7 +310,7 @@
                             <m:ObjectNumber number="{EcslTaxAmount}" unit="{Currencycode}" textAlign="End"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="EcslBaseAmount" filterProperty="EcslBaseAmount" hAlign="End" sum="EcslBaseAmount">
+                    <table:Column width="8rem" sortProperty="EcslBaseAmount" filterProperty="EcslBaseAmount" hAlign="End">
                         <table:customData>
                             <core:CustomData key="p13nData" value='\{"columnKey": "EcslBaseAmount", "leadingProperty": "EcslBaseAmount", "sortProperty": "EcslBaseAmount", "filterProperty": "EcslBaseAmount", "columnIndex": 9, "type": "numeric"}'/>
                         </table:customData>
@@ -321,7 +321,7 @@
                             <m:ObjectNumber number="{EcslBaseAmount}" unit="{Currencycode}" textAlign="End"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="EcslGrossAmount" filterProperty="EcslGrossAmount" hAlign="End" sum="EcslGrossAmount">
+                    <table:Column width="8rem" sortProperty="EcslGrossAmount" filterProperty="EcslGrossAmount" hAlign="End">
                         <table:customData>
                             <core:CustomData key="p13nData" value='\{"columnKey": "EcslGrossAmount", "leadingProperty": "EcslGrossAmount", "sortProperty": "EcslGrossAmount", "filterProperty": "EcslGrossAmount", "columnIndex": 10, "type": "numeric"}'/>
                         </table:customData>
@@ -333,7 +333,7 @@
                         </table:template>
                     </table:Column>
                     <!-- Diff Columns -->
-                    <table:Column width="8rem" sortProperty="DiffBaseAmount" filterProperty="DiffBaseAmount" hAlign="End" sum="DiffBaseAmount">
+                    <table:Column width="8rem" sortProperty="DiffBaseAmount" filterProperty="DiffBaseAmount" hAlign="End">
                         <table:customData>
                             <core:CustomData key="p13nData" value='\{"columnKey": "DiffBaseAmount", "leadingProperty": "DiffBaseAmount", "sortProperty": "DiffBaseAmount", "filterProperty": "DiffBaseAmount", "columnIndex": 11, "type": "numeric"}'/>
                         </table:customData>
@@ -344,7 +344,7 @@
                             <m:ObjectNumber number="{DiffBaseAmount}" unit="{Currencycode}" state="{path: 'DiffBaseAmount', formatter: '.formatter.formatDiffAmountState'}" textAlign="End"/>
                         </table:template>
                     </table:Column>
-                    <table:Column width="8rem" sortProperty="DiffGrossAmount" filterProperty="DiffGrossAmount" hAlign="End" sum="DiffGrossAmount">
+                    <table:Column width="8rem" sortProperty="DiffGrossAmount" filterProperty="DiffGrossAmount" hAlign="End">
                         <table:customData>
                             <core:CustomData key="p13nData" value='\{"columnKey": "DiffGrossAmount", "leadingProperty": "DiffGrossAmount", "sortProperty": "DiffGrossAmount", "filterProperty": "DiffGrossAmount", "columnIndex": 12, "type": "numeric"}'/>
                         </table:customData>

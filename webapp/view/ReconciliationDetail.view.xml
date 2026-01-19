@@ -167,7 +167,6 @@
                 showTablePersonalisation="true"
                 initialise="true"
                 beforeRebindTable="onBeforeRebindDocumentsTable"
-                requestAtLeastFields="CompanyCode,Box,DocumentNo,TaxCode,Currencycode,VatrBaseAmount,VatrTaxAmount,VatrGrossAmount,EcslBaseAmount,EcslTaxAmount,EcslGrossAmount,DiffBaseAmount,DiffGrossAmount,Status,StatusText"
                 class="sapUiNoContentPadding"
                 height="100%">
                     <st:customToolbar>

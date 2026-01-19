@@ -21,10 +21,8 @@
         "type": "OData",
         "settings": {
           "annotations": [
-            {
-              "type": "ODataAnnotation",
-              "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='%2FTAXERA%2FVERECON_UI_O2_VAN',Version='0001')/$value/"
-            }
+            "TAXERA_VERECON_UI_O2_VAN",
+            "annotation"
           ],
           "odataVersion": "2.0"
         }

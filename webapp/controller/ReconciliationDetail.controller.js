@@ -6,13 +6,8 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "tech/taxera/taxreporting/verecon/utils/formatter",
     "tech/taxera/taxreporting/verecon/utils/types",
-    "sap/ui/core/ResizeHandler",
-    "sap/m/GroupHeaderListItem",
-    "sap/m/Text",
-    "sap/m/ColumnListItem",
-    "sap/m/VBox",
-    "sap/m/Title"
-], (BaseController, Filter, FilterOperator, Sorter, JSONModel, formatter, types, ResizeHandler, GroupHeaderListItem, Text, ColumnListItem, VBox, Title) => {
+    "sap/ui/core/ResizeHandler"
+], (BaseController, Filter, FilterOperator, Sorter, JSONModel, formatter, types, ResizeHandler) => {
     "use strict";
 
     const ReconciliationDetailController = BaseController.extend("tech.taxera.taxreporting.verecon.controller.ReconciliationDetail", {
@@ -412,125 +407,18 @@ sap.ui.define([
         },
 
         /**
-         * Factory function for creating group headers with subtotals
-         * Returns a ColumnListItem with cells aligned to table columns
-         */
-        onGroupHeaderFactory: function(oGroup) {
-            const oController = this;
-            const sGroupKey = oGroup ? oGroup.key : "";
-            
-            // Create cells array matching table columns
-            const aCells = [];
-            
-            // First cell: Group title with subtotals info
-            const oGroupTitleBox = new VBox({
-                class: "sapUiTinyMargin"
-            });
-            
-            let sTitle = oGroup ? oGroup.text : "";
-            const oTitle = new Title({
-                text: sTitle,
-                titleStyle: "H6",
-                class: "sapUiTinyMarginBottom"
-            });
-            oGroupTitleBox.addItem(oTitle);
-            
-            // Add subtotals text
-            const oSubtotalsText = new Text({
-                text: "Subtotals",
-                class: "sapUiTinyMarginTop"
-            });
-            oGroupTitleBox.addItem(oSubtotalsText);
-            
-            aCells.push(oGroupTitleBox);
-            
-            // Empty cells for non-numeric columns (DocumentNo, PostingDate, Box, TaxCode)
-            aCells.push(new Text({text: ""}));
-            aCells.push(new Text({text: ""}));
-            aCells.push(new Text({text: ""}));
-            aCells.push(new Text({text: ""}));
-            
-            // Hidden cells for hidden columns (FiscalYear, Currencycode)
-            aCells.push(new Text({text: "", visible: false}));
-            aCells.push(new Text({text: "", visible: false}));
-            
-            // Get group totals from model if available
-            const oGroupTotalsModel = this.getView().getModel("groupTotals");
-            const oGroupTotal = oGroupTotalsModel && sGroupKey ? oGroupTotalsModel.getProperty(`/${sGroupKey}`) : null;
-            
-            // Helper function to create currency cell
-            const fnCreateCurrencyCell = (sFieldName) => {
-                let sText = "";
-                if (oGroupTotal && oGroupTotal[sFieldName]) {
-                    const fValue = parseFloat(oGroupTotal[sFieldName] || 0);
-                    if (!isNaN(fValue) && fValue !== 0) {
-                        const fRounded = Math.round(fValue * 100) / 100;
-                        const sCurrency = oGroupTotal.Currencycode || "";
-                        sText = fRounded.toFixed(2) + " " + sCurrency;
-                    }
-                }
-                return new Text({
-                    text: sText,
-                    textAlign: "End",
-                    class: "sapMTableGroupHeaderCell"
-                });
-            };
-            
-            // Numeric columns with subtotals (aligned with table columns)
-            aCells.push(fnCreateCurrencyCell("VatrBaseAmount"));
-            aCells.push(fnCreateCurrencyCell("VatrTaxAmount"));
-            aCells.push(fnCreateCurrencyCell("VatrGrossAmount"));
-            aCells.push(fnCreateCurrencyCell("EcslTaxAmount"));
-            aCells.push(fnCreateCurrencyCell("EcslBaseAmount"));
-            aCells.push(fnCreateCurrencyCell("EcslGrossAmount"));
-            aCells.push(fnCreateCurrencyCell("DiffBaseAmount"));
-            aCells.push(fnCreateCurrencyCell("DiffGrossAmount"));
-            
-            // Last cell for Status column
-            aCells.push(new Text({text: ""}));
-            
-            // Create and return ColumnListItem styled as group header
-            return new ColumnListItem({
-                class: "sapUiTableGroupHeaderRow",
-                cells: aCells
-            });
-        },
-
-        /**
          * Group function for grouping by CompanyCode and Box
+         * Used by AnalyticalTable for grouping
          */
         _groupByCompanyCodeAndBox: function(oContext) {
             const sCompanyCode = oContext.getProperty("CompanyCode") || "";
             const sBox = oContext.getProperty("Box") || "";
             const sKey = `${sCompanyCode}|${sBox}`;
-            let sText = sBox ? `${sCompanyCode} - ${sBox}` : sCompanyCode;
-            
-            // Get subtotals for this group if available
-            const oGroupTotalsModel = this.getView().getModel("groupTotals");
-            if (oGroupTotalsModel) {
-                const oGroupTotal = oGroupTotalsModel.getProperty(`/${sKey}`);
-                if (oGroupTotal) {
-                    const sCurrency = oGroupTotal.Currencycode || "";
-                    const aSubtotals = [];
-                    
-                    // Add key subtotals if they have values
-                    if (oGroupTotal.DiffGrossAmount) {
-                        const fDiffGross = Math.abs(parseFloat(oGroupTotal.DiffGrossAmount || 0));
-                        if (fDiffGross > 0) {
-                            aSubtotals.push(`Diff: ${fDiffGross.toFixed(2)} ${sCurrency}`);
-                        }
-                    }
-                    
-                    if (aSubtotals.length > 0) {
-                        sText = `${sText} | ${aSubtotals.join(", ")}`;
-                    }
-                }
-            }
+            const sText = sBox ? `${sCompanyCode} - ${sBox}` : sCompanyCode;
             
             return {
                 key: sKey,
-                text: sText,
-                groupKey: sKey
+                text: sText
             };
         },
 

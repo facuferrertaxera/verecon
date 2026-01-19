@@ -179,8 +179,7 @@
                         id="documentsTable"
                         alternateRowColors="true"
                         selectionMode="None"
-                        enableColumnFreeze="true"
-                        visibleRowCountMode="Auto">
+                        enableColumnFreeze="true">
                     </table:AnalyticalTable>
                 </st:SmartTable>
         </f:content>

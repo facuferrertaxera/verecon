@@ -167,7 +167,6 @@
                 showTablePersonalisation="true"
                 initialise="true"
                 beforeRebindTable="onBeforeRebindDocumentsTable"
-                initialVisibleFields="CompanyCode,DocumentNo,PostingDate,Box,TaxCode,VatrBaseAmount,VatrTaxAmount,VatrGrossAmount,EcslTaxAmount,EcslBaseAmount,EcslGrossAmount,DiffBaseAmount,DiffGrossAmount,Status"
                 class="sapUiNoContentPadding"
                 height="100%">
                     <st:customToolbar>

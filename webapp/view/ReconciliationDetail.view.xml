@@ -185,32 +185,8 @@
                         mode="None"
                         growing="true"
                         growingScrollToLoad="true"
-                        growingThreshold="100">
-                <groupHeaderTemplate>
-                    <ColumnListItem class="sapUiTableGroupHeaderRow">
-                        <cells>
-                            <VBox>
-                                <Title text="{text}" titleStyle="H6" class="sapUiTinyMarginBottom"/>
-                                <Text text="Subtotals" class="sapUiTinyMarginTop"/>
-                            </VBox>
-                            <Text text=""/>
-                            <Text text=""/>
-                            <Text text=""/>
-                            <Text text=""/>
-                            <Text text="" visible="false"/>
-                            <Text text="" visible="false"/>
-                            <Text text="{parts: [{path: 'groupTotals>/'}, {path: 'key'}, {value: 'VatrBaseAmount'}, {value: 'Currencycode'}], formatter: '.formatter.formatGroupSubtotalCurrency'}" textAlign="End" class="sapMTableGroupHeaderCell"/>
-                            <Text text="{parts: [{path: 'groupTotals>/'}, {path: 'key'}, {value: 'VatrTaxAmount'}, {value: 'Currencycode'}], formatter: '.formatter.formatGroupSubtotalCurrency'}" textAlign="End" class="sapMTableGroupHeaderCell"/>
-                            <Text text="{parts: [{path: 'groupTotals>/'}, {path: 'key'}, {value: 'VatrGrossAmount'}, {value: 'Currencycode'}], formatter: '.formatter.formatGroupSubtotalCurrency'}" textAlign="End" class="sapMTableGroupHeaderCell"/>
-                            <Text text="{parts: [{path: 'groupTotals>/'}, {path: 'key'}, {value: 'EcslTaxAmount'}, {value: 'Currencycode'}], formatter: '.formatter.formatGroupSubtotalCurrency'}" textAlign="End" class="sapMTableGroupHeaderCell"/>
-                            <Text text="{parts: [{path: 'groupTotals>/'}, {path: 'key'}, {value: 'EcslBaseAmount'}, {value: 'Currencycode'}], formatter: '.formatter.formatGroupSubtotalCurrency'}" textAlign="End" class="sapMTableGroupHeaderCell"/>
-                            <Text text="{parts: [{path: 'groupTotals>/'}, {path: 'key'}, {value: 'EcslGrossAmount'}, {value: 'Currencycode'}], formatter: '.formatter.formatGroupSubtotalCurrency'}" textAlign="End" class="sapMTableGroupHeaderCell"/>
-                            <Text text="{parts: [{path: 'groupTotals>/'}, {path: 'key'}, {value: 'DiffBaseAmount'}, {value: 'Currencycode'}], formatter: '.formatter.formatGroupSubtotalCurrency'}" textAlign="End" class="sapMTableGroupHeaderCell"/>
-                            <Text text="{parts: [{path: 'groupTotals>/'}, {path: 'key'}, {value: 'DiffGrossAmount'}, {value: 'Currencycode'}], formatter: '.formatter.formatGroupSubtotalCurrency'}" textAlign="End" class="sapMTableGroupHeaderCell"/>
-                            <Text text=""/>
-                        </cells>
-                    </ColumnListItem>
-                </groupHeaderTemplate>
+                        growingThreshold="100"
+                        groupHeaderFactory="onGroupHeaderFactory">
                 <columns>
                     <Column demandPopin="true" hAlign="Left">
                         <customData>

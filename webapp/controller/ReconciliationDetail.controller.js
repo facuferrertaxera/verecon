@@ -238,6 +238,9 @@ sap.ui.define([
                 return;
             }
 
+            // Store ReconId for filtering DocumentSUM
+            this._sReconId = sReconId;
+
             // Get the reconciliation context
             // Format GUID correctly for OData V2: guid'...'
             const sReconciliationPath = `/Reconciliation(guid'${sReconId}')`;
@@ -281,24 +284,34 @@ sap.ui.define([
         },
 
         /**
-         * Store reconciliation path for SmartTable binding
+         * Store ReconId for filtering DocumentSUM
          */
-        _sReconciliationPath: null,
+        _sReconId: null,
 
         /**
          * Handler for SmartTable beforeRebindTable event
-         * Sets up the binding path to the navigation property and applies filters
+         * Filters DocumentSUM by ReconId and applies additional filters
          */
         onBeforeRebindDocumentsTable: function(oEvent) {
             const oBindingParams = oEvent.getParameter("bindingParams");
             
-            if (this._sReconciliationPath) {
-                // Set the binding path to the navigation property for aggregated view
-                oBindingParams.path = `${this._sReconciliationPath}/to_DocumentSUM`;
-            }
-            
             // Get existing filters or initialize empty array
             let aFilters = oBindingParams.filters || [];
+            
+            // Add filter for ReconId if available
+            if (this._sReconId) {
+                // Remove any existing ReconId filter
+                aFilters = aFilters.filter(function(oFilter) {
+                    return oFilter.sPath !== "ReconId";
+                });
+                
+                // Add ReconId filter
+                aFilters.push(new Filter({
+                    path: "ReconId",
+                    operator: FilterOperator.EQ,
+                    value1: this._sReconId
+                }));
+            }
             
             // Get filter flags from view model
             const oViewModel = this.getView().getModel("view");
@@ -631,13 +644,11 @@ sap.ui.define([
         },
 
         /**
-         * Bind the documents SmartTable to the navigation property
+         * Bind the documents SmartTable - triggers rebind with ReconId filter
          */
         _bindDocumentsTable: function(sReconciliationPath) {
-            // Store the path for use in onBeforeRebindDocumentsTable
-            this._sReconciliationPath = sReconciliationPath;
-            
             // Trigger rebind on the SmartTable
+            // The ReconId filter will be applied in onBeforeRebindDocumentsTable
             const oSmartTable = this.byId("documentsSmartTable");
             if (oSmartTable) {
                 oSmartTable.rebindTable();

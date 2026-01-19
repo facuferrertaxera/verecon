@@ -158,7 +158,6 @@
             <st:SmartTable
                 id="documentsSmartTable"
                 entitySet="DocumentSUM"
-                tableBindingPath="to_DocumentSUM"
                 tableType="AnalyticalTable"
                 useExportToExcel="true"
                 useVariantManagement="false"

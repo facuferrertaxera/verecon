@@ -358,10 +358,10 @@ sap.ui.define([
                 const oResponse = await this.promRead("/DocumentSUM", {
                     filters: [
                         new Filter("ReconId", FilterOperator.EQ, this._sReconId),
-                        new Filter("DiffGrossAmount", FilterOperator.NE, 0)
+                        new Filter("AbsDiffBaseAmount", FilterOperator.NE, 0)
                     ],
                     urlParameters: {
-                        "$select": "DiffGrossAmount"
+                        "$select": "AbsDiffBaseAmount"
                     }
                 });
 
@@ -371,11 +371,10 @@ sap.ui.define([
                     
                     // With analytical view, selecting only aggregated measure without dimensions
                     // should return one row with the total, but may return multiple if grouped
-                    // We'll sum all DiffGrossAmount values and count rows
+                    // We'll sum all AbsDiffBaseAmount values and count rows
                     oResponse.results.forEach((oDocument) => {
                         if (oDocument) {
-                            const fDiffAmount = Math.abs(oDocument.DiffGrossAmount || 0);
-                            // Use absolute value for total difference
+                            const fDiffAmount = oDocument.AbsDiffBaseAmount || 0; // Already absolute value
                             fTotalDifference += fDiffAmount;
                             // Count rows (each row represents grouped documents)
                             if (fDiffAmount > 0) {
@@ -482,7 +481,7 @@ sap.ui.define([
         /**
          * Load status card data from the full unfiltered dataset using DocumentSUM analytical view
          * This should only be called once when route is matched
-         * Uses aggregation to group by Status and sum DiffGrossAmount - $select acts like GROUP BY
+         * Uses aggregation to group by Status and sum AbsDiffBaseAmount - $select acts like GROUP BY
          */
         _loadStatusCardData: async function() {
             if (!this._sReconId) {
@@ -491,14 +490,14 @@ sap.ui.define([
 
             try {
                 // Read from DocumentSUM analytical view directly
-                // Select Status as dimension and DiffGrossAmount as aggregated measure
-                // This groups by Status and sums DiffGrossAmount for each status group
+                // Select Status as dimension and AbsDiffBaseAmount as aggregated measure
+                // This groups by Status and sums AbsDiffBaseAmount for each status group
                 const oResponse = await this.promRead("/DocumentSUM", {
                     filters: [
                         new Filter("ReconId", FilterOperator.EQ, this._sReconId)
                     ],
                     urlParameters: {
-                        "$select": "Status,StatusText,DiffGrossAmount"
+                        "$select": "Status,StatusText,AbsDiffBaseAmount"
                     }
                 });
 
@@ -509,29 +508,29 @@ sap.ui.define([
                         mismatched: { count: 0, total: 0 }
                     };
 
-                    // Process grouped results - each row is already grouped by Status with aggregated DiffGrossAmount
+                    // Process grouped results - each row is already grouped by Status with aggregated AbsDiffBaseAmount
                     oResponse.results.forEach((oDocument) => {
                         if (!oDocument) {
                             return;
                         }
 
-                        const fDiffAmount = Math.abs(oDocument.DiffGrossAmount || 0);
+                        const fDiffAmount = oDocument.AbsDiffBaseAmount || 0; // Already absolute value
                         const sStatus = oDocument.Status || "";
 
                         // Not in EC Sales List: Status = "NE"
                         if (sStatus === "NE") {
                             mStatusData.notInEcsl.count++; // Count of groups (represents documents)
-                            mStatusData.notInEcsl.total += fDiffAmount; // Sum of aggregated DiffGrossAmount
+                            mStatusData.notInEcsl.total += fDiffAmount; // Sum of aggregated AbsDiffBaseAmount
                         }
                         // Not in VAT Return: Status = "NV"
                         else if (sStatus === "NV") {
                             mStatusData.notInVatr.count++; // Count of groups (represents documents)
-                            mStatusData.notInVatr.total += fDiffAmount; // Sum of aggregated DiffGrossAmount
+                            mStatusData.notInVatr.total += fDiffAmount; // Sum of aggregated AbsDiffBaseAmount
                         }
                         // Mismatched Documents: Status = "E" (Error)
                         else if (sStatus === "E") {
                             mStatusData.mismatched.count++; // Count of groups (represents documents)
-                            mStatusData.mismatched.total += fDiffAmount; // Sum of aggregated DiffGrossAmount
+                            mStatusData.mismatched.total += fDiffAmount; // Sum of aggregated AbsDiffBaseAmount
                         }
                     });
 

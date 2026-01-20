@@ -106,7 +106,7 @@
                         <OverflowToolbarButton icon="sap-icon://delete" tooltip="{i18n>reconciliationList.Delete}" press="onDeleteReconciliation" enabled="{= ${view>/reconciliationList/bEditMode} &amp;&amp; ${view>/reconciliationList/bDeleteEnabled} }"/>
                     </OverflowToolbar>
                 </st:customToolbar>
-                <Table id="reconcilesTable" sticky="ColumnHeaders,HeaderToolbar" mode="{= ${view>/reconciliationList/bEditMode} ? 'SingleSelectLeft' : 'None'}" selectionChange="onSelectReconciliation" growing="true" growingScrollToLoad="true" growingThreshold="100">
+                <Table id="reconcilesTable" sticky="ColumnHeaders,HeaderToolbar" mode="{= ${view>/reconciliationList/bEditMode} ? 'SingleSelectLeft' : 'None'}" selectionChange="onSelectReconciliation" growing="true" growingScrollToLoad="true" growingThreshold="100" updateFinished="onTableUpdateFinished">
                     <columns>
                         <Column width="20rem">
                             <customData>
@@ -154,8 +154,8 @@
                     <items>
                         <ColumnListItem type="Navigation" press="onReconciliationPress">
                             <cells>
-                                <Tokenizer id="countryListCellTokenizer" editable="false" class="sapUiTinyMargin selectedCountriesTokenizer" width="100%" multiLine="true"/>
-                                <Tokenizer id="companyCodeListCellTokenizer" editable="false" class="sapUiTinyMargin selectedCountriesTokenizer" width="100%" multiLine="true"/>
+                                <Tokenizer editable="false" class="sapUiTinyMargin selectedCountriesTokenizer" width="100%" multiLine="true"/>
+                                <Tokenizer editable="false" class="sapUiTinyMargin selectedCountriesTokenizer" width="100%" multiLine="true"/>
                                 <Text text="{path: 'FromDate', type: '.types.TaxeraDateType'}"/>
                                 <Text text="{path: 'ToDate', type: '.types.TaxeraDateType'}"/>
                                 <ObjectStatus inverted="false" text="{StatusText}" icon="{path: 'Status', formatter: '.formatter.formatReconciliationStatusIcon' }" state="{path: 'Status', formatter: '.formatter.formatReconciliationStatusColor' }"/>

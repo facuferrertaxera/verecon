@@ -747,6 +747,39 @@ sap.ui.define([
         },
 
         /**
+         * Handler for table updateFinished event
+         * Populates tokenizers whenever table rows are updated (including growing/pagination)
+         * This ensures tokenizers are populated even when rows are added incrementally
+         */
+        onTableUpdateFinished: async function() {
+            console.log("[onTableUpdateFinished] Table update finished");
+            const oTable = this.getView().byId("reconcilesTable");
+            if (!oTable) {
+                console.log("[onTableUpdateFinished] Table not found");
+                return;
+            }
+
+            // Wait for component maps to be ready
+            const oComponent = this.getOwnerComponent();
+            if (oComponent && oComponent.getMapsReadyPromise) {
+                try {
+                    console.log("[onTableUpdateFinished] Waiting for component maps to be ready...");
+                    await oComponent.getMapsReadyPromise();
+                    console.log("[onTableUpdateFinished] Component maps ready");
+                } catch (oError) {
+                    console.error("[onTableUpdateFinished] Error waiting for maps:", oError);
+                    // Continue anyway - maps might be partially loaded
+                }
+            } else {
+                console.log("[onTableUpdateFinished] No component maps promise found, proceeding anyway");
+            }
+
+            // Maps are ready (or promise resolved), populate tokenizers
+            console.log("[onTableUpdateFinished] Populating tokenizers");
+            this._populateTableTokenizers();
+        },
+
+        /**
          * Handler for table data received - populate tokenizers
          * Note: setTokens() exists on ValueHelpDialog, but for Tokenizer controls
          * we must use removeAllTokens() and addToken() methods

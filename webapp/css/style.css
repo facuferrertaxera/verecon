@@ -29,6 +29,15 @@
     width: 100% !important;
 }
 
+/* Total Difference Currency - Small text aligned to baseline of amount (red color) */
+.totalDifferenceCurrency {
+    font-size: 1.5rem !important;
+    font-weight: normal !important;
+    color: #bb0000 !important;
+    margin-left: 0.5rem !important;
+    line-height: 1 !important;
+}
+
 /* Total Difference Card - Active state (red background, white text) */
 .totalDifferenceCardActive {
     background-color: #e53935 !important;
@@ -43,6 +52,10 @@
 }
 
 .totalDifferenceCardActive .totalDifferenceValue {
+    color: #ffffff !important;
+}
+
+.totalDifferenceCardActive .totalDifferenceCurrency {
     color: #ffffff !important;
 }
 
@@ -79,6 +92,15 @@
     width: 100% !important;
 }
 
+/* Status Card Currency - Small text aligned to baseline of amount (blue color) */
+.statusCardCurrency {
+    font-size: 1.5rem !important;
+    font-weight: normal !important;
+    color: #0070F2 !important;
+    margin-left: 0.5rem !important;
+    line-height: 1 !important;
+}
+
 /* Status Card - Active state (blue background, white text) */
 .statusCardActive {
     background-color: #0070F2 !important;
@@ -93,6 +115,10 @@
 }
 
 .statusCardActive .statusCardValue {
+    color: #ffffff !important;
+}
+
+.statusCardActive .statusCardCurrency {
     color: #ffffff !important;
 }
 

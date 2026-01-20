@@ -96,14 +96,13 @@
                                 <VBox width="100%" height="100%" class="sapUiSmallMargin statusCardContent">
                                     <Title text="{i18n>reconciliationDetail.NotInEcsl}" titleStyle="H6" class="sapUiTinyMarginBottom" />
                                     <VBox justifyContent="Center" alignItems="Center" width="100%" class="statusCardValueContainer">
-                                        <HBox justifyContent="Center" alignItems="Center" width="100%">
+                                        <HBox justifyContent="Center" alignItems="Baseline" width="100%">
                                             <Text 
                                                 text="{path: 'view>/reconciliationDetail/statusCards/notInEcsl/total', formatter: '.formatter.formatNumberWithScale'}" 
                                                 class="statusCardValue" />
                                             <Text 
                                                 text="{view>/reconciliationDetail/statusCards/notInEcsl/currency}"
-                                                class="sapUiTinyMarginBegin"
-                                                style="font-size: 1.5rem; font-weight: normal; color: inherit;" />
+                                                class="statusCardCurrency" />
                                         </HBox>
                                         <Text 
                                             text="{path: 'view>/reconciliationDetail/statusCards/notInEcsl/count', formatter: '.formatter.formatDocCount'}" 
@@ -125,14 +124,13 @@
                                 <VBox width="100%" height="100%" class="sapUiSmallMargin statusCardContent">
                                     <Title text="{i18n>reconciliationDetail.NotInVatr}" titleStyle="H6" class="sapUiTinyMarginBottom" />
                                     <VBox justifyContent="Center" alignItems="Center" width="100%" class="statusCardValueContainer">
-                                        <HBox justifyContent="Center" alignItems="Center" width="100%">
+                                        <HBox justifyContent="Center" alignItems="Baseline" width="100%">
                                             <Text 
                                                 text="{path: 'view>/reconciliationDetail/statusCards/notInVatr/total', formatter: '.formatter.formatNumberWithScale'}" 
                                                 class="statusCardValue" />
                                             <Text 
                                                 text="{view>/reconciliationDetail/statusCards/notInVatr/currency}"
-                                                class="sapUiTinyMarginBegin"
-                                                style="font-size: 1.5rem; font-weight: normal; color: inherit;" />
+                                                class="statusCardCurrency" />
                                         </HBox>
                                         <Text 
                                             text="{path: 'view>/reconciliationDetail/statusCards/notInVatr/count', formatter: '.formatter.formatDocCount'}" 
@@ -151,14 +149,13 @@
                                 <VBox width="100%" height="100%" class="sapUiSmallMargin totalDifferenceCardContent">
                                     <Title text="{i18n>reconciliationDetail.TotalDifference}" titleStyle="H6" class="sapUiTinyMarginBottom" />
                                     <VBox justifyContent="Center" alignItems="Center" width="100%" class="totalDifferenceValueContainer">
-                                        <HBox justifyContent="Center" alignItems="Center" width="100%">
+                                        <HBox justifyContent="Center" alignItems="Baseline" width="100%">
                                             <Text 
                                                 text="{path: 'view>/reconciliationDetail/totalDifference/value', formatter: '.formatter.formatNumberWithScale'}" 
                                                 class="totalDifferenceValue" />
                                             <Text 
                                                 text="{view>/reconciliationDetail/totalDifference/currency}"
-                                                class="sapUiTinyMarginBegin"
-                                                style="font-size: 1.5rem; font-weight: normal; color: inherit;" />
+                                                class="totalDifferenceCurrency" />
                                         </HBox>
                                         <Text 
                                             text="{path: 'view>/reconciliationDetail/totalDifference/count', formatter: '.formatter.formatDocCount'}" 

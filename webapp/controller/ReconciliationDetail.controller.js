@@ -372,7 +372,8 @@ sap.ui.define([
                     // Process individual document rows - each row represents one document
                     oResponse.results.forEach((oDocument) => {
                         if (oDocument) {
-                            const fDiffAmount = oDocument.AbsDiffBaseAmount || 0; // Already absolute value
+                            // Convert to number to avoid string concatenation issues
+                            const fDiffAmount = parseFloat(oDocument.AbsDiffBaseAmount) || 0; // Already absolute value
                             fTotalDifference += fDiffAmount;
                             // Count individual documents with differences
                             if (fDiffAmount > 0) {
@@ -512,7 +513,8 @@ sap.ui.define([
                             return;
                         }
 
-                        const fDiffAmount = oDocument.AbsDiffBaseAmount || 0; // Already absolute value
+                        // Convert to number to avoid string concatenation issues
+                        const fDiffAmount = parseFloat(oDocument.AbsDiffBaseAmount) || 0; // Already absolute value
                         const sStatus = oDocument.Status || "";
 
                         // Not in EC Sales List: Status = "NE"

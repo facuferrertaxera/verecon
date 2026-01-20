@@ -353,15 +353,15 @@ sap.ui.define([
 
             try {
                 // Read from DocumentSUM analytical view directly
-                // Select only aggregated measure to get total sum across all documents
-                // Using $select with aggregated fields calculates totals at the server
+                // Include DocId to get one row per document (not aggregated into groups)
+                // This ensures we can count individual documents correctly
                 const oResponse = await this.promRead("/DocumentSUM", {
                     filters: [
                         new Filter("ReconId", FilterOperator.EQ, this._sReconId),
                         new Filter("AbsDiffBaseAmount", FilterOperator.NE, 0)
                     ],
                     urlParameters: {
-                        "$select": "AbsDiffBaseAmount"
+                        "$select": "DocId,AbsDiffBaseAmount"
                     }
                 });
 
@@ -369,14 +369,12 @@ sap.ui.define([
                     let fTotalDifference = 0;
                     let iCount = 0;
                     
-                    // With analytical view, selecting only aggregated measure without dimensions
-                    // should return one row with the total, but may return multiple if grouped
-                    // We'll sum all AbsDiffBaseAmount values and count rows
+                    // Process individual document rows - each row represents one document
                     oResponse.results.forEach((oDocument) => {
                         if (oDocument) {
                             const fDiffAmount = oDocument.AbsDiffBaseAmount || 0; // Already absolute value
                             fTotalDifference += fDiffAmount;
-                            // Count rows (each row represents grouped documents)
+                            // Count individual documents with differences
                             if (fDiffAmount > 0) {
                                 iCount++;
                             }
@@ -406,14 +404,14 @@ sap.ui.define([
 
             try {
                 // Read from DocumentSUM analytical view directly
-                // Select Status as dimension to group by status (acts like GROUP BY Status)
-                // This returns one row per unique Status value
+                // Include DocId to get one row per document (not grouped by Status only)
+                // This ensures we can count individual documents correctly
                 const oResponse = await this.promRead("/DocumentSUM", {
                     filters: [
                         new Filter("ReconId", FilterOperator.EQ, this._sReconId)
                     ],
                     urlParameters: {
-                        "$select": "Status,StatusText"
+                        "$select": "DocId,Status,StatusText"
                     }
                 });
 
@@ -425,7 +423,7 @@ sap.ui.define([
                         "E": 0   // Error
                     };
 
-                    // Count rows by status (each row represents grouped documents with that status)
+                    // Count individual documents by status (each row represents one document)
                     oResponse.results.forEach((oDocument) => {
                         if (!oDocument) {
                             return;
@@ -490,14 +488,14 @@ sap.ui.define([
 
             try {
                 // Read from DocumentSUM analytical view directly
-                // Select Status as dimension and AbsDiffBaseAmount as aggregated measure
-                // This groups by Status and sums AbsDiffBaseAmount for each status group
+                // Include DocId to get one row per document (not grouped by Status only)
+                // This ensures we can count individual documents correctly
                 const oResponse = await this.promRead("/DocumentSUM", {
                     filters: [
                         new Filter("ReconId", FilterOperator.EQ, this._sReconId)
                     ],
                     urlParameters: {
-                        "$select": "Status,StatusText,AbsDiffBaseAmount"
+                        "$select": "DocId,Status,StatusText,AbsDiffBaseAmount"
                     }
                 });
 
@@ -508,7 +506,7 @@ sap.ui.define([
                         mismatched: { count: 0, total: 0 }
                     };
 
-                    // Process grouped results - each row is already grouped by Status with aggregated AbsDiffBaseAmount
+                    // Process individual document rows - each row represents one document
                     oResponse.results.forEach((oDocument) => {
                         if (!oDocument) {
                             return;
@@ -519,18 +517,18 @@ sap.ui.define([
 
                         // Not in EC Sales List: Status = "NE"
                         if (sStatus === "NE") {
-                            mStatusData.notInEcsl.count++; // Count of groups (represents documents)
-                            mStatusData.notInEcsl.total += fDiffAmount; // Sum of aggregated AbsDiffBaseAmount
+                            mStatusData.notInEcsl.count++; // Count individual documents
+                            mStatusData.notInEcsl.total += fDiffAmount; // Sum AbsDiffBaseAmount
                         }
                         // Not in VAT Return: Status = "NV"
                         else if (sStatus === "NV") {
-                            mStatusData.notInVatr.count++; // Count of groups (represents documents)
-                            mStatusData.notInVatr.total += fDiffAmount; // Sum of aggregated AbsDiffBaseAmount
+                            mStatusData.notInVatr.count++; // Count individual documents
+                            mStatusData.notInVatr.total += fDiffAmount; // Sum AbsDiffBaseAmount
                         }
                         // Mismatched Documents: Status = "E" (Error)
                         else if (sStatus === "E") {
-                            mStatusData.mismatched.count++; // Count of groups (represents documents)
-                            mStatusData.mismatched.total += fDiffAmount; // Sum of aggregated AbsDiffBaseAmount
+                            mStatusData.mismatched.count++; // Count individual documents
+                            mStatusData.mismatched.total += fDiffAmount; // Sum AbsDiffBaseAmount
                         }
                     });
 

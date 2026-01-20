@@ -20,6 +20,12 @@ sap.ui.define([
             if (sStatus === "S") {
                 return "sap-icon://accept";
             }
+
+            // S (Success) - Success icon (tick)
+            // Using accept icon which is more reliable than sys-enter-2
+            if (sStatus === "RS") {
+                return "sap-icon://accept";
+            }
             
             // RF (Reconciliation Failed) - Error icon (cross)
             if (sStatus === "RF") {
@@ -32,7 +38,7 @@ sap.ui.define([
             }
             
             // P (Extraction in Progress) - Clock icon
-            if (sStatus === "P") {
+            if (sStatus === "RP") {
                 return "sap-icon://time-entry-request";
             }
             
@@ -56,14 +62,24 @@ sap.ui.define([
                 return "Success";
             }
             
+            // RS (Reconciliation Success) - Success (green)
+            if (sStatus === "RS") {
+                return "Success";
+            }
+            
             // RF (Reconciliation Failed) - Error (red)
             if (sStatus === "RF") {
                 return "Error";
             }
             
             // P (Extraction in Progress) - Information (blue)
-            if (sStatus === "P") {
+            if (sStatus === "RP") {
                 return "Information";
+            }
+            
+            // E (Error) - Error (red)
+            if (sStatus === "E") {
+                return "Error";
             }
             
             // Default fallback

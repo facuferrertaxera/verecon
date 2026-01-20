@@ -22,19 +22,6 @@ sap.ui.define([
                     chartFiltersVisible: true,
                     chartsHeight: "200px",
                     donutHeight: "150px",
-                    selectedCountry: "",
-                    bChartShowError: false,
-                    headerFilters: {
-                        statusDonutChart: {
-                            segments: []
-                        },
-                        documentTypeBarChart: {
-                            bars: []
-                        },
-                        submissionDateLineChart: {
-                            points: []
-                        }
-                    },
                     totalDifference: {
                         value: 0,
                         count: 0,
@@ -158,9 +145,9 @@ sap.ui.define([
                         this._bindDocumentsTable(sReconciliationPath);
                         
                         // Load total difference, donut chart, and status card data from the full unfiltered dataset
-                        this._loadTotalDifference(sReconciliationPath);
-                        this._loadDonutChartData(sReconciliationPath);
-                        this._loadStatusCardData(sReconciliationPath);
+                        this._loadTotalDifference();
+                        this._loadDonutChartData();
+                        this._loadStatusCardData();
                     },
                     change: (oEvent) => {
                         // Handle binding errors
@@ -355,192 +342,207 @@ sap.ui.define([
         },
 
         /**
-         * Load total difference from the full unfiltered dataset
+         * Load total difference from the full unfiltered dataset using DocumentSUM analytical view
          * This should only be called once when route is matched
+         * Uses aggregation to calculate totals - $select with aggregated fields acts like GROUP BY
          */
-        _loadTotalDifference: function(sReconciliationPath) {
-            const oModel = this.getModel();
-            if (!oModel) {
+        _loadTotalDifference: async function() {
+            if (!this._sReconId) {
                 return;
             }
 
-            // Read all documents without any filters to calculate total difference
-            // Use a high $top value to get all records (SAP UI5 defaults to $top=100)
-            oModel.read(`${sReconciliationPath}/to_Document`, {
-                urlParameters: {
-                    "$select": "DiffGrossAmount",
-                    "$top": "999999"  // Set high limit to get all records
-                },
-                success: (oResponse) => {
-                    if (oResponse && oResponse.results) {
-                        let fTotalDifference = 0;
-                        let iCount = 0;
-                        oResponse.results.forEach((oDocument) => {
-                            if (oDocument) {
-                                const fDiffAmount = Math.abs(oDocument.DiffGrossAmount || 0);
-                                // Use absolute value for total difference
-                                fTotalDifference += fDiffAmount;
-                                // Count documents with differences greater than 0
-                                if (fDiffAmount > 0) {
-                                    iCount++;
-                                }
-                            }
-                        });
-                        
-                        const oViewModel = this.getView().getModel("view");
-                        if (oViewModel) {
-                            oViewModel.setProperty("/reconciliationDetail/totalDifference/value", fTotalDifference);
-                            oViewModel.setProperty("/reconciliationDetail/totalDifference/count", iCount);
-                        }
+            try {
+                // Read from DocumentSUM analytical view directly
+                // Select only aggregated measure to get total sum across all documents
+                // Using $select with aggregated fields calculates totals at the server
+                const oResponse = await this.promRead("/DocumentSUM", {
+                    filters: [
+                        new Filter("ReconId", FilterOperator.EQ, this._sReconId),
+                        new Filter("DiffGrossAmount", FilterOperator.NE, 0)
+                    ],
+                    urlParameters: {
+                        "$select": "DiffGrossAmount"
                     }
-                },
-                error: (oError) => {
-                    console.error("Error loading total difference:", oError);
-                }
-            });
-        },
+                });
 
-        /**
-         * Load donut chart data from the full unfiltered dataset
-         * This should only be called once when route is matched
-         */
-        _loadDonutChartData: function(sReconciliationPath) {
-            const oModel = this.getModel();
-            if (!oModel) {
-                return;
-            }
-
-            // Read all documents without any filters to calculate donut chart data
-            // Use a high $top value to get all records (SAP UI5 defaults to $top=100)
-            oModel.read(`${sReconciliationPath}/to_Document`, {
-                urlParameters: {
-                    "$select": "Status,StatusText",
-                    "$top": "999999"  // Set high limit to get all records
-                },
-                success: (oResponse) => {
-                    if (oResponse && oResponse.results) {
-                        const mStatusCounts = {
-                            "S": 0,  // Reconciled
-                            "NE": 0, // Not in ECSL
-                            "NV": 0, // Not in VAT Return
-                            "E": 0   // Error
-                        };
-
-                        // Count documents by status
-                        oResponse.results.forEach((oDocument) => {
-                            if (!oDocument) {
-                                return;
-                            }
-
-                            const sStatus = oDocument.Status || "";
-                            if (mStatusCounts.hasOwnProperty(sStatus)) {
-                                mStatusCounts[sStatus]++;
-                            } else if (sStatus && sStatus.indexOf("S") === 0) {
-                                // Any status starting with S is considered Reconciled
-                                mStatusCounts["S"]++;
-                            }
-                        });
-
-                        // Create segments array for donut chart
-                        const aSegments = [
-                            {
-                                label: "Reconciled",
-                                value: mStatusCounts["S"],
-                                displayedValue: mStatusCounts["S"].toString(),
-                                status: "S"
-                            },
-                            {
-                                label: "Not in ECSL",
-                                value: mStatusCounts["NE"],
-                                displayedValue: mStatusCounts["NE"].toString(),
-                                status: "NE"
-                            },
-                            {
-                                label: "Not in VAT Return",
-                                value: mStatusCounts["NV"],
-                                displayedValue: mStatusCounts["NV"].toString(),
-                                status: "NV"
-                            },
-                            {
-                                label: "Other differences",
-                                value: mStatusCounts["E"],
-                                displayedValue: mStatusCounts["E"].toString(),
-                                status: "E"
-                            }
-                        ];
-
-                        const oViewModel = this.getView().getModel("view");
-                        if (oViewModel) {
-                            oViewModel.setProperty("/reconciliationDetail/donutChartData/segments", aSegments);
-                        }
-                    }
-                },
-                error: (oError) => {
-                    console.error("Error loading donut chart data:", oError);
-                }
-            });
-        },
-
-        /**
-         * Load status card data from the full unfiltered dataset
-         * This should only be called once when route is matched
-         */
-        _loadStatusCardData: function(sReconciliationPath) {
-            const oModel = this.getModel();
-            if (!oModel) {
-                return;
-            }
-
-            // Read all documents without any filters to calculate status card data
-            // Use a high $top value to get all records (SAP UI5 defaults to $top=100)
-            oModel.read(`${sReconciliationPath}/to_Document`, {
-                urlParameters: {
-                    "$select": "Status,StatusText,DiffGrossAmount",
-                    "$top": "999999"  // Set high limit to get all records
-                },
-                success: (oResponse) => {
-                    if (oResponse && oResponse.results) {
-                        const mStatusData = {
-                            notInEcsl: { count: 0, total: 0 },
-                            notInVatr: { count: 0, total: 0 },
-                            mismatched: { count: 0, total: 0 }
-                        };
-
-                        oResponse.results.forEach((oDocument) => {
-                            if (!oDocument) {
-                                return;
-                            }
-
+                if (oResponse && oResponse.results) {
+                    let fTotalDifference = 0;
+                    let iCount = 0;
+                    
+                    // With analytical view, selecting only aggregated measure without dimensions
+                    // should return one row with the total, but may return multiple if grouped
+                    // We'll sum all DiffGrossAmount values and count rows
+                    oResponse.results.forEach((oDocument) => {
+                        if (oDocument) {
                             const fDiffAmount = Math.abs(oDocument.DiffGrossAmount || 0);
-                            const sStatus = oDocument.Status || "";
-
-                            // Not in EC Sales List: Status = "NE"
-                            if (sStatus === "NE") {
-                                mStatusData.notInEcsl.count++;
-                                mStatusData.notInEcsl.total += fDiffAmount;
+                            // Use absolute value for total difference
+                            fTotalDifference += fDiffAmount;
+                            // Count rows (each row represents grouped documents)
+                            if (fDiffAmount > 0) {
+                                iCount++;
                             }
-                            // Not in VAT Return: Status = "NV"
-                            else if (sStatus === "NV") {
-                                mStatusData.notInVatr.count++;
-                                mStatusData.notInVatr.total += fDiffAmount;
-                            }
-                            // Mismatched Documents: Status = "E" (Error)
-                            else if (sStatus === "E") {
-                                mStatusData.mismatched.count++;
-                                mStatusData.mismatched.total += fDiffAmount;
-                            }
-                        });
-
-                        const oViewModel = this.getView().getModel("view");
-                        if (oViewModel) {
-                            oViewModel.setProperty("/reconciliationDetail/statusCards", mStatusData);
                         }
+                    });
+                    
+                    const oViewModel = this.getView().getModel("view");
+                    if (oViewModel) {
+                        oViewModel.setProperty("/reconciliationDetail/totalDifference/value", fTotalDifference);
+                        oViewModel.setProperty("/reconciliationDetail/totalDifference/count", iCount);
                     }
-                },
-                error: (oError) => {
-                    console.error("Error loading status card data:", oError);
                 }
-            });
+            } catch (oError) {
+                console.error("Error loading total difference:", oError);
+            }
+        },
+
+        /**
+         * Load donut chart data from the full unfiltered dataset using DocumentSUM analytical view
+         * This should only be called once when route is matched
+         * Uses aggregation to group by Status - $select with Status as dimension groups results
+         */
+        _loadDonutChartData: async function() {
+            if (!this._sReconId) {
+                return;
+            }
+
+            try {
+                // Read from DocumentSUM analytical view directly
+                // Select Status as dimension to group by status (acts like GROUP BY Status)
+                // This returns one row per unique Status value
+                const oResponse = await this.promRead("/DocumentSUM", {
+                    filters: [
+                        new Filter("ReconId", FilterOperator.EQ, this._sReconId)
+                    ],
+                    urlParameters: {
+                        "$select": "Status,StatusText"
+                    }
+                });
+
+                if (oResponse && oResponse.results) {
+                    const mStatusCounts = {
+                        "S": 0,  // Reconciled
+                        "NE": 0, // Not in ECSL
+                        "NV": 0, // Not in VAT Return
+                        "E": 0   // Error
+                    };
+
+                    // Count rows by status (each row represents grouped documents with that status)
+                    oResponse.results.forEach((oDocument) => {
+                        if (!oDocument) {
+                            return;
+                        }
+
+                        const sStatus = oDocument.Status || "";
+                        if (mStatusCounts.hasOwnProperty(sStatus)) {
+                            mStatusCounts[sStatus]++;
+                        } else if (sStatus && sStatus.indexOf("S") === 0) {
+                            // Any status starting with S is considered Reconciled
+                            mStatusCounts["S"]++;
+                        }
+                    });
+
+                    // Create segments array for donut chart
+                    const aSegments = [
+                        {
+                            label: "Reconciled",
+                            value: mStatusCounts["S"],
+                            displayedValue: mStatusCounts["S"].toString(),
+                            status: "S"
+                        },
+                        {
+                            label: "Not in ECSL",
+                            value: mStatusCounts["NE"],
+                            displayedValue: mStatusCounts["NE"].toString(),
+                            status: "NE"
+                        },
+                        {
+                            label: "Not in VAT Return",
+                            value: mStatusCounts["NV"],
+                            displayedValue: mStatusCounts["NV"].toString(),
+                            status: "NV"
+                        },
+                        {
+                            label: "Other differences",
+                            value: mStatusCounts["E"],
+                            displayedValue: mStatusCounts["E"].toString(),
+                            status: "E"
+                        }
+                    ];
+
+                    const oViewModel = this.getView().getModel("view");
+                    if (oViewModel) {
+                        oViewModel.setProperty("/reconciliationDetail/donutChartData/segments", aSegments);
+                    }
+                }
+            } catch (oError) {
+                console.error("Error loading donut chart data:", oError);
+            }
+        },
+
+        /**
+         * Load status card data from the full unfiltered dataset using DocumentSUM analytical view
+         * This should only be called once when route is matched
+         * Uses aggregation to group by Status and sum DiffGrossAmount - $select acts like GROUP BY
+         */
+        _loadStatusCardData: async function() {
+            if (!this._sReconId) {
+                return;
+            }
+
+            try {
+                // Read from DocumentSUM analytical view directly
+                // Select Status as dimension and DiffGrossAmount as aggregated measure
+                // This groups by Status and sums DiffGrossAmount for each status group
+                const oResponse = await this.promRead("/DocumentSUM", {
+                    filters: [
+                        new Filter("ReconId", FilterOperator.EQ, this._sReconId)
+                    ],
+                    urlParameters: {
+                        "$select": "Status,StatusText,DiffGrossAmount"
+                    }
+                });
+
+                if (oResponse && oResponse.results) {
+                    const mStatusData = {
+                        notInEcsl: { count: 0, total: 0 },
+                        notInVatr: { count: 0, total: 0 },
+                        mismatched: { count: 0, total: 0 }
+                    };
+
+                    // Process grouped results - each row is already grouped by Status with aggregated DiffGrossAmount
+                    oResponse.results.forEach((oDocument) => {
+                        if (!oDocument) {
+                            return;
+                        }
+
+                        const fDiffAmount = Math.abs(oDocument.DiffGrossAmount || 0);
+                        const sStatus = oDocument.Status || "";
+
+                        // Not in EC Sales List: Status = "NE"
+                        if (sStatus === "NE") {
+                            mStatusData.notInEcsl.count++; // Count of groups (represents documents)
+                            mStatusData.notInEcsl.total += fDiffAmount; // Sum of aggregated DiffGrossAmount
+                        }
+                        // Not in VAT Return: Status = "NV"
+                        else if (sStatus === "NV") {
+                            mStatusData.notInVatr.count++; // Count of groups (represents documents)
+                            mStatusData.notInVatr.total += fDiffAmount; // Sum of aggregated DiffGrossAmount
+                        }
+                        // Mismatched Documents: Status = "E" (Error)
+                        else if (sStatus === "E") {
+                            mStatusData.mismatched.count++; // Count of groups (represents documents)
+                            mStatusData.mismatched.total += fDiffAmount; // Sum of aggregated DiffGrossAmount
+                        }
+                    });
+
+                    const oViewModel = this.getView().getModel("view");
+                    if (oViewModel) {
+                        oViewModel.setProperty("/reconciliationDetail/statusCards", mStatusData);
+                    }
+                }
+            } catch (oError) {
+                console.error("Error loading status card data:", oError);
+            }
         },
 
         /**

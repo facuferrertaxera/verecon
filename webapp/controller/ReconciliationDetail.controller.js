@@ -361,16 +361,17 @@ sap.ui.define([
                         new Filter("AbsDiffBaseAmount", FilterOperator.NE, 0)
                     ],
                     urlParameters: {
-                        "$select": "DocId,AbsDiffBaseAmount"
+                        "$select": "DocId,AbsDiffBaseAmount,Currencycode"
                     }
                 });
 
                 if (oResponse && oResponse.results) {
                     let fTotalDifference = 0;
                     let iCount = 0;
+                    let sCurrency = "";
                     
                     // Process individual document rows - each row represents one document
-                    oResponse.results.forEach((oDocument) => {
+                    oResponse.results.forEach((oDocument, iIndex) => {
                         if (oDocument) {
                             // Convert to number to avoid string concatenation issues
                             const fDiffAmount = parseFloat(oDocument.AbsDiffBaseAmount) || 0; // Already absolute value
@@ -379,6 +380,10 @@ sap.ui.define([
                             if (fDiffAmount > 0) {
                                 iCount++;
                             }
+                            // Get currency code from first document (all should have same currency)
+                            if (iIndex === 0 && oDocument.Currencycode) {
+                                sCurrency = oDocument.Currencycode;
+                            }
                         }
                     });
                     
@@ -386,6 +391,9 @@ sap.ui.define([
                     if (oViewModel) {
                         oViewModel.setProperty("/reconciliationDetail/totalDifference/value", fTotalDifference);
                         oViewModel.setProperty("/reconciliationDetail/totalDifference/count", iCount);
+                        if (sCurrency) {
+                            oViewModel.setProperty("/reconciliationDetail/totalDifference/currency", sCurrency);
+                        }
                     }
                 }
             } catch (oError) {
@@ -496,15 +504,15 @@ sap.ui.define([
                         new Filter("ReconId", FilterOperator.EQ, this._sReconId)
                     ],
                     urlParameters: {
-                        "$select": "DocId,Status,StatusText,AbsDiffBaseAmount"
+                        "$select": "DocId,Status,StatusText,AbsDiffBaseAmount,Currencycode"
                     }
                 });
 
                 if (oResponse && oResponse.results) {
                     const mStatusData = {
-                        notInEcsl: { count: 0, total: 0 },
-                        notInVatr: { count: 0, total: 0 },
-                        mismatched: { count: 0, total: 0 }
+                        notInEcsl: { count: 0, total: 0, currency: "" },
+                        notInVatr: { count: 0, total: 0, currency: "" },
+                        mismatched: { count: 0, total: 0, currency: "" }
                     };
 
                     // Process individual document rows - each row represents one document
@@ -516,21 +524,31 @@ sap.ui.define([
                         // Convert to number to avoid string concatenation issues
                         const fDiffAmount = parseFloat(oDocument.AbsDiffBaseAmount) || 0; // Already absolute value
                         const sStatus = oDocument.Status || "";
+                        const sCurrency = oDocument.Currencycode || "";
 
                         // Not in EC Sales List: Status = "NE"
                         if (sStatus === "NE") {
                             mStatusData.notInEcsl.count++; // Count individual documents
                             mStatusData.notInEcsl.total += fDiffAmount; // Sum AbsDiffBaseAmount
+                            if (sCurrency && !mStatusData.notInEcsl.currency) {
+                                mStatusData.notInEcsl.currency = sCurrency;
+                            }
                         }
                         // Not in VAT Return: Status = "NV"
                         else if (sStatus === "NV") {
                             mStatusData.notInVatr.count++; // Count individual documents
                             mStatusData.notInVatr.total += fDiffAmount; // Sum AbsDiffBaseAmount
+                            if (sCurrency && !mStatusData.notInVatr.currency) {
+                                mStatusData.notInVatr.currency = sCurrency;
+                            }
                         }
                         // Mismatched Documents: Status = "E" (Error)
                         else if (sStatus === "E") {
                             mStatusData.mismatched.count++; // Count individual documents
                             mStatusData.mismatched.total += fDiffAmount; // Sum AbsDiffBaseAmount
+                            if (sCurrency && !mStatusData.mismatched.currency) {
+                                mStatusData.mismatched.currency = sCurrency;
+                            }
                         }
                     });
 

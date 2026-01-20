@@ -353,15 +353,15 @@ sap.ui.define([
 
             try {
                 // Read from DocumentSUM analytical view directly
-                // Include DocId to get one row per document (not aggregated into groups)
-                // This ensures we can count individual documents correctly
+                // Use aggregated Counter property for count and AbsDiffBaseAmount for total
+                // The analytical view aggregates these values at the server
                 const oResponse = await this.promRead("/DocumentSUM", {
                     filters: [
                         new Filter("ReconId", FilterOperator.EQ, this._sReconId),
                         new Filter("AbsDiffBaseAmount", FilterOperator.NE, 0)
                     ],
                     urlParameters: {
-                        "$select": "DocId,AbsDiffBaseAmount,Currencycode"
+                        "$select": "Counter,AbsDiffBaseAmount,Currencycode"
                     }
                 });
 
@@ -370,16 +370,15 @@ sap.ui.define([
                     let iCount = 0;
                     let sCurrency = "";
                     
-                    // Process individual document rows - each row represents one document
+                    // Process aggregated results - Counter provides the aggregated count
                     oResponse.results.forEach((oDocument, iIndex) => {
                         if (oDocument) {
                             // Convert to number to avoid string concatenation issues
                             const fDiffAmount = parseFloat(oDocument.AbsDiffBaseAmount) || 0; // Already absolute value
                             fTotalDifference += fDiffAmount;
-                            // Count individual documents with differences
-                            if (fDiffAmount > 0) {
-                                iCount++;
-                            }
+                            // Use aggregated Counter for document count
+                            const iDocCount = parseFloat(oDocument.Counter) || 0;
+                            iCount += iDocCount;
                             // Get currency code from first document (all should have same currency)
                             if (iIndex === 0 && oDocument.Currencycode) {
                                 sCurrency = oDocument.Currencycode;
@@ -413,14 +412,14 @@ sap.ui.define([
 
             try {
                 // Read from DocumentSUM analytical view directly
-                // Include DocId to get one row per document (not grouped by Status only)
-                // This ensures we can count individual documents correctly
+                // Select Status and Counter - analytical view groups by Status
+                // Counter provides aggregated count per status group
                 const oResponse = await this.promRead("/DocumentSUM", {
                     filters: [
                         new Filter("ReconId", FilterOperator.EQ, this._sReconId)
                     ],
                     urlParameters: {
-                        "$select": "DocId,Status,StatusText"
+                        "$select": "Status,StatusText,Counter"
                     }
                 });
 
@@ -432,18 +431,20 @@ sap.ui.define([
                         "E": 0   // Error
                     };
 
-                    // Count individual documents by status (each row represents one document)
+                    // Process aggregated results - each row is grouped by Status with aggregated Counter
                     oResponse.results.forEach((oDocument) => {
                         if (!oDocument) {
                             return;
                         }
 
                         const sStatus = oDocument.Status || "";
+                        const iDocCount = parseFloat(oDocument.Counter) || 0; // Aggregated count from server
+                        
                         if (mStatusCounts.hasOwnProperty(sStatus)) {
-                            mStatusCounts[sStatus]++;
+                            mStatusCounts[sStatus] += iDocCount; // Use aggregated Counter
                         } else if (sStatus && sStatus.indexOf("S") === 0) {
                             // Any status starting with S is considered Reconciled
-                            mStatusCounts["S"]++;
+                            mStatusCounts["S"] += iDocCount; // Use aggregated Counter
                         }
                     });
 
@@ -497,14 +498,14 @@ sap.ui.define([
 
             try {
                 // Read from DocumentSUM analytical view directly
-                // Include DocId to get one row per document (not grouped by Status only)
-                // This ensures we can count individual documents correctly
+                // Select Status, Counter, and AbsDiffBaseAmount - analytical view groups by Status
+                // Counter provides aggregated count per status group
                 const oResponse = await this.promRead("/DocumentSUM", {
                     filters: [
                         new Filter("ReconId", FilterOperator.EQ, this._sReconId)
                     ],
                     urlParameters: {
-                        "$select": "DocId,Status,StatusText,AbsDiffBaseAmount,Currencycode"
+                        "$select": "Status,StatusText,Counter,AbsDiffBaseAmount,Currencycode"
                     }
                 });
 
@@ -515,7 +516,7 @@ sap.ui.define([
                         mismatched: { count: 0, total: 0, currency: "" }
                     };
 
-                    // Process individual document rows - each row represents one document
+                    // Process aggregated results - each row is grouped by Status with aggregated Counter and AbsDiffBaseAmount
                     oResponse.results.forEach((oDocument) => {
                         if (!oDocument) {
                             return;
@@ -523,12 +524,13 @@ sap.ui.define([
 
                         // Convert to number to avoid string concatenation issues
                         const fDiffAmount = parseFloat(oDocument.AbsDiffBaseAmount) || 0; // Already absolute value
+                        const iDocCount = parseFloat(oDocument.Counter) || 0; // Aggregated count from server
                         const sStatus = oDocument.Status || "";
                         const sCurrency = oDocument.Currencycode || "";
 
                         // Not in EC Sales List: Status = "NE"
                         if (sStatus === "NE") {
-                            mStatusData.notInEcsl.count++; // Count individual documents
+                            mStatusData.notInEcsl.count += iDocCount; // Use aggregated Counter
                             mStatusData.notInEcsl.total += fDiffAmount; // Sum AbsDiffBaseAmount
                             if (sCurrency && !mStatusData.notInEcsl.currency) {
                                 mStatusData.notInEcsl.currency = sCurrency;
@@ -536,7 +538,7 @@ sap.ui.define([
                         }
                         // Not in VAT Return: Status = "NV"
                         else if (sStatus === "NV") {
-                            mStatusData.notInVatr.count++; // Count individual documents
+                            mStatusData.notInVatr.count += iDocCount; // Use aggregated Counter
                             mStatusData.notInVatr.total += fDiffAmount; // Sum AbsDiffBaseAmount
                             if (sCurrency && !mStatusData.notInVatr.currency) {
                                 mStatusData.notInVatr.currency = sCurrency;
@@ -544,7 +546,7 @@ sap.ui.define([
                         }
                         // Mismatched Documents: Status = "E" (Error)
                         else if (sStatus === "E") {
-                            mStatusData.mismatched.count++; // Count individual documents
+                            mStatusData.mismatched.count += iDocCount; // Use aggregated Counter
                             mStatusData.mismatched.total += fDiffAmount; // Sum AbsDiffBaseAmount
                             if (sCurrency && !mStatusData.mismatched.currency) {
                                 mStatusData.mismatched.currency = sCurrency;
